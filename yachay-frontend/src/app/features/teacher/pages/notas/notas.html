@@ -1,0 +1,57 @@
+<section class="grid gap-6">
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div>
+      <h1 class="text-3xl font-extrabold text-yachay-900">Notas</h1>
+      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Registro y revisión de calificaciones por curso.</p>
+    </div>
+    <button type="button" class="btn-primary w-full sm:w-auto">Registrar nota</button>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <input type="search" class="input" placeholder="Buscar alumno, curso o bimestre" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar notas" />
+    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
+      <option value="TODOS">Todos</option>
+      <option value="REGISTRADA">Registrada</option>
+      <option value="OBSERVADA">Observada</option>
+      <option value="ANULADA">Anulada</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[78rem] border-collapse text-left text-sm">
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th class="px-5 py-4 font-extrabold" scope="col">Alumno</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Bimestre</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Nota</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Observación</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Registro</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (grade of filteredGrades(); track grade.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ grade.alumno }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.curso }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ grade.bimestre }}</td>
+            <td class="px-5 py-4 text-lg font-extrabold text-yachay-900">{{ grade.nota }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.observacion }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.fechaRegistro }}</td>
+            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ grade.estado }}</span></td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar nota</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Anular nota</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="8" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay notas para los filtros seleccionados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

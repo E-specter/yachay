@@ -1,0 +1,161 @@
+<section class="min-h-screen bg-cloud text-ink-dark">
+  @if (mobileSidebarOpen()) {
+    <button
+      type="button"
+      class="fixed inset-0 z-40 bg-ink-dark/40 backdrop-blur-sm lg:hidden"
+      aria-label="Cerrar menu lateral"
+      (click)="closeMobileSidebar()"
+    ></button>
+  }
+
+  <aside [class]="sidebarClass()" aria-label="Navegacion administrador">
+    <div class="border-b border-brown/10 p-5">
+      <div class="flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="grid size-11 place-items-center rounded-lg bg-ink-dark text-sm font-black text-white" aria-hidden="true">YA</div>
+          @if (!sidebarCollapsed()) {
+            <div>
+              <h1 class="text-2xl font-black text-ink-dark">Yachay</h1>
+              <p class="text-sm font-extrabold text-brown">Administracion</p>
+            </div>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="grid size-10 place-items-center rounded-lg bg-ink-dark text-white transition hover:bg-brown lg:hidden"
+          aria-label="Cerrar menu lateral"
+          (click)="closeMobileSidebar()"
+        >
+          <app-icon name="close" className="h-5 w-5" />
+        </button>
+      </div>
+
+      @if (!sidebarCollapsed()) {
+        <div class="mt-5 rounded-lg border border-brown/10 bg-cloud p-4">
+          <p class="text-xs font-black uppercase tracking-wide text-brown">Colegio</p>
+          <p class="mt-2 text-sm font-black text-ink-dark">Manuel Gonzales Prada</p>
+        </div>
+      }
+    </div>
+
+    <nav class="grid gap-1 overflow-y-auto p-4" aria-label="Administracion">
+      @for (item of navItems; track item.path) {
+        <a
+          [routerLink]="item.path"
+          routerLinkActive="bg-sky-soft/45 text-ink-dark shadow-sm"
+          [routerLinkActiveOptions]="{ exact: item.exact }"
+          class="group flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-extrabold text-brown transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-soft/35 hover:text-ink-dark hover:shadow-sm"
+          (click)="closeMobileSidebar()"
+        >
+          <span class="grid size-9 shrink-0 place-items-center rounded-lg bg-cloud text-brown transition group-hover:bg-white group-hover:text-ink-dark">
+            <app-icon [name]="item.icon" className="h-5 w-5" />
+          </span>
+          @if (!sidebarCollapsed()) {
+            <span>{{ item.label }}</span>
+          }
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <main [class]="mainClass()">
+    <header class="sticky top-0 z-30 border-b border-brown/10 bg-white/90 px-4 py-3 backdrop-blur lg:px-6">
+      <div class="flex items-center justify-between gap-4">
+        <div class="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            class="grid size-11 place-items-center rounded-lg bg-ink-dark text-white transition hover:bg-brown lg:hidden"
+            aria-label="Abrir menu lateral"
+            (click)="openMobileSidebar()"
+          >
+            <app-icon name="menu" className="h-6 w-6" />
+          </button>
+
+          <button
+            type="button"
+            class="hidden size-11 place-items-center rounded-lg bg-ink-dark text-white transition hover:bg-brown lg:grid"
+            aria-label="Colapsar menu lateral"
+            (click)="toggleCollapsed()"
+          >
+            <app-icon name="menu" className="h-6 w-6" />
+          </button>
+
+          <div class="min-w-0">
+            <p class="text-xs font-black uppercase tracking-wide text-brown">Campus Virtual</p>
+            <h2 class="truncate text-lg font-black text-ink-dark md:text-xl">{{ sectionTitle }}</h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            class="relative grid size-11 place-items-center rounded-lg border border-brown/10 bg-cloud text-ink-dark transition hover:-translate-y-0.5 hover:shadow-lg"
+            aria-label="Ver notificaciones"
+          >
+            <app-icon name="notification" className="h-5 w-5" />
+            <span class="absolute -right-1 -top-1 rounded-full bg-green-soft px-1.5 py-0.5 text-[10px] font-black text-ink-dark shadow">
+              {{ notificationCount }}
+            </span>
+          </button>
+
+          <div class="relative">
+            <button
+              type="button"
+              class="flex items-center gap-3 rounded-lg border border-brown/10 bg-white p-1.5 pr-3 transition hover:-translate-y-0.5 hover:shadow-lg"
+              aria-haspopup="menu"
+              [attr.aria-expanded]="userMenuOpen()"
+              (click)="toggleUserMenu()"
+            >
+              <span class="grid size-10 place-items-center rounded-lg bg-sky-soft text-sm font-black text-ink-dark">JG</span>
+              <span class="hidden text-left md:block">
+                <span class="block text-sm font-black text-ink-dark">Hola, {{ userName }}</span>
+                <span class="block text-xs font-extrabold text-brown">{{ roleLabel }}</span>
+              </span>
+              <app-icon name="chevron-down" className="h-4 w-4 text-brown" />
+            </button>
+
+            @if (userMenuOpen()) {
+              <div
+                class="absolute right-0 mt-3 w-56 rounded-lg border border-brown/10 bg-white p-2 shadow-xl"
+                role="menu"
+              >
+                <a
+                  [routerLink]="profilePath"
+                  class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-extrabold text-ink-dark transition hover:bg-cloud"
+                  role="menuitem"
+                  (click)="closeUserMenu()"
+                >
+                  <app-icon name="profile" className="h-4 w-4 text-brown" />
+                  Ver perfil
+                </a>
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-extrabold text-ink-dark transition hover:bg-cloud"
+                  role="menuitem"
+                  (click)="closeUserMenu()"
+                >
+                  <app-icon name="settings" className="h-4 w-4 text-brown" />
+                  Configuracion
+                </button>
+                <button
+                  type="button"
+                  class="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm font-extrabold text-red transition hover:bg-red/10"
+                  role="menuitem"
+                  (click)="logout()"
+                >
+                  <app-icon name="logout" className="h-4 w-4" />
+                  Cerrar sesion
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-5 lg:p-8">
+      <router-outlet />
+    </div>
+  </main>
+</section>

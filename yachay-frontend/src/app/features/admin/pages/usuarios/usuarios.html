@@ -1,0 +1,86 @@
+<section class="grid gap-6">
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div>
+      <h1 class="text-3xl font-extrabold text-yachay-900">Usuarios</h1>
+      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">
+        Gestión de cuentas internas para administración, docentes y alumnos.
+      </p>
+    </div>
+
+    <button type="button" class="btn-primary w-full sm:w-auto">
+      Nuevo usuario
+    </button>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <label class="sr-only" for="usuarios-search">Buscar usuarios</label>
+    <input
+      id="usuarios-search"
+      type="search"
+      class="input"
+      placeholder="Buscar por nombre, correo o rol"
+      [value]="search()"
+      (input)="updateSearch($event)"
+    />
+
+    <label class="sr-only" for="usuarios-status">Filtrar por estado</label>
+    <select
+      id="usuarios-status"
+      class="input"
+      [value]="statusFilter()"
+      (change)="updateStatusFilter($event)"
+    >
+      <option value="TODOS">Todos los estados</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[64rem] border-collapse text-left text-sm">
+      <caption class="sr-only">Usuarios internos del sistema</caption>
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th scope="col" class="px-5 py-4 font-extrabold">ID</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Nombres</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Apellidos</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Email</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Rol</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Estado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Creación</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of filteredUsers(); track user.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-muted">{{ user.id }}</td>
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ user.nombres }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ user.apellidos }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ user.email }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ user.rol }}</td>
+            <td class="px-5 py-4">
+              <span class="rounded-lg border px-3 py-2 text-xs font-extrabold" [class]="statusClass(user.estado)">
+                {{ user.estado }}
+              </span>
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ user.fechaCreacion }}</td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">{{ nextStatusLabel(user.estado) }}</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Resetear</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="px-5 py-10 text-center font-semibold text-yachay-muted">
+              No hay usuarios para los filtros seleccionados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

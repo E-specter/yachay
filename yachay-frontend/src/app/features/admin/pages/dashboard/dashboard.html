@@ -1,0 +1,120 @@
+<section class="grid gap-6">
+  <div class="overflow-hidden rounded-lg bg-ink-dark text-white shadow-sm">
+    <div class="grid gap-6 p-6 lg:grid-cols-[1fr_22rem] lg:p-8">
+      <div>
+        <p class="text-sm font-black uppercase tracking-wide text-sky-soft">Campus Manuel Gonzales Prada</p>
+        <h1 class="mt-3 max-w-3xl text-3xl font-black tracking-normal md:text-4xl">
+          Panel administrativo
+        </h1>
+        <p class="mt-4 max-w-3xl text-sm font-semibold leading-6 text-cloud">
+          Control operativo del campus: admision, usuarios, matricula, cursos, evaluacion y comunicaciones institucionales.
+        </p>
+      </div>
+
+      <div class="rounded-lg border border-white/15 bg-white/10 p-5">
+        <p class="text-sm font-black text-sky-soft">Resumen institucional</p>
+        <div class="mt-4 grid gap-3">
+          @for (item of activity; track item) {
+            <p class="rounded-lg bg-white/10 px-4 py-3 text-sm font-semibold leading-6 text-cloud">{{ item }}</p>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    @for (stat of stats; track stat.label) {
+      <app-stat-card
+        [label]="stat.label"
+        [value]="stat.value"
+        [caption]="stat.caption"
+        [icon]="stat.icon"
+        [tone]="stat.tone"
+      />
+    }
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    @for (action of quickActions; track action.link) {
+      <app-quick-action-card
+        [title]="action.title"
+        [description]="action.description"
+        [link]="action.link"
+        [icon]="action.icon"
+        [tone]="action.tone"
+      />
+    }
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+    <app-section-card
+      title="Postulaciones recientes"
+      subtitle="Solicitudes que requieren seguimiento administrativo."
+      actionLabel="Ver postulaciones"
+      actionLink="/admin/postulaciones"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[680px] text-left">
+          <thead>
+            <tr class="border-b border-slate-200 text-xs font-black uppercase tracking-wide text-slate-500">
+              <th class="pb-3">Codigo</th>
+              <th class="pb-3">Postulante</th>
+              <th class="pb-3">Nivel</th>
+              <th class="pb-3">Grado</th>
+              <th class="pb-3 text-right">Estado</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (admission of admissions; track admission.codigo) {
+              <tr class="text-sm font-semibold text-ink">
+                <td class="py-4 text-slate-500">{{ admission.codigo }}</td>
+                <td class="py-4 font-black">{{ admission.postulante }}</td>
+                <td class="py-4">{{ admission.nivel }}</td>
+                <td class="py-4">{{ admission.grado }}</td>
+                <td class="py-4 text-right">
+                  <app-status-badge [label]="admission.estado" />
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+
+    <app-section-card title="Calendario administrativo" subtitle="Fechas operativas y actividad institucional.">
+      <div class="grid gap-3">
+        @for (event of adminCalendar; track event.day) {
+          <article class="grid grid-cols-[3.5rem_1fr] gap-4 rounded-lg border border-slate-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <span class="grid size-11 place-items-center rounded-lg bg-cloud text-brown">
+              <app-icon name="calendar" className="h-5 w-5" />
+            </span>
+            <div>
+              <p class="font-black text-ink-dark">{{ event.day }} - {{ event.event }}</p>
+              <p [class]="'mt-2 inline-flex rounded-lg px-3 py-1 text-xs font-black uppercase tracking-wide ' + event.tone">
+                {{ event.type }}
+              </p>
+            </div>
+          </article>
+        }
+      </div>
+    </app-section-card>
+  </div>
+
+  <app-section-card
+    title="Ultimos alumnos registrados"
+    subtitle="Altas recientes vinculadas a apoderados responsables."
+    actionLabel="Ver alumnos"
+    actionLink="/admin/alumnos"
+  >
+    <div class="grid gap-3 md:grid-cols-3">
+      @for (student of recentStudents; track student.codigo) {
+        <article class="rounded-lg border border-slate-200 p-4">
+          <p class="text-xs font-black uppercase tracking-wide text-slate-500">{{ student.codigo }}</p>
+          <p class="mt-2 font-black text-ink">{{ student.nombre }}</p>
+          <p class="mt-1 text-sm font-semibold text-slate-500">{{ student.aula }}</p>
+          <p class="mt-3 text-sm font-bold text-blue">{{ student.apoderado }}</p>
+        </article>
+      }
+    </div>
+  </app-section-card>
+</section>

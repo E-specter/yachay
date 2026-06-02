@@ -1,0 +1,69 @@
+<section class="grid gap-6">
+  <div>
+    <p class="text-sm font-bold text-yachay-org-dark">Admisión</p>
+    <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">
+      Postulaciones
+    </h1>
+    <p class="mt-3 max-w-3xl text-sm font-medium leading-7 text-yachay-muted">
+      Revisión inicial de solicitudes públicas. Al aceptar una postulación,
+      el flujo futuro creará el alumno, asignará nivel, grado y sección,
+      generará usuario institucional y vinculará al apoderado para
+      notificaciones.
+    </p>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[64rem] border-collapse text-left text-sm">
+      <caption class="sr-only">Lista de postulaciones de admisión</caption>
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th scope="col" class="px-5 py-4 font-extrabold">Postulante</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Apoderado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Nivel</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Grado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Estado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (postulacion of postulaciones; track postulacion.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-900">
+              {{ postulacion.postulante }}
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">
+              {{ postulacion.apoderado }}
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">
+              {{ postulacion.nivel }}
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">
+              {{ postulacion.grado }}
+            </td>
+            <td class="px-5 py-4">
+              <span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">
+                {{ postulacion.estado }}
+              </span>
+            </td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-yachay-800 px-3 py-2 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white">
+                  Ver
+                </button>
+                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white">
+                  Aceptar
+                </button>
+                <button type="button" class="rounded-lg border border-yachay-danger px-3 py-2 text-xs font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white">
+                  Rechazar
+                </button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-muted transition hover:bg-yachay-100">
+                  Asignar sección
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

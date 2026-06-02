@@ -1,0 +1,44 @@
+<section class="grid gap-6">
+  <div>
+    <h1 class="text-3xl font-extrabold text-yachay-900">Mis cursos</h1>
+    <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Cursos activos y rendimiento por asignatura.</p>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <input type="search" class="input" placeholder="Buscar curso o docente" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar cursos" />
+    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
+      <option value="TODOS">Todos</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[72rem] border-collapse text-left text-sm">
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th class="px-5 py-4 font-extrabold" scope="col">Código</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Docente</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Aula</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Promedio</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (course of filteredCourses(); track course.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ course.codigo }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ course.nombre }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ course.docente }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ course.nivel }} · {{ course.grado }} {{ course.seccion }}</td>
+            <td class="px-5 py-4 text-lg font-extrabold text-yachay-900">{{ course.promedio }}</td>
+            <td class="px-5 py-4"><span class="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-extrabold text-green-700">{{ course.estado }}</span></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay cursos para los filtros seleccionados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

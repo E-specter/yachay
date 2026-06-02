@@ -1,0 +1,153 @@
+<section class="grid gap-6">
+  <div class="overflow-hidden rounded-lg bg-ink-dark text-white shadow-sm">
+    <div class="grid gap-6 p-6 lg:grid-cols-[1fr_20rem] lg:p-8">
+      <div>
+        <p class="text-sm font-black uppercase tracking-wide text-green-soft">Portal docente</p>
+        <h1 class="mt-3 max-w-3xl text-3xl font-black tracking-normal md:text-4xl">
+          Actividad academica del dia
+        </h1>
+        <p class="mt-4 max-w-3xl text-sm font-semibold leading-6 text-cloud">
+          Cursos, evaluaciones, tareas pendientes y alertas academicas para gestionar la jornada.
+        </p>
+      </div>
+
+      <div class="rounded-lg border border-white/20 bg-white/10 p-5">
+        <p class="text-sm font-black text-white">Prioridad</p>
+        <p class="mt-3 text-4xl font-black text-green-soft">45</p>
+        <p class="mt-2 text-sm font-semibold leading-6 text-cloud">entregas esperan revision antes del cierre semanal.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    @for (stat of stats; track stat.label) {
+      <app-stat-card
+        [label]="stat.label"
+        [value]="stat.value"
+        [caption]="stat.caption"
+        [icon]="stat.icon"
+        [tone]="stat.tone"
+      />
+    }
+  </div>
+
+  <div class="grid gap-4 md:grid-cols-3">
+    @for (action of quickActions; track action.link) {
+      <app-quick-action-card
+        [title]="action.title"
+        [description]="action.description"
+        [link]="action.link"
+        [icon]="action.icon"
+        [tone]="action.tone"
+      />
+    }
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+    <app-section-card title="Mis cursos de hoy" subtitle="Horario y aulas asignadas." actionLabel="Ver cursos" actionLink="/docente/cursos">
+      <div class="grid gap-3">
+        @for (course of todayCourses; track course.hora) {
+          <article class="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 rounded-lg border border-slate-200 p-4">
+            <p class="text-sm font-black text-blue">{{ course.hora }}</p>
+            <div>
+              <p class="font-black text-ink">{{ course.curso }}</p>
+              <p class="mt-1 text-sm font-semibold text-slate-500">{{ course.aula }}</p>
+            </div>
+            <p class="text-sm font-black text-slate-500">{{ course.alumnos }} alumnos</p>
+          </article>
+        }
+      </div>
+    </app-section-card>
+
+    <app-section-card title="Tareas por revisar" subtitle="Entregas abiertas por curso." actionLabel="Ver tareas" actionLink="/docente/tareas">
+      <div class="overflow-x-auto">
+        <table class="w-full min-w-[640px] text-left">
+          <thead>
+            <tr class="border-b border-slate-200 text-xs font-black uppercase tracking-wide text-slate-500">
+              <th class="pb-3">Tarea</th>
+              <th class="pb-3">Curso</th>
+              <th class="pb-3">Aula</th>
+              <th class="pb-3 text-right">Pendientes</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            @for (task of dashboard.reviewTasks; track task.id) {
+              <tr class="text-sm font-semibold text-ink">
+                <td class="py-4 font-black">{{ task.titulo }}</td>
+                <td class="py-4">{{ task.curso }}</td>
+                <td class="py-4 text-slate-500">{{ task.aula }}</td>
+                <td class="py-4 text-right font-black text-blue">{{ task.pendientes }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </app-section-card>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+    <app-section-card title="Alumnos con seguimiento" subtitle="Alertas academicas para intervencion temprana." actionLabel="Ver alumnos" actionLink="/docente/alumnos">
+      <div class="grid gap-3">
+        @for (student of lowPerformance; track student.alumno) {
+          <article class="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_auto] md:items-center">
+            <div>
+              <p class="font-black text-ink">{{ student.alumno }}</p>
+              <p class="mt-1 text-sm font-semibold text-slate-500">{{ student.curso }} - {{ student.aula }}</p>
+            </div>
+            <p class="text-sm font-black text-red">Promedio {{ student.promedio }}</p>
+          </article>
+        }
+      </div>
+    </app-section-card>
+
+    <app-section-card title="Calendario docente" subtitle="Clases y actividades de la semana.">
+      <div class="grid gap-3">
+        @for (item of weeklyCalendar; track item.day) {
+          <article class="grid grid-cols-[3.5rem_1fr] gap-4 rounded-lg border border-slate-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
+            <span class="grid size-11 place-items-center rounded-lg bg-cloud text-brown">
+              <app-icon name="calendar" className="h-5 w-5" />
+            </span>
+            <div>
+              <p class="font-black text-ink-dark">{{ item.day }} - {{ item.event }}</p>
+              <p [class]="'mt-2 inline-flex rounded-lg px-3 py-1 text-xs font-black uppercase tracking-wide ' + item.tone">
+                {{ item.detail }}
+              </p>
+            </div>
+          </article>
+        }
+      </div>
+    </app-section-card>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
+    <app-section-card title="Actividad reciente" subtitle="Movimientos docentes y academicos.">
+      <div class="grid gap-3">
+        @for (item of recentActivity; track item.title) {
+          <article class="grid grid-cols-[3rem_1fr] gap-4 rounded-lg border border-slate-200 p-4">
+            <span class="grid size-11 place-items-center rounded-lg bg-sky-soft/35 text-brown">
+              <app-icon [name]="item.icon" className="h-5 w-5" />
+            </span>
+            <div>
+              <p class="font-black text-ink-dark">{{ item.title }}</p>
+              <p class="mt-1 text-sm font-semibold leading-6 text-slate-500">{{ item.detail }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    </app-section-card>
+
+    <app-section-card title="Ultimos comunicados" subtitle="Mensajes publicados o en preparacion.">
+      <div class="grid gap-3">
+        @for (announcement of dashboard.announcements; track announcement.id) {
+          <article class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
+            <div>
+              <p class="font-black text-ink">{{ announcement.titulo }}</p>
+              <p class="mt-1 text-sm font-semibold text-slate-500">{{ announcement.fechaPublicacion }}</p>
+            </div>
+            <app-status-badge [label]="announcement.estado" />
+          </article>
+        }
+      </div>
+    </app-section-card>
+  </div>
+</section>

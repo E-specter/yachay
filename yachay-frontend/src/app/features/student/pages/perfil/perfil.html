@@ -1,0 +1,20 @@
+<section class="grid gap-6">
+  <div>
+    <h1 class="text-3xl font-extrabold text-yachay-900">Perfil</h1>
+    <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Información académica y contacto responsable.</p>
+  </div>
+
+  <section class="rounded-lg border border-yachay-300 bg-white p-5">
+    <dl class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+      <div><dt class="text-sm font-bold text-yachay-muted">Código</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.codigo }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Nombres</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.nombres }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Apellidos</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.apellidos }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Documento</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.documento }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Correo institucional</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.correoInstitucional }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Aula</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.nivel }} · {{ profile.grado }} {{ profile.seccion }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Apoderado</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.apoderado }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Correo apoderado</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.correoApoderado }}</dd></div>
+      <div><dt class="text-sm font-bold text-yachay-muted">Celular apoderado</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.celularApoderado }}</dd></div>
+    </dl>
+  </section>
+</section>

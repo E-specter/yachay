@@ -1,0 +1,54 @@
+<section class="grid gap-6">
+  <div>
+    <h1 class="text-3xl font-extrabold text-yachay-900">Tareas</h1>
+    <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Tareas asignadas y estado de entrega.</p>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <input type="search" class="input" placeholder="Buscar tarea, curso o docente" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar tareas" />
+    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
+      <option value="TODOS">Todos</option>
+      <option value="PENDIENTE">Pendiente</option>
+      <option value="ENTREGADA">Entregada</option>
+      <option value="VENCIDA">Vencida</option>
+      <option value="CALIFICADA">Calificada</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[82rem] border-collapse text-left text-sm">
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th class="px-5 py-4 font-extrabold" scope="col">Tarea</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Docente</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Publicación</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Entrega</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (homework of filteredHomeworks(); track homework.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4"><p class="font-bold text-yachay-900">{{ homework.titulo }}</p><p class="max-w-md truncate font-semibold text-yachay-muted">{{ homework.descripcion }}</p></td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ homework.curso }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.docente }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.fechaPublicacion }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.fechaEntrega }}</td>
+            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ homework.estadoEntrega }}</span></td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver tarea</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Entregar tarea</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver calificación</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay tareas para los filtros seleccionados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

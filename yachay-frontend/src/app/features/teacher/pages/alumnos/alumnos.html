@@ -1,0 +1,48 @@
+<section class="grid gap-6">
+  <div>
+    <h1 class="text-3xl font-extrabold text-yachay-900">Mis alumnos</h1>
+    <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">
+      Alumnos vinculados a los cursos asignados.
+    </p>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <input type="search" class="input" placeholder="Buscar alumno, documento o curso" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar alumnos" />
+    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
+      <option value="TODOS">Todos</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[78rem] border-collapse text-left text-sm">
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th class="px-5 py-4 font-extrabold" scope="col">Código</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Alumno</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Documento</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Aula</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Promedio</th>
+          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of filteredStudents(); track student.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ student.codigo }}</td>
+            <td class="px-5 py-4"><p class="font-bold text-yachay-900">{{ student.nombres }}</p><p class="font-semibold text-yachay-muted">{{ student.apellidos }}</p></td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.documento }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.nivel }} · {{ student.grado }} {{ student.seccion }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ student.curso }}</td>
+            <td class="px-5 py-4 text-lg font-extrabold text-yachay-900">{{ student.promedio }}</td>
+            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ student.estado }}</span></td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay alumnos para los filtros seleccionados.</td></tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

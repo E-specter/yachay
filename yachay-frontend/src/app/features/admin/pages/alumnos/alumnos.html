@@ -1,0 +1,80 @@
+<section class="grid gap-6">
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div>
+      <h1 class="text-3xl font-extrabold text-yachay-900">Alumnos</h1>
+      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">
+        Gestión académica de estudiantes aceptados y vinculados con su apoderado.
+      </p>
+    </div>
+
+    <button type="button" class="btn-primary w-full sm:w-auto">
+      Nuevo alumno
+    </button>
+  </div>
+
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
+    <label class="sr-only" for="alumnos-search">Buscar alumnos</label>
+    <input id="alumnos-search" type="search" class="input" placeholder="Buscar por código, alumno o apoderado" [value]="search()" (input)="updateSearch($event)" />
+
+    <label class="sr-only" for="alumnos-status">Filtrar por estado</label>
+    <select id="alumnos-status" class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)">
+      <option value="TODOS">Todos los estados</option>
+      <option value="ACTIVO">Activo</option>
+      <option value="INACTIVO">Inactivo</option>
+      <option value="RETIRADO">Retirado</option>
+    </select>
+  </div>
+
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    <table class="w-full min-w-[88rem] border-collapse text-left text-sm">
+      <caption class="sr-only">Alumnos registrados</caption>
+      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
+        <tr>
+          <th scope="col" class="px-5 py-4 font-extrabold">Código</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Alumno</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Documento</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Correo institucional</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Aula</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Estado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Apoderado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Correo apoderado</th>
+          <th scope="col" class="px-5 py-4 font-extrabold">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (student of filteredStudents(); track student.id) {
+          <tr class="border-b border-yachay-300 last:border-b-0">
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ student.codigo }}</td>
+            <td class="px-5 py-4">
+              <p class="font-bold text-yachay-900">{{ student.nombres }}</p>
+              <p class="font-semibold text-yachay-muted">{{ student.apellidos }}</p>
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.documentoTipo }} {{ student.documentoNumero }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.correoInstitucional }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-900">{{ student.nivel }} · {{ student.grado }} {{ student.seccion }}</td>
+            <td class="px-5 py-4">
+              <span class="rounded-lg border px-3 py-2 text-xs font-extrabold" [class]="statusClass(student.estado)">
+                {{ student.estado }}
+              </span>
+            </td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.apoderado }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ student.correoApoderado }}</td>
+            <td class="px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Cambiar estado</button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="9" class="px-5 py-10 text-center font-semibold text-yachay-muted">
+              No hay alumnos para los filtros seleccionados.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
