@@ -1,0 +1,93 @@
+<section class="grid gap-6">
+  <div class="rounded-lg border border-yachay-300 bg-white p-5 shadow-sm">
+    <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+      <div>
+        <p class="text-sm font-black uppercase tracking-wide text-yachay-800">Calendario académico</p>
+        <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">{{ monthTitle }}</h1>
+        <p class="mt-2 text-sm font-semibold text-yachay-muted">{{ weekTitle }}</p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" class="btn-primary" (click)="goToday()">Hoy</button>
+        <button type="button" class="grid size-12 place-items-center rounded-lg border border-yachay-300 bg-white text-yachay-800 transition hover:bg-yachay-100" aria-label="Semana anterior" (click)="goPrevious()">
+          <app-icon name="chevron-left" className="h-5 w-5" />
+        </button>
+        <button type="button" class="grid size-12 place-items-center rounded-lg border border-yachay-300 bg-white text-yachay-800 transition hover:bg-yachay-100" aria-label="Semana siguiente" (click)="goNext()">
+          <app-icon name="chevron-right" className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  </div>
+
+  @if (notice()) {
+    <div class="rounded-lg border border-yachay-success bg-yachay-success/10 px-4 py-3 text-sm font-bold text-yachay-success">
+      {{ notice() }}
+    </div>
+  }
+
+  <div class="grid gap-6 xl:grid-cols-[18rem_1fr]">
+    <aside class="grid gap-4 self-start rounded-lg border border-yachay-300 bg-white p-5 shadow-sm">
+      <div>
+        <h2 class="text-lg font-extrabold text-yachay-900">Filtros</h2>
+        <p class="mt-1 text-sm font-semibold text-yachay-muted">Activa o desactiva eventos.</p>
+      </div>
+
+      <div class="grid gap-3">
+        @for (filter of filters; track filter.type) {
+          <button type="button" class="flex items-center justify-between rounded-lg border border-yachay-300 bg-yachay-100 px-3 py-3 text-left transition hover:bg-white" (click)="toggleType(filter.type)">
+            <span class="flex items-center gap-3">
+              <span [class]="'size-3 rounded-full ' + filter.color"></span>
+              <span class="text-sm font-extrabold text-yachay-900">{{ filter.label }}</span>
+            </span>
+            @if (activeTypes().includes(filter.type)) {
+              <app-icon name="check" className="h-4 w-4 text-yachay-success" />
+            }
+          </button>
+        }
+      </div>
+    </aside>
+
+    <div class="overflow-hidden rounded-lg border border-yachay-300 bg-white shadow-sm">
+      <div class="grid min-w-[58rem] grid-cols-[5rem_repeat(5,minmax(10rem,1fr))] border-b border-yachay-300 bg-yachay-100">
+        <div class="border-r border-yachay-300 px-3 py-4 text-xs font-black uppercase tracking-wide text-yachay-muted">Hora</div>
+        @for (day of weekDays; track day.key) {
+          <div class="border-r border-yachay-300 px-4 py-4 last:border-r-0">
+            <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">{{ day.label }}</p>
+            <p class="mt-1 text-2xl font-black text-yachay-900">{{ day.date }}</p>
+          </div>
+        }
+      </div>
+
+      <div class="overflow-x-auto">
+        <div class="grid min-w-[58rem] grid-cols-[5rem_repeat(5,minmax(10rem,1fr))]">
+          <div class="grid">
+            @for (slot of timeSlots; track slot) {
+              <div class="min-h-32 border-b border-yachay-300 px-3 py-3 text-xs font-black text-yachay-muted">
+                {{ slot }}
+              </div>
+            }
+          </div>
+
+          @for (day of weekDays; track day.key) {
+            <div class="grid border-l border-yachay-300">
+              @for (slot of timeSlots; track slot) {
+                <div class="min-h-32 border-b border-yachay-300 bg-white p-2">
+                  <div class="grid gap-2">
+                    @for (event of eventsFor(day.key, slot); track event.id) {
+                      <article [class]="'rounded-lg border-l-4 p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ' + eventClass(event.type)">
+                        <p class="text-xs font-black uppercase tracking-wide">{{ event.type }}</p>
+                        <h3 class="mt-1 text-sm font-black leading-5">{{ event.title }}</h3>
+                        <p class="mt-1 text-xs font-semibold opacity-80">{{ event.startTime }} - {{ event.endTime }}</p>
+                        <p class="mt-1 text-xs font-semibold opacity-80">{{ event.subtitle }}</p>
+                      </article>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

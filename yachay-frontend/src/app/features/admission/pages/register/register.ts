@@ -13,7 +13,6 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 
 import {
   AdmissionRequest,
@@ -52,11 +51,12 @@ type ApoderadoForm = FormGroup<{
   correo: FormControl<string>;
   profesion: FormControl<string>;
   centroTrabajo: FormControl<string>;
+  recibeNotificaciones: FormControl<boolean>;
 }>;
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule],
   templateUrl: './register.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -204,6 +204,7 @@ export class Register {
       correo: ['', [Validators.required, Validators.email]],
       profesion: [''],
       centroTrabajo: [''],
+      recibeNotificaciones: [true],
     });
   }
 

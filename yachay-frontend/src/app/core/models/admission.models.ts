@@ -29,6 +29,7 @@ export interface ApoderadoRequest {
   correo: string;
   profesion?: string;
   centroTrabajo?: string;
+  recibeNotificaciones?: boolean;
 }
 
 export interface AdmissionRequest {

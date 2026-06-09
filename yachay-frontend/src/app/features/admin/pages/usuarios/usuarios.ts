@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import { AdminUser, AdminUserStatus } from '../../../../core/models/user.models';
+import { UserService } from '../../../../core/services/user';
 
 type UserStatusFilter = AdminUserStatus | 'TODOS';
 
@@ -11,50 +13,29 @@ type UserStatusFilter = AdminUserStatus | 'TODOS';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Usuarios {
+  private readonly userService = inject(UserService);
+
   readonly search = signal('');
   readonly statusFilter = signal<UserStatusFilter>('TODOS');
-
-  readonly users: readonly AdminUser[] = [
-    {
-      id: 1,
-      nombres: 'Administrador',
-      apellidos: 'Yachay',
-      email: 'admin@mgp.edu.pe',
-      rol: 'ADMINISTRADOR',
-      estado: 'ACTIVO',
-      fechaCreacion: '2026-04-30',
-    },
-    {
-      id: 2,
-      nombres: 'Rosa Elena',
-      apellidos: 'Vargas Medina',
-      email: 'rvargas@mgp.edu.pe',
-      rol: 'DOCENTE',
-      estado: 'ACTIVO',
-      fechaCreacion: '2026-05-01',
-    },
-    {
-      id: 3,
-      nombres: 'Luis Alberto',
-      apellidos: 'Torres Quispe',
-      email: 'ltorres@mgp.edu.pe',
-      rol: 'ALUMNO',
-      estado: 'INACTIVO',
-      fechaCreacion: '2026-05-02',
-    },
-  ];
+  readonly users = signal<AdminUser[]>([]);
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
 
   readonly filteredUsers = computed(() => {
     const query = this.search().trim().toLowerCase();
     const status = this.statusFilter();
 
-    return this.users.filter((user) => {
+    return this.users().filter((user) => {
       const matchesStatus = status === 'TODOS' || user.estado === status;
       const searchable = `${user.nombres} ${user.apellidos} ${user.email} ${user.rol}`.toLowerCase();
 
       return matchesStatus && searchable.includes(query);
     });
   });
+
+  constructor() {
+    this.loadUsers();
+  }
 
   updateSearch(event: Event): void {
     this.search.set((event.target as HTMLInputElement).value);
@@ -72,5 +53,33 @@ export class Usuarios {
 
   nextStatusLabel(status: AdminUserStatus): string {
     return status === 'ACTIVO' ? 'Inactivar' : 'Activar';
+  }
+
+  private loadUsers(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+
+    this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users.set(users);
+        this.loading.set(false);
+      },
+      error: (error: unknown) => {
+        this.loading.set(false);
+        this.errorMessage.set(
+          'No se pudo conectar con el servidor. Verifica que el backend este activo en http://localhost:8080/api y que MySQL este iniciado.',
+        );
+
+        if (error instanceof HttpErrorResponse) {
+          console.error('Error cargando usuarios', {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            message: error.message,
+            error: error.error,
+          });
+        }
+      },
+    });
   }
 }

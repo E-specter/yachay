@@ -1,27 +1,23 @@
 package edu.yachay.backend.identity.application.services;
 
-import edu.yachay.backend.identity.application.dtos.TeacherProfileDTO;
 import edu.yachay.backend.identity.application.dtos.CreateTeacherProfileRequest;
+import edu.yachay.backend.identity.application.dtos.TeacherProfileDTO;
 import edu.yachay.backend.identity.application.ports.inputs.TeacherProfileServicePort;
 import edu.yachay.backend.identity.domain.exceptions.ResourceConflictException;
 import edu.yachay.backend.identity.domain.exceptions.ResourceNotFoundException;
-import edu.yachay.backend.identity.domain.models.TeacherProfile;
 import edu.yachay.backend.identity.domain.models.Profile;
 import edu.yachay.backend.identity.domain.models.School;
-import edu.yachay.backend.identity.domain.repositories.TeacherProfileRepository;
+import edu.yachay.backend.identity.domain.models.TeacherProfile;
 import edu.yachay.backend.identity.domain.repositories.ProfileRepository;
 import edu.yachay.backend.identity.domain.repositories.SchoolRepository;
+import edu.yachay.backend.identity.domain.repositories.TeacherProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-/**
- * Servicio de aplicación para gestionar perfiles de docente.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -34,7 +30,7 @@ public class TeacherProfileService implements TeacherProfileServicePort {
 
     @Override
     public TeacherProfileDTO createTeacherProfile(CreateTeacherProfileRequest request) {
-        Profile profile = profileRepository.findByUserId(UUID.fromString(request.getUserId()))
+        Profile profile = profileRepository.findByUserId(parseUserId(request.getUserId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil para usuario " + request.getUserId() + " no encontrado"));
 
         School school = schoolRepository.findById(request.getSchoolId())
@@ -105,5 +101,13 @@ public class TeacherProfileService implements TeacherProfileServicePort {
             throw new ResourceNotFoundException("Perfil de docente con ID " + teacherProfileId + " no encontrado");
         }
         teacherProfileRepository.deleteById(teacherProfileId);
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.valueOf(userId);
+        } catch (NumberFormatException exception) {
+            throw new ResourceNotFoundException("Perfil para usuario " + userId + " no encontrado");
+        }
     }
 }

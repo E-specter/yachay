@@ -1,0 +1,39 @@
+<section class="grid gap-6">
+  <a routerLink="/admin/dashboard" class="inline-flex w-fit items-center gap-2 rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-black text-yachay-800 transition hover:bg-yachay-100">
+    <app-icon name="arrow-left" className="h-4 w-4" />
+    Volver al panel
+  </a>
+
+  <article class="overflow-hidden rounded-lg border border-yachay-300 bg-white shadow-sm">
+    <div class="bg-ink-dark p-6 text-white">
+      <p class="text-sm font-black uppercase tracking-wide text-sky-soft">Perfil administrador</p>
+      <h1 class="mt-2 text-3xl font-extrabold">{{ profile().nombres }} {{ profile().apellidos }}</h1>
+      <p class="mt-2 text-sm font-semibold text-cloud">{{ profile().email }}</p>
+    </div>
+
+    <div class="grid gap-4 p-6 md:grid-cols-2 xl:grid-cols-4">
+      <div class="rounded-lg border border-yachay-300 bg-yachay-100 p-5">
+        <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">Nombres</p>
+        <p class="mt-2 text-lg font-black text-yachay-900">{{ profile().nombres }}</p>
+      </div>
+      <div class="rounded-lg border border-yachay-300 bg-yachay-100 p-5">
+        <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">Apellidos</p>
+        <p class="mt-2 text-lg font-black text-yachay-900">{{ profile().apellidos }}</p>
+      </div>
+      <div class="rounded-lg border border-yachay-300 bg-yachay-100 p-5">
+        <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">Rol</p>
+        <p class="mt-2 text-lg font-black text-yachay-900">{{ profile().rol }}</p>
+      </div>
+      <div class="rounded-lg border border-yachay-300 bg-yachay-100 p-5">
+        <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">Fecha creación</p>
+        <p class="mt-2 text-lg font-black text-yachay-900">{{ profile().fechaCreacion }}</p>
+      </div>
+    </div>
+
+    <div class="border-t border-yachay-300 p-6">
+      <span class="rounded-lg border border-yachay-success bg-yachay-success/10 px-4 py-3 text-sm font-black text-yachay-success">
+        {{ profile().estado }}
+      </span>
+    </div>
+  </article>
+</section>

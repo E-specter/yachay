@@ -47,6 +47,7 @@ export class StudentDashboardPage {
     { title: 'Mis notas', description: 'Consultar el avance por curso y bimestre.', link: '/alumno/notas', icon: 'grades', tone: 'sky' },
     { title: 'Comunicados', description: 'Leer avisos del colegio y docentes.', link: '/alumno/comunicados', icon: 'announcements', tone: 'yellow' },
     { title: 'Mis cursos', description: 'Entrar a tus cursos activos del periodo.', link: '/alumno/cursos', icon: 'courses', tone: 'red' },
+    { title: 'Abrir calendario', description: 'Ver horario semanal, tareas y evaluaciones.', link: '/alumno/calendario', icon: 'calendar', tone: 'sky' },
   ] as const;
 
   readonly academicCalendar = [
@@ -58,9 +59,9 @@ export class StudentDashboardPage {
   ] as const;
 
   readonly courses = [
-    { name: 'Matematica III', teacher: 'Rosa Vargas', progress: '74%', next: 'Resolucion de problemas', tone: 'bg-sky-soft/40' },
-    { name: 'Comunicacion I', teacher: 'Luis Herrera', progress: '68%', next: 'Lectura evaluada', tone: 'bg-green-soft/35' },
-    { name: 'Ciencia y Tecnologia', teacher: 'Ana Medina', progress: '81%', next: 'Informe de laboratorio', tone: 'bg-brown/10' },
+    { id: 1, name: 'Matematica III', teacher: 'Rosa Vargas', progress: '74%', next: 'Resolucion de problemas', tone: 'bg-sky-soft/40' },
+    { id: 2, name: 'Comunicacion I', teacher: 'Luis Herrera', progress: '68%', next: 'Lectura evaluada', tone: 'bg-green-soft/35' },
+    { id: 3, name: 'Ciencia y Tecnologia', teacher: 'Ana Medina', progress: '81%', next: 'Informe de laboratorio', tone: 'bg-brown/10' },
   ] as const;
 
   readonly activityRecent = [

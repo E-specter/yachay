@@ -39,9 +39,9 @@
             <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ homework.estadoEntrega }}</span></td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver tarea</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Entregar tarea</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver calificación</button>
+                <a [routerLink]="['/alumno/tareas', homework.id]" class="inline-flex min-h-10 items-center rounded-lg border border-yachay-300 px-3 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-100">Ver tarea</a>
+                <a [routerLink]="['/alumno/tareas', homework.id]" class="inline-flex min-h-10 items-center rounded-lg border border-yachay-300 px-3 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-100">Entregar tarea</a>
+                <a routerLink="/alumno/notas" class="inline-flex min-h-10 items-center rounded-lg border border-yachay-300 px-3 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-100">Ver calificación</a>
               </div>
             </td>
           </tr>

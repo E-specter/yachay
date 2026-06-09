@@ -67,9 +67,19 @@ export class Comunicados {
     this.statusFilter.set((event.target as HTMLSelectElement).value as AnnouncementStatusFilter);
   }
 
+  viewAnnouncement(announcement: Announcement): void {
+    this.showAction(`Comunicado: ${announcement.titulo}`);
+  }
+
   statusClass(status: AnnouncementStatus): string {
     if (status === 'PUBLICADO') return 'border-green-200 bg-green-50 text-green-700';
     if (status === 'ARCHIVADO') return 'border-slate-200 bg-slate-50 text-slate-600';
     return 'border-yellow-200 bg-yellow-50 text-yellow-800';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

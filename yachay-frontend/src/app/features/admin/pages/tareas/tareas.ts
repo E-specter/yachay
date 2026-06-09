@@ -76,9 +76,19 @@ export class Tareas {
     this.statusFilter.set((event.target as HTMLSelectElement).value as HomeworkStatusFilter);
   }
 
+  viewHomework(homework: Homework): void {
+    this.showAction(`Tarea: ${homework.titulo}`);
+  }
+
   statusClass(status: HomeworkStatus): string {
     if (status === 'PUBLICADA') return 'border-green-200 bg-green-50 text-green-700';
     if (status === 'CERRADA') return 'border-slate-200 bg-slate-50 text-slate-600';
     return 'border-yellow-200 bg-yellow-50 text-yellow-800';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

@@ -70,9 +70,19 @@ export class Secciones {
     this.statusFilter.set((event.target as HTMLSelectElement).value as SectionStatusFilter);
   }
 
+  viewSection(section: SchoolSection): void {
+    this.showAction(`Sección: ${section.nivel} ${section.grado} ${section.seccion}`);
+  }
+
   statusClass(status: SchoolSectionStatus): string {
     return status === 'ACTIVO'
       ? 'border-green-200 bg-green-50 text-green-700'
       : 'border-slate-200 bg-slate-50 text-slate-600';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

@@ -1,6 +1,7 @@
 package edu.yachay.backend.identity.application.services;
 
-import edu.yachay.backend.identity.application.dtos.*;
+import edu.yachay.backend.identity.application.dtos.ProfileDTO;
+import edu.yachay.backend.identity.application.dtos.UpdateUserRequest;
 import edu.yachay.backend.identity.application.ports.inputs.ProfileServicePort;
 import edu.yachay.backend.identity.domain.exceptions.ResourceNotFoundException;
 import edu.yachay.backend.identity.domain.models.Profile;
@@ -11,11 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-/**
- * Servicio de aplicación para gestionar perfiles.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -27,8 +24,7 @@ public class ProfileService implements ProfileServicePort {
     @Override
     @Transactional(readOnly = true)
     public ProfileDTO getProfileByUserId(String userId) {
-        UUID uuid = UUID.fromString(userId);
-        Profile profile = profileRepository.findByUserId(uuid)
+        Profile profile = profileRepository.findByUserId(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil para usuario " + userId + " no encontrado"));
         return mapper.toProfileDTO(profile);
     }
@@ -49,8 +45,7 @@ public class ProfileService implements ProfileServicePort {
 
     @Override
     public void updateProfile(String userId, UpdateUserRequest request) {
-        UUID uuid = UUID.fromString(userId);
-        Profile profile = profileRepository.findByUserId(uuid)
+        Profile profile = profileRepository.findByUserId(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil para usuario " + userId + " no encontrado"));
 
         if (request.getFirstName() != null) profile.setFirstName(request.getFirstName());
@@ -68,5 +63,13 @@ public class ProfileService implements ProfileServicePort {
             throw new ResourceNotFoundException("Perfil con ID " + profileId + " no encontrado");
         }
         profileRepository.deleteById(profileId);
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.valueOf(userId);
+        } catch (NumberFormatException exception) {
+            throw new ResourceNotFoundException("Perfil para usuario " + userId + " no encontrado");
+        }
     }
 }

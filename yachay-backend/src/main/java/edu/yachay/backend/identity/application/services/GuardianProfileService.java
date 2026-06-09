@@ -1,7 +1,7 @@
 package edu.yachay.backend.identity.application.services;
 
-import edu.yachay.backend.identity.application.dtos.GuardianProfileDTO;
 import edu.yachay.backend.identity.application.dtos.CreateGuardianProfileRequest;
+import edu.yachay.backend.identity.application.dtos.GuardianProfileDTO;
 import edu.yachay.backend.identity.application.ports.inputs.GuardianProfileServicePort;
 import edu.yachay.backend.identity.domain.exceptions.ResourceNotFoundException;
 import edu.yachay.backend.identity.domain.models.GuardianProfile;
@@ -16,11 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
-/**
- * Servicio de aplicación para gestionar perfiles de apoderado/tutor.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,7 +29,7 @@ public class GuardianProfileService implements GuardianProfileServicePort {
 
     @Override
     public GuardianProfileDTO createGuardianProfile(CreateGuardianProfileRequest request) {
-        Profile profile = profileRepository.findByUserId(UUID.fromString(request.getUserId()))
+        Profile profile = profileRepository.findByUserId(parseUserId(request.getUserId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Perfil para usuario " + request.getUserId() + " no encontrado"));
 
         GuardianProfile guardianProfile = GuardianProfile.builder()
@@ -102,5 +98,13 @@ public class GuardianProfileService implements GuardianProfileServicePort {
 
         guardian.removeStudent(student);
         guardianProfileRepository.save(guardian);
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.valueOf(userId);
+        } catch (NumberFormatException exception) {
+            throw new ResourceNotFoundException("Perfil para usuario " + userId + " no encontrado");
+        }
     }
 }

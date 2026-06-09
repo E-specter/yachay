@@ -48,4 +48,14 @@ export class TeacherTareas {
   updateStatusFilter(event: Event): void {
     this.statusFilter.set((event.target as HTMLSelectElement).value as StatusFilter);
   }
+
+  viewSubmissions(homework: TeacherHomework): void {
+    this.showAction(`Entregas de ${homework.titulo}: 24 recibidas, 6 pendientes.`);
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
+  }
 }

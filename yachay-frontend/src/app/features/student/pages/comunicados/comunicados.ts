@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 interface StudentAnnouncement {
   id: number;
@@ -13,7 +14,7 @@ type ReadFilter = 'TODOS' | 'LEIDOS' | 'NO_LEIDOS';
 
 @Component({
   selector: 'app-student-comunicados',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './comunicados.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -23,7 +24,7 @@ export class StudentComunicados {
 
   readonly announcements: readonly StudentAnnouncement[] = [
     { id: 1, titulo: 'Entrega de libretas', contenido: 'Cronograma de entrega del primer bimestre.', remitente: 'Administración', fechaPublicacion: '2026-05-10', leido: false },
-    { id: 2, titulo: 'Material de refuerzo', contenido: 'Material complementario de matemática.', remitente: 'Miguel Campos', fechaPublicacion: '2026-05-09', leido: true },
+    { id: 2, titulo: 'Material de refuerzo', contenido: 'Material complementario de matemática.', remitente: 'Rosa Vargas', fechaPublicacion: '2026-05-09', leido: true },
     { id: 3, titulo: 'Actividad deportiva', contenido: 'Programación de educación física.', remitente: 'Coordinación', fechaPublicacion: '2026-05-07', leido: true },
   ];
 

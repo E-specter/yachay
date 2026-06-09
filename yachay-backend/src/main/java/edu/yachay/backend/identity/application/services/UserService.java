@@ -1,26 +1,27 @@
 package edu.yachay.backend.identity.application.services;
 
-import edu.yachay.backend.identity.application.dtos.*;
+import edu.yachay.backend.identity.application.dtos.CreateUserRequest;
+import edu.yachay.backend.identity.application.dtos.UpdateUserRequest;
+import edu.yachay.backend.identity.application.dtos.UserDTO;
 import edu.yachay.backend.identity.application.ports.inputs.UserServicePort;
 import edu.yachay.backend.identity.domain.exceptions.ResourceConflictException;
 import edu.yachay.backend.identity.domain.exceptions.ResourceNotFoundException;
-import edu.yachay.backend.identity.domain.models.User;
 import edu.yachay.backend.identity.domain.models.Profile;
 import edu.yachay.backend.identity.domain.models.Role;
-import edu.yachay.backend.identity.domain.repositories.UserRepository;
+import edu.yachay.backend.identity.domain.models.User;
 import edu.yachay.backend.identity.domain.repositories.ProfileRepository;
 import edu.yachay.backend.identity.domain.repositories.RoleRepository;
+import edu.yachay.backend.identity.domain.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Servicio de aplicación para gestionar usuarios.
- */
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -35,23 +36,20 @@ public class UserService implements UserServicePort {
     @Override
     public UserDTO createUser(CreateUserRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new ResourceConflictException("El email '" + request.getEmail() + "' ya está registrado");
+            throw new ResourceConflictException("El email '" + request.getEmail() + "' ya esta registrado");
         }
 
         if (request.getPhone() != null && userRepository.existsByPhone(request.getPhone())) {
-            throw new ResourceConflictException("El teléfono '" + request.getPhone() + "' ya está registrado");
+            throw new ResourceConflictException("El telefono '" + request.getPhone() + "' ya esta registrado");
         }
 
-        UUID userId = UUID.randomUUID();
         User user = User.builder()
-                .id(userId)
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .displayName(request.getFirstName() + " " + request.getLastName())
                 .encryptedPassword(passwordEncoder.encode(request.getPassword()))
                 .build();
 
-        // Asignar roles si se proporciona
         if (request.getRoleNames() != null && !request.getRoleNames().isEmpty()) {
             Set<Role> roles = roleRepository.findByNameIn(request.getRoleNames());
             user.setRoles(roles);
@@ -59,7 +57,6 @@ public class UserService implements UserServicePort {
 
         User savedUser = userRepository.save(user);
 
-        // Crear perfil asociado
         Profile profile = Profile.builder()
                 .user(savedUser)
                 .firstName(request.getFirstName())
@@ -76,22 +73,19 @@ public class UserService implements UserServicePort {
 
     @Override
     public UserDTO updateUser(String userId, UpdateUserRequest request) {
-        UUID uuid = UUID.fromString(userId);
-        User user = userRepository.findById(uuid)
+        User user = userRepository.findById(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado"));
 
-        // Validar email único (si cambió)
         if (request.getEmail() != null && !request.getEmail().equals(user.getEmail())) {
             if (userRepository.existsByEmail(request.getEmail())) {
-                throw new ResourceConflictException("El email '" + request.getEmail() + "' ya está registrado");
+                throw new ResourceConflictException("El email '" + request.getEmail() + "' ya esta registrado");
             }
             user.setEmail(request.getEmail());
         }
 
-        // Validar teléfono único (si cambió)
         if (request.getPhone() != null && !request.getPhone().equals(user.getPhone())) {
             if (userRepository.existsByPhone(request.getPhone())) {
-                throw new ResourceConflictException("El teléfono '" + request.getPhone() + "' ya está registrado");
+                throw new ResourceConflictException("El telefono '" + request.getPhone() + "' ya esta registrado");
             }
             user.setPhone(request.getPhone());
         }
@@ -118,8 +112,7 @@ public class UserService implements UserServicePort {
     @Override
     @Transactional(readOnly = true)
     public UserDTO getUserById(String userId) {
-        UUID uuid = UUID.fromString(userId);
-        User user = userRepository.findById(uuid)
+        User user = userRepository.findById(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado"));
         return mapper.toUserDTO(user);
     }
@@ -140,17 +133,16 @@ public class UserService implements UserServicePort {
 
     @Override
     public void deleteUser(String userId) {
-        UUID uuid = UUID.fromString(userId);
-        if (!userRepository.existsById(uuid)) {
+        Long id = parseUserId(userId);
+        if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado");
         }
-        userRepository.deleteById(uuid);
+        userRepository.deleteById(id);
     }
 
     @Override
     public void assignRoleToUser(String userId, String roleName) {
-        UUID uuid = UUID.fromString(userId);
-        User user = userRepository.findById(uuid)
+        User user = userRepository.findById(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado"));
 
         Role role = roleRepository.findByName(roleName)
@@ -166,8 +158,7 @@ public class UserService implements UserServicePort {
 
     @Override
     public void removeRoleFromUser(String userId, String roleName) {
-        UUID uuid = UUID.fromString(userId);
-        User user = userRepository.findById(uuid)
+        User user = userRepository.findById(parseUserId(userId))
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado"));
 
         Role role = roleRepository.findByName(roleName)
@@ -191,5 +182,13 @@ public class UserService implements UserServicePort {
                 .filter(user -> user.getRoles().contains(role))
                 .map(mapper::toUserDTO)
                 .collect(Collectors.toList());
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.valueOf(userId);
+        } catch (NumberFormatException exception) {
+            throw new ResourceNotFoundException("Usuario con ID " + userId + " no encontrado");
+        }
     }
 }

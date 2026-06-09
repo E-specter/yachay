@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { GradeRecord, GradeStatus } from '../../../../core/models/grade.models';
+import { ReportService } from '../../../../core/services/report';
 
 type GradeStatusFilter = GradeStatus | 'TODOS';
 
@@ -11,6 +12,8 @@ type GradeStatusFilter = GradeStatus | 'TODOS';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Notas {
+  private readonly reportService = inject(ReportService);
+
   readonly search = signal('');
   readonly statusFilter = signal<GradeStatusFilter>('TODOS');
 
@@ -67,9 +70,28 @@ export class Notas {
     this.statusFilter.set((event.target as HTMLSelectElement).value as GradeStatusFilter);
   }
 
+  downloadExcel(): void {
+    const filename = 'notas.xlsx';
+
+    this.reportService.downloadNotas().subscribe({
+      next: (blob) => this.reportService.downloadFile(blob, filename),
+      error: (error) => this.reportService.handleDownloadError(filename, error),
+    });
+  }
+
+  viewGrade(grade: GradeRecord): void {
+    this.showAction(`Nota: ${grade.alumno} - ${grade.curso}`);
+  }
+
   statusClass(status: GradeStatus): string {
     if (status === 'REGISTRADA') return 'border-green-200 bg-green-50 text-green-700';
     if (status === 'OBSERVADA') return 'border-yellow-200 bg-yellow-50 text-yellow-800';
     return 'border-red-200 bg-red-50 text-red-700';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

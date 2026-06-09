@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/guards/auth';
+import { roleGuard } from './core/guards/role';
 
 export const routes: Routes = [
   {
@@ -44,7 +45,8 @@ export const routes: Routes = [
       import('./features/admin/layout/admin-layout/admin-layout').then(
         (m) => m.AdminLayout,
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMINISTRADOR'] },
     children: [
       {
         path: '',
@@ -58,6 +60,14 @@ export const routes: Routes = [
             (m) => m.Dashboard,
           ),
         title: 'Dashboard | Yachay',
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/admin/pages/perfil/perfil').then(
+            (m) => m.AdminPerfil,
+          ),
+        title: 'Perfil administrador | Yachay',
       },
       {
         path: 'postulaciones',
@@ -125,6 +135,14 @@ export const routes: Routes = [
           ),
         title: 'Comunicados | Yachay',
       },
+      {
+        path: 'notificaciones',
+        loadComponent: () =>
+          import('./features/admin/pages/notificaciones/notificaciones').then(
+            (m) => m.AdminNotificaciones,
+          ),
+        title: 'Notificaciones | Yachay',
+      },
     ],
   },
   {
@@ -133,7 +151,8 @@ export const routes: Routes = [
       import('./features/teacher/layout/teacher-layout/teacher-layout').then(
         (m) => m.TeacherLayout,
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['DOCENTE'] },
     children: [
       {
         path: '',
@@ -204,7 +223,8 @@ export const routes: Routes = [
       import('./features/student/layout/student-layout/student-layout').then(
         (m) => m.StudentLayout,
       ),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ALUMNO'] },
     children: [
       {
         path: '',
@@ -228,12 +248,36 @@ export const routes: Routes = [
         title: 'Mis cursos | Yachay',
       },
       {
+        path: 'cursos/:id',
+        loadComponent: () =>
+          import('./features/student/pages/curso-detalle/curso-detalle').then(
+            (m) => m.CursoDetalle,
+          ),
+        title: 'Detalle de curso | Yachay',
+      },
+      {
+        path: 'calendario',
+        loadComponent: () =>
+          import('./features/student/pages/calendario/calendario').then(
+            (m) => m.StudentCalendario,
+          ),
+        title: 'Calendario alumno | Yachay',
+      },
+      {
         path: 'tareas',
         loadComponent: () =>
           import('./features/student/pages/tareas/tareas').then(
             (m) => m.StudentTareas,
           ),
         title: 'Tareas alumno | Yachay',
+      },
+      {
+        path: 'tareas/:id',
+        loadComponent: () =>
+          import('./features/student/pages/tarea-detalle/tarea-detalle').then(
+            (m) => m.TareaDetalle,
+          ),
+        title: 'Detalle de tarea | Yachay',
       },
       {
         path: 'notas',
@@ -250,6 +294,14 @@ export const routes: Routes = [
             (m) => m.StudentComunicados,
           ),
         title: 'Comunicados alumno | Yachay',
+      },
+      {
+        path: 'comunicados/:id',
+        loadComponent: () =>
+          import('./features/student/pages/comunicado-detalle/comunicado-detalle').then(
+            (m) => m.ComunicadoDetalle,
+          ),
+        title: 'Detalle de comunicado | Yachay',
       },
       {
         path: 'perfil',

@@ -1,13 +1,14 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
 import {
   FormBuilder,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 
-import { AuthService } from '../../../../core/services/auth';
 import { UserRole } from '../../../../core/models/auth.models';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-login',
@@ -43,11 +44,9 @@ export class Login {
         this.loading.set(false);
         this.router.navigateByUrl(this.homeRouteByRole(response.user.role));
       },
-      error: () => {
+      error: (error: unknown) => {
         this.loading.set(false);
-        this.errorMessage.set(
-          'Credenciales incorrectas. Verifica tu correo institucional y contraseña.',
-        );
+        this.errorMessage.set(this.loginErrorMessage(error));
       },
     });
   }
@@ -65,5 +64,27 @@ export class Login {
     };
 
     return routes[role];
+  }
+
+  private loginErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      console.error('Error iniciando sesion', {
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        message: error.message,
+        error: error.error,
+      });
+
+      if (error.status === 401 || error.status === 403 || error.status === 400) {
+        return 'Credenciales incorrectas.';
+      }
+
+      if (error.status === 0) {
+        return 'No se pudo conectar con el servidor. Verifica que el backend este activo en http://localhost:8080/api y que MySQL este iniciado.';
+      }
+    }
+
+    return 'No se pudo conectar con el servidor. Verifica que el backend este activo en http://localhost:8080/api y que MySQL este iniciado.';
   }
 }

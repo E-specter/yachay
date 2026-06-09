@@ -1,6 +1,8 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { Student, StudentStatus } from '../../../../core/models/student.models';
+import { DocumentService } from '../../../../core/services/document';
+import { ReportService } from '../../../../core/services/report';
 
 type StudentStatusFilter = StudentStatus | 'TODOS';
 
@@ -11,6 +13,9 @@ type StudentStatusFilter = StudentStatus | 'TODOS';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Alumnos {
+  private readonly reportService = inject(ReportService);
+  private readonly documentService = inject(DocumentService);
+
   readonly search = signal('');
   readonly statusFilter = signal<StudentStatusFilter>('TODOS');
 
@@ -82,9 +87,43 @@ export class Alumnos {
     this.statusFilter.set((event.target as HTMLSelectElement).value as StudentStatusFilter);
   }
 
+  downloadExcel(): void {
+    const filename = 'alumnos.xlsx';
+
+    this.reportService.downloadAlumnos().subscribe({
+      next: (blob) => this.reportService.downloadFile(blob, filename),
+      error: (error) => this.reportService.handleDownloadError(filename, error),
+    });
+  }
+
+  generateStudentPdf(student: Student): void {
+    this.documentService.generateStudentPdf(student.id).subscribe({
+      next: (response) => this.showAction(response.message),
+      error: () => this.showAction('No se pudo generar la ficha PDF. Verifica que el backend este activo.'),
+    });
+  }
+
+  viewStudent(student: Student): void {
+    this.showAction(`Alumno: ${student.nombres} ${student.apellidos}`);
+  }
+
+  editStudent(student: Student): void {
+    this.showAction(`Editar alumno: ${student.nombres} ${student.apellidos}`);
+  }
+
+  changeStudentStatus(student: Student): void {
+    this.showAction(`Cambiar estado de: ${student.nombres} ${student.apellidos}`);
+  }
+
   statusClass(status: StudentStatus): string {
     if (status === 'ACTIVO') return 'border-green-200 bg-green-50 text-green-700';
     if (status === 'RETIRADO') return 'border-red-200 bg-red-50 text-red-700';
     return 'border-slate-200 bg-slate-50 text-slate-600';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

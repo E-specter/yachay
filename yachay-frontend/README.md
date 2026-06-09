@@ -115,15 +115,33 @@ Despues del login, el frontend redirige por rol:
 - `/login`
 - `/register`
 - `/admin/dashboard`
+- `/admin/notificaciones`
 - `/docente/dashboard`
 - `/alumno/dashboard`
 
-Cada modulo protegido usa `authGuard`. Mas adelante se puede agregar un `roleGuard` para reforzar autorizacion por rol.
+Cada modulo protegido usa `authGuard` y `roleGuard` para separar rutas de administrador, docente y alumno.
+
+## Administracion Avance 3
+
+La administracion incluye botones de descarga XLSX en:
+
+- `/admin/alumnos`
+- `/admin/docentes`
+- `/admin/cursos`
+- `/admin/postulaciones`
+- `/admin/notas`
+
+Tambien existe la vista `/admin/notificaciones`, que permite probar correo SMTP y WhatsApp mock contra el backend. Si el backend no esta activo, los servicios muestran mensajes controlados sin romper la pantalla.
+
+Los botones de PDF preparados estan en:
+
+- `/admin/alumnos`: `Ficha PDF`
+- `/admin/postulaciones`: `Generar PDF`
 
 ## Ejecutar
 
 ```powershell
-cd C:\GitHub\yachay\yachay-frontend
+cd C:\E-specter\yachay\yachay-frontend
 npm install
 npm start
 ```

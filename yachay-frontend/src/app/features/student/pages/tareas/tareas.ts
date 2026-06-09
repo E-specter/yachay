@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 interface StudentHomework {
   id: number;
@@ -15,7 +16,7 @@ type StatusFilter = StudentHomework['estadoEntrega'] | 'TODOS';
 
 @Component({
   selector: 'app-student-tareas',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './tareas.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -24,9 +25,9 @@ export class StudentTareas {
   readonly statusFilter = signal<StatusFilter>('TODOS');
 
   readonly homeworks: readonly StudentHomework[] = [
-    { id: 1, titulo: 'Resolución de problemas', descripcion: 'Ejercicios de multiplicación y división.', curso: 'Matemática III', docente: 'Miguel Campos Flores', fechaPublicacion: '2026-05-05', fechaEntrega: '2026-05-12', estadoEntrega: 'PENDIENTE' },
-    { id: 2, titulo: 'Lectura guiada', descripcion: 'Comprensión lectora.', curso: 'Comunicación III', docente: 'Rosa Vargas Medina', fechaPublicacion: '2026-05-04', fechaEntrega: '2026-05-11', estadoEntrega: 'ENTREGADA' },
-    { id: 3, titulo: 'Vocabulary quiz', descripcion: 'Lista de vocabulario semanal.', curso: 'Inglés III', docente: 'Patricia López Rivas', fechaPublicacion: '2026-04-28', fechaEntrega: '2026-05-02', estadoEntrega: 'CALIFICADA' },
+    { id: 1, titulo: 'Resolución de problemas', descripcion: 'Ejercicios de multiplicación y división.', curso: 'Matemática III', docente: 'Rosa Vargas', fechaPublicacion: '2026-05-05', fechaEntrega: '2026-05-12', estadoEntrega: 'PENDIENTE' },
+    { id: 2, titulo: 'Lectura guiada', descripcion: 'Comprensión lectora.', curso: 'Comunicación I', docente: 'Luis Herrera', fechaPublicacion: '2026-05-04', fechaEntrega: '2026-05-11', estadoEntrega: 'ENTREGADA' },
+    { id: 3, titulo: 'Vocabulary quiz', descripcion: 'Lista de vocabulario semanal.', curso: 'Inglés III', docente: 'Patricia López', fechaPublicacion: '2026-04-28', fechaEntrega: '2026-05-02', estadoEntrega: 'CALIFICADA' },
   ];
 
   readonly filteredHomeworks = computed(() => {

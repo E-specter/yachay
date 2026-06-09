@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 interface StudentCourse {
   id: number;
@@ -16,7 +17,7 @@ type StatusFilter = StudentCourse['estado'] | 'TODOS';
 
 @Component({
   selector: 'app-student-cursos',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './cursos.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -25,9 +26,9 @@ export class StudentCursos {
   readonly statusFilter = signal<StatusFilter>('TODOS');
 
   readonly courses: readonly StudentCourse[] = [
-    { id: 1, codigo: 'MAT-P3', nombre: 'Matemática III', docente: 'Miguel Campos Flores', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 17.4, estado: 'ACTIVO' },
-    { id: 2, codigo: 'COM-P3', nombre: 'Comunicación III', docente: 'Rosa Vargas Medina', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 16.2, estado: 'ACTIVO' },
-    { id: 3, codigo: 'ING-P3', nombre: 'Inglés III', docente: 'Patricia López Rivas', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 15.8, estado: 'ACTIVO' },
+    { id: 1, codigo: 'MAT-P3', nombre: 'Matemática III', docente: 'Rosa Vargas', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 17.4, estado: 'ACTIVO' },
+    { id: 2, codigo: 'COM-P3', nombre: 'Comunicación I', docente: 'Luis Herrera', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 16.2, estado: 'ACTIVO' },
+    { id: 3, codigo: 'ING-P3', nombre: 'Inglés III', docente: 'Patricia López', nivel: 'Primaria', grado: '3° Primaria', seccion: 'B', promedio: 15.8, estado: 'ACTIVO' },
   ];
 
   readonly filteredCourses = computed(() => {

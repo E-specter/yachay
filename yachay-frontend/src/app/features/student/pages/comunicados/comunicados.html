@@ -33,8 +33,8 @@
             <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ announcement.leido ? 'LEÍDO' : 'NO LEÍDO' }}</span></td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Ver comunicado</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Marcar como leído</button>
+                <a [routerLink]="['/alumno/comunicados', announcement.id]" class="inline-flex min-h-10 items-center rounded-lg border border-yachay-300 px-3 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-100">Ver comunicado</a>
+                <a [routerLink]="['/alumno/comunicados', announcement.id]" class="inline-flex min-h-10 items-center rounded-lg border border-yachay-300 px-3 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-100">Marcar como leído</a>
               </div>
             </td>
           </tr>

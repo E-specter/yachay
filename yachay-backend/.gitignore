@@ -1,4 +1,8 @@
 HELP.md
+.env
+src/main/resources/application-local.yaml
+run-backend.ps1
+*.log
 target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/

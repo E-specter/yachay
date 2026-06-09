@@ -46,4 +46,14 @@ export class TeacherComunicados {
   updateStatusFilter(event: Event): void {
     this.statusFilter.set((event.target as HTMLSelectElement).value as StatusFilter);
   }
+
+  viewAnnouncement(announcement: TeacherAnnouncement): void {
+    this.showAction(`Comunicado: ${announcement.titulo}`);
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
+  }
 }

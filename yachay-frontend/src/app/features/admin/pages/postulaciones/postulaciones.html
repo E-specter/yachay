@@ -1,20 +1,29 @@
 <section class="grid gap-6">
-  <div>
-    <p class="text-sm font-bold text-yachay-org-dark">Admisión</p>
-    <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">
-      Postulaciones
-    </h1>
-    <p class="mt-3 max-w-3xl text-sm font-medium leading-7 text-yachay-muted">
-      Revisión inicial de solicitudes públicas. Al aceptar una postulación,
-      el flujo futuro creará el alumno, asignará nivel, grado y sección,
-      generará usuario institucional y vinculará al apoderado para
-      notificaciones.
-    </p>
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+    <div>
+      <p class="text-sm font-bold text-yachay-org-dark">Admision</p>
+      <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">
+        Postulaciones
+      </h1>
+      <p class="mt-3 max-w-3xl text-sm font-medium leading-7 text-yachay-muted">
+        Revision inicial de solicitudes publicas. Al aceptar una postulacion,
+        el flujo futuro crea el alumno, asigna nivel, grado y seccion,
+        genera usuario institucional y vincula al apoderado para notificaciones.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="rounded-lg border border-yachay-800 bg-white px-5 py-3 text-sm font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white"
+      (click)="downloadExcel()"
+    >
+      Descargar Excel
+    </button>
   </div>
 
   <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
-    <table class="w-full min-w-[64rem] border-collapse text-left text-sm">
-      <caption class="sr-only">Lista de postulaciones de admisión</caption>
+    <table class="w-full min-w-[72rem] border-collapse text-left text-sm">
+      <caption class="sr-only">Lista de postulaciones de admision</caption>
       <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
         <tr>
           <th scope="col" class="px-5 py-4 font-extrabold">Postulante</th>
@@ -47,17 +56,20 @@
             </td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-800 px-3 py-2 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white">
+                <button type="button" class="rounded-lg border border-yachay-800 px-3 py-2 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white" (click)="viewPostulacion(postulacion)">
                   Ver
                 </button>
-                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white">
+                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white" (click)="acceptPostulacion(postulacion)">
                   Aceptar
                 </button>
-                <button type="button" class="rounded-lg border border-yachay-danger px-3 py-2 text-xs font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white">
+                <button type="button" class="rounded-lg border border-yachay-danger px-3 py-2 text-xs font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white" (click)="rejectPostulacion(postulacion)">
                   Rechazar
                 </button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-muted transition hover:bg-yachay-100">
-                  Asignar sección
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-muted transition hover:bg-yachay-100" (click)="assignSection(postulacion)">
+                  Asignar seccion
+                </button>
+                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white" (click)="generatePdf(postulacion)">
+                  Generar PDF
                 </button>
               </div>
             </td>

@@ -1,6 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 
 import { Teacher, TeacherStatus } from '../../../../core/models/teacher.models';
+import { ReportService } from '../../../../core/services/report';
 
 type TeacherStatusFilter = TeacherStatus | 'TODOS';
 
@@ -11,6 +12,8 @@ type TeacherStatusFilter = TeacherStatus | 'TODOS';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Docentes {
+  private readonly reportService = inject(ReportService);
+
   readonly search = signal('');
   readonly statusFilter = signal<TeacherStatusFilter>('TODOS');
 
@@ -73,9 +76,28 @@ export class Docentes {
     this.statusFilter.set((event.target as HTMLSelectElement).value as TeacherStatusFilter);
   }
 
+  downloadExcel(): void {
+    const filename = 'docentes.xlsx';
+
+    this.reportService.downloadDocentes().subscribe({
+      next: (blob) => this.reportService.downloadFile(blob, filename),
+      error: (error) => this.reportService.handleDownloadError(filename, error),
+    });
+  }
+
+  viewTeacher(teacher: Teacher): void {
+    this.showAction(`Docente: ${teacher.nombres} ${teacher.apellidos}`);
+  }
+
   statusClass(status: TeacherStatus): string {
     return status === 'ACTIVO'
       ? 'border-green-200 bg-green-50 text-green-700'
       : 'border-slate-200 bg-slate-50 text-slate-600';
+  }
+
+  private showAction(message: string): void {
+    if (typeof window !== 'undefined') {
+      window.alert(message);
+    }
   }
 }

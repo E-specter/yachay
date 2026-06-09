@@ -67,9 +67,9 @@ identity/
 
 ### User
 
-Representa un usuario del sistema extendido de `auth.users` de Supabase.
+Representa un usuario del sistema en la tabla compatible con MySQL `auth_users`.
 
-- **Campos**: id (UUID), email, phone, displayName, encryptedPassword, confirmaciones, roles
+- **Campos**: id (Long autoincremental), email, phone, displayName, encryptedPassword, confirmaciones, roles
 - **Relaciones**: 1-1 con Profile, N-M con Role
 
 ### Role
@@ -253,20 +253,20 @@ DELETE /api/v1/schools/{schoolId}       # Eliminar escuela
 
 ## Configuración de Base de Datos
 
-El módulo utiliza PostgreSQL con JPA/Hibernate. La configuración se encuentra en `application.yaml`:
+El modulo utiliza MySQL con JPA/Hibernate. La configuracion se encuentra en `application.yaml`:
 
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/yachay
-    username: postgres
-    password: postgres
+    url: jdbc:mysql://localhost:3306/yachay?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima
+    username: root
+    password:
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 ```
 
 ## Manejo de Excepciones
@@ -363,6 +363,6 @@ entidades. Las operaciones de lectura utilizan `readOnly = true` para optimizaci
 
 - Spring Boot 4.0.6
 - Spring Data JPA
-- PostgreSQL Driver
+- MySQL Connector/J
 - Lombok
 - Jakarta Validation

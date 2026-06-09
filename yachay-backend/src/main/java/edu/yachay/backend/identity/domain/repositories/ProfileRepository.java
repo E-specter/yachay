@@ -5,14 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
-/**
- * Repositorio para acceder a entidades Profile en la base de datos.
- */
 @Repository
 public interface ProfileRepository extends JpaRepository<Profile, Integer> {
-    Optional<Profile> findByUserId(UUID userId);
+    Optional<Profile> findByUserId(Long userId);
 
-    boolean existsByUserId(UUID userId);
+    boolean existsByUserId(Long userId);
 }

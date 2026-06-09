@@ -1,36 +1,82 @@
-<main class="min-h-screen bg-yachay-100 px-5 py-8 text-yachay-900 sm:px-8 lg:px-10">
+<main class="public-shell">
   <section class="mx-auto w-full max-w-7xl">
-    <div class="flex flex-col gap-5 border-b border-yachay-300 pb-8 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <a routerLink="/login" class="text-sm font-bold text-yachay-800 transition hover:text-yachay-org-dark">
-          Volver al login
-        </a>
+    <header class="public-hero">
+      <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-3xl">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <img
+              src="/images/brand/yachay-logo.png"
+              alt="Yachay Campus Virtual"
+              class="h-14 w-auto object-contain"
+            />
+          </div>
 
-        <p class="mt-6 text-sm font-bold uppercase text-yachay-org-dark">
-          Admisión escolar
-        </p>
+          <p class="mt-7 text-sm font-black uppercase tracking-[0.28em] text-public-orange">
+            Solicitud de admisión
+          </p>
 
-        <h1 class="mt-3 text-4xl font-extrabold leading-tight text-yachay-900 sm:text-5xl">
-          Solicitud de registro de postulantes
-        </h1>
+          <h1 class="mt-3 text-4xl font-black leading-tight text-public-ink sm:text-5xl">
+            Registro de postulación
+          </h1>
 
-        <p class="mt-4 max-w-3xl text-base font-medium leading-7 text-yachay-muted">
-          El apoderado completa la información de uno o más postulantes. La
-          solicitud quedará pendiente para revisión del administrador.
-        </p>
+          <p class="mt-4 max-w-3xl text-base font-semibold leading-7 text-slate-700">
+            Completa los datos del postulante y del apoderado responsable. La
+            solicitud será revisada por administración.
+          </p>
+        </div>
+
+        <div class="rounded-lg border border-public-line bg-public-paper px-5 py-4">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-slate-500">
+            Postulantes
+          </p>
+          <p class="mt-1 text-3xl font-black text-public-ink">
+            {{ totalPostulantes() }}
+          </p>
+        </div>
       </div>
 
-      <div class="rounded-lg border border-yachay-300 bg-white px-5 py-4">
-        <p class="text-sm font-bold text-yachay-muted">Postulantes</p>
-        <p class="mt-1 text-3xl font-extrabold text-yachay-800">
-          {{ totalPostulantes() }}
-        </p>
+      <div class="mt-8 grid gap-3 md:grid-cols-3" aria-label="Etapas de la postulación">
+        <div class="rounded-lg border border-public-line bg-white p-4">
+          <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-public-aqua text-sm font-black text-public-ink">
+              1
+            </span>
+            <div>
+              <p class="text-sm font-black text-public-ink">Postulante</p>
+              <p class="text-xs font-semibold text-slate-600">Datos personales y académicos</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-public-line bg-white p-4">
+          <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-public-mint text-sm font-black text-public-ink">
+              2
+            </span>
+            <div>
+              <p class="text-sm font-black text-public-ink">Apoderado</p>
+              <p class="text-xs font-semibold text-slate-600">Responsable legal y contacto</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-public-line bg-white p-4">
+          <div class="flex items-center gap-3">
+            <span class="flex h-9 w-9 items-center justify-center rounded-full bg-public-amber text-sm font-black text-public-ink">
+              3
+            </span>
+            <div>
+              <p class="text-sm font-black text-public-ink">Confirmación</p>
+              <p class="text-xs font-semibold text-slate-600">Revisión por administración</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </header>
 
     @if (successMessage()) {
       <div
-        class="mt-6 rounded-lg border border-yachay-success bg-yachay-success/10 px-5 py-4 text-sm font-bold text-yachay-success"
+        class="mt-6 rounded-lg border border-public-mint bg-public-mint/20 px-5 py-4 text-sm font-black text-public-ink"
         role="status"
         aria-live="polite"
       >
@@ -40,594 +86,638 @@
 
     @if (errorMessage()) {
       <div
-        class="mt-6 rounded-lg border border-yachay-danger bg-yachay-danger/10 px-5 py-4 text-sm font-bold text-yachay-danger"
+        class="mt-6 rounded-lg border border-public-orange bg-public-orange/10 px-5 py-4 text-sm font-black text-public-ink"
         role="alert"
       >
         {{ errorMessage() }}
       </div>
     }
 
-    <form [formGroup]="form" (ngSubmit)="enviarPostulacion()" class="mt-8 grid gap-6">
+    <form [formGroup]="form" (ngSubmit)="enviarPostulacion()" class="mt-6 grid gap-6">
       <div formArrayName="postulantes" class="grid gap-6">
         @for (postulante of postulantes.controls; track postulante; let index = $index) {
           <article
             [formGroupName]="index"
-            class="rounded-lg border border-yachay-300 bg-white"
+            class="form-section"
             [attr.aria-labelledby]="'postulante-title-' + index"
           >
-            <div class="flex flex-col gap-4 border-b border-yachay-300 px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-4 border-b border-public-line pb-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p class="text-sm font-bold text-yachay-muted">Postulante</p>
+                <p class="text-xs font-black uppercase tracking-[0.2em] text-public-orange">
+                  Postulante {{ index + 1 }}
+                </p>
                 <h2
-                  class="mt-1 text-2xl font-extrabold text-yachay-900"
+                  class="mt-2 text-2xl font-black text-public-ink"
                   [id]="'postulante-title-' + index"
                 >
-                  Datos del estudiante {{ index + 1 }}
+                  Datos del postulante
                 </h2>
+                <p class="mt-1 text-sm font-semibold text-slate-600">
+                  Información personal para identificar correctamente la solicitud.
+                </p>
               </div>
 
               @if (postulantes.length > 1) {
                 <button
                   type="button"
-                  class="rounded-md border border-yachay-danger px-4 py-2 text-sm font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white"
+                  class="inline-flex min-h-10 items-center justify-center rounded-lg border border-public-orange px-4 text-sm font-black text-public-orange transition hover:bg-public-orange hover:text-white"
                   (click)="eliminarPostulante(index)"
                   [attr.aria-label]="'Eliminar postulante ' + (index + 1)"
                 >
-                  Eliminar
+                  Eliminar postulante
                 </button>
               }
             </div>
 
-            <div class="grid gap-8 p-5 lg:p-6">
-              <section>
-                <h3 class="text-lg font-extrabold text-yachay-900">Datos personales</h3>
+            <section class="pt-6" aria-labelledby="datos-personales-postulante">
+              <h3 id="datos-personales-postulante" class="text-lg font-black text-public-ink">
+                Datos personales del postulante
+              </h3>
+              <p class="mt-1 text-sm font-semibold text-slate-600">
+                Registra los datos tal como figuran en el documento de identidad.
+              </p>
 
-                <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'apellidoPaterno')">
-                      Apellido paterno <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'apellidoPaterno')"
-                      formControlName="apellidoPaterno"
-                      autocomplete="family-name"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.apellidoPaterno')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.apellidoPaterno')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.apellidoPaterno') ? postulanteErrorId(index, 'apellidoPaterno') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.apellidoPaterno')) {
-                      <p [id]="postulanteErrorId(index, 'apellidoPaterno')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'apellidoMaterno')">
-                      Apellido materno <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'apellidoMaterno')"
-                      formControlName="apellidoMaterno"
-                      autocomplete="family-name"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.apellidoMaterno')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.apellidoMaterno')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.apellidoMaterno') ? postulanteErrorId(index, 'apellidoMaterno') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.apellidoMaterno')) {
-                      <p [id]="postulanteErrorId(index, 'apellidoMaterno')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div class="xl:col-span-2">
-                    <label class="label" [for]="postulanteId(index, 'nombres')">
-                      Nombres <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'nombres')"
-                      formControlName="nombres"
-                      autocomplete="given-name"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.nombres')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.nombres')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.nombres') ? postulanteErrorId(index, 'nombres') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.nombres')) {
-                      <p [id]="postulanteErrorId(index, 'nombres')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'genero')">
-                      Género <span aria-hidden="true">*</span>
-                    </label>
-                    <select
-                      [id]="postulanteId(index, 'genero')"
-                      formControlName="genero"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.genero')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.genero')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.genero') ? postulanteErrorId(index, 'genero') : null"
-                    >
-                      <option value="">Selecciona</option>
-                      @for (genero of generos; track genero) {
-                        <option [value]="genero">{{ genero }}</option>
-                      }
-                    </select>
-                    @if (campoInvalido('postulantes.' + index + '.genero')) {
-                      <p [id]="postulanteErrorId(index, 'genero')" class="field-error">
-                        Selecciona una opción.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'documentoTipo')">
-                      Tipo de documento <span aria-hidden="true">*</span>
-                    </label>
-                    <select
-                      [id]="postulanteId(index, 'documentoTipo')"
-                      formControlName="documentoTipo"
-                      class="input"
-                    >
-                      <option value="DNI">DNI</option>
-                      <option value="CE">Carné de extranjería</option>
-                      <option value="Pasaporte">Pasaporte</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'documentoNumero')">
-                      Número de documento <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'documentoNumero')"
-                      formControlName="documentoNumero"
-                      inputmode="numeric"
-                      autocomplete="off"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.documentoNumero')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.documentoNumero')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.documentoNumero') ? postulanteErrorId(index, 'documentoNumero') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.documentoNumero')) {
-                      <p [id]="postulanteErrorId(index, 'documentoNumero')" class="field-error">
-                        Ingresa al menos 8 caracteres.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'fechaNacimiento')">
-                      Fecha de nacimiento <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'fechaNacimiento')"
-                      type="date"
-                      formControlName="fechaNacimiento"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.fechaNacimiento')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.fechaNacimiento')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.fechaNacimiento') ? postulanteErrorId(index, 'fechaNacimiento') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.fechaNacimiento')) {
-                      <p [id]="postulanteErrorId(index, 'fechaNacimiento')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'viveCon')">
-                      Vive con <span aria-hidden="true">*</span>
-                    </label>
-                    <select
-                      [id]="postulanteId(index, 'viveCon')"
-                      formControlName="viveCon"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.viveCon')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.viveCon')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.viveCon') ? postulanteErrorId(index, 'viveCon') : null"
-                    >
-                      <option value="">Selecciona</option>
-                      @for (item of viveCon; track item) {
-                        <option [value]="item">{{ item }}</option>
-                      }
-                    </select>
-                    @if (campoInvalido('postulantes.' + index + '.viveCon')) {
-                      <p [id]="postulanteErrorId(index, 'viveCon')" class="field-error">
-                        Selecciona una opción.
-                      </p>
-                    }
-                  </div>
+              <div class="form-grid">
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'apellidoPaterno')">
+                    Apellido paterno <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'apellidoPaterno')"
+                    formControlName="apellidoPaterno"
+                    autocomplete="family-name"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.apellidoPaterno')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.apellidoPaterno')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.apellidoPaterno') ? postulanteErrorId(index, 'apellidoPaterno') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.apellidoPaterno')) {
+                    <p [id]="postulanteErrorId(index, 'apellidoPaterno')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
                 </div>
-              </section>
 
-              <section>
-                <h3 class="text-lg font-extrabold text-yachay-900">Datos académicos</h3>
-
-                <div class="mt-5 grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'colegioProcedencia')">
-                      Colegio de procedencia <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'colegioProcedencia')"
-                      formControlName="colegioProcedencia"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.colegioProcedencia')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.colegioProcedencia')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.colegioProcedencia') ? postulanteErrorId(index, 'colegioProcedencia') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.colegioProcedencia')) {
-                      <p [id]="postulanteErrorId(index, 'colegioProcedencia')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'lugarColegioProcedencia')">
-                      Lugar del colegio <span aria-hidden="true">*</span>
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'lugarColegioProcedencia')"
-                      formControlName="lugarColegioProcedencia"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia') ? postulanteErrorId(index, 'lugarColegioProcedencia') : null"
-                    />
-                    @if (campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')) {
-                      <p [id]="postulanteErrorId(index, 'lugarColegioProcedencia')" class="field-error">
-                        Campo obligatorio.
-                      </p>
-                    }
-                  </div>
-
-                  <div class="md:col-span-2">
-                    <label class="label" [for]="postulanteId(index, 'referenciaZonaColegio')">
-                      Referencia de zona
-                    </label>
-                    <input
-                      [id]="postulanteId(index, 'referenciaZonaColegio')"
-                      formControlName="referenciaZonaColegio"
-                      class="input"
-                    />
-                  </div>
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'apellidoMaterno')">
+                    Apellido materno <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'apellidoMaterno')"
+                    formControlName="apellidoMaterno"
+                    autocomplete="family-name"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.apellidoMaterno')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.apellidoMaterno')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.apellidoMaterno') ? postulanteErrorId(index, 'apellidoMaterno') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.apellidoMaterno')) {
+                    <p [id]="postulanteErrorId(index, 'apellidoMaterno')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
                 </div>
-              </section>
 
-              <section>
-                <h3 class="text-lg font-extrabold text-yachay-900">Datos de postulación</h3>
-
-                <div class="mt-5 grid gap-5 md:grid-cols-2">
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'nivel')">
-                      Nivel <span aria-hidden="true">*</span>
-                    </label>
-                    <select
-                      [id]="postulanteId(index, 'nivel')"
-                      formControlName="nivel"
-                      class="input"
-                      (change)="cambiarNivel(index)"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.nivel')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.nivel')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.nivel') ? postulanteErrorId(index, 'nivel') : null"
-                    >
-                      <option value="">Selecciona</option>
-                      @for (nivel of niveles; track nivel) {
-                        <option [value]="nivel">{{ nivel }}</option>
-                      }
-                    </select>
-                    @if (campoInvalido('postulantes.' + index + '.nivel')) {
-                      <p [id]="postulanteErrorId(index, 'nivel')" class="field-error">
-                        Selecciona un nivel.
-                      </p>
-                    }
-                  </div>
-
-                  <div>
-                    <label class="label" [for]="postulanteId(index, 'grado')">
-                      Grado <span aria-hidden="true">*</span>
-                    </label>
-                    <select
-                      [id]="postulanteId(index, 'grado')"
-                      formControlName="grado"
-                      class="input"
-                      [class.input-invalid]="campoInvalido('postulantes.' + index + '.grado')"
-                      [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.grado')"
-                      [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.grado') ? postulanteErrorId(index, 'grado') : null"
-                    >
-                      <option value="">Selecciona</option>
-                      @for (grado of gradosDisponibles(index); track grado) {
-                        <option [value]="grado">{{ grado }}</option>
-                      }
-                    </select>
-                    @if (campoInvalido('postulantes.' + index + '.grado')) {
-                      <p [id]="postulanteErrorId(index, 'grado')" class="field-error">
-                        Selecciona un grado.
-                      </p>
-                    }
-                  </div>
+                <div class="xl:col-span-2">
+                  <label class="label" [for]="postulanteId(index, 'nombres')">
+                    Nombres <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'nombres')"
+                    formControlName="nombres"
+                    autocomplete="given-name"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.nombres')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.nombres')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.nombres') ? postulanteErrorId(index, 'nombres') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.nombres')) {
+                    <p [id]="postulanteErrorId(index, 'nombres')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
                 </div>
-              </section>
-            </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'genero')">
+                    Género <span aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    [id]="postulanteId(index, 'genero')"
+                    formControlName="genero"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.genero')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.genero')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.genero') ? postulanteErrorId(index, 'genero') : null"
+                  >
+                    <option value="">Selecciona</option>
+                    @for (genero of generos; track genero) {
+                      <option [value]="genero">{{ genero }}</option>
+                    }
+                  </select>
+                  @if (campoInvalido('postulantes.' + index + '.genero')) {
+                    <p [id]="postulanteErrorId(index, 'genero')" class="field-error">
+                      Selecciona una opción.
+                    </p>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'documentoTipo')">
+                    Tipo de documento <span aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    [id]="postulanteId(index, 'documentoTipo')"
+                    formControlName="documentoTipo"
+                    class="input"
+                  >
+                    <option value="DNI">DNI</option>
+                    <option value="CE">Carné de extranjería</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'documentoNumero')">
+                    Número de documento <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'documentoNumero')"
+                    formControlName="documentoNumero"
+                    inputmode="numeric"
+                    autocomplete="off"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.documentoNumero')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.documentoNumero')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.documentoNumero') ? postulanteErrorId(index, 'documentoNumero') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.documentoNumero')) {
+                    <p [id]="postulanteErrorId(index, 'documentoNumero')" class="field-error">
+                      Ingresa al menos 8 caracteres.
+                    </p>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'fechaNacimiento')">
+                    Fecha de nacimiento <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'fechaNacimiento')"
+                    type="date"
+                    formControlName="fechaNacimiento"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.fechaNacimiento')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.fechaNacimiento')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.fechaNacimiento') ? postulanteErrorId(index, 'fechaNacimiento') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.fechaNacimiento')) {
+                    <p [id]="postulanteErrorId(index, 'fechaNacimiento')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'viveCon')">
+                    Vive con <span aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    [id]="postulanteId(index, 'viveCon')"
+                    formControlName="viveCon"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.viveCon')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.viveCon')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.viveCon') ? postulanteErrorId(index, 'viveCon') : null"
+                  >
+                    <option value="">Selecciona</option>
+                    @for (item of viveCon; track item) {
+                      <option [value]="item">{{ item }}</option>
+                    }
+                  </select>
+                  @if (campoInvalido('postulantes.' + index + '.viveCon')) {
+                    <p [id]="postulanteErrorId(index, 'viveCon')" class="field-error">
+                      Selecciona una opción.
+                    </p>
+                  }
+                </div>
+              </div>
+            </section>
+
+            <section class="mt-8 border-t border-public-line pt-6" aria-labelledby="datos-academicos-postulante">
+              <h3 id="datos-academicos-postulante" class="text-lg font-black text-public-ink">
+                Datos académicos del postulante
+              </h3>
+              <p class="mt-1 text-sm font-semibold text-slate-600">
+                Indica el colegio de procedencia y el grado al que postula.
+              </p>
+
+              <div class="mt-5 grid gap-4 md:grid-cols-2">
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'colegioProcedencia')">
+                    Colegio de procedencia <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'colegioProcedencia')"
+                    formControlName="colegioProcedencia"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.colegioProcedencia')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.colegioProcedencia')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.colegioProcedencia') ? postulanteErrorId(index, 'colegioProcedencia') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.colegioProcedencia')) {
+                    <p [id]="postulanteErrorId(index, 'colegioProcedencia')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'lugarColegioProcedencia')">
+                    Lugar del colegio <span aria-hidden="true">*</span>
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'lugarColegioProcedencia')"
+                    formControlName="lugarColegioProcedencia"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.lugarColegioProcedencia') ? postulanteErrorId(index, 'lugarColegioProcedencia') : null"
+                  />
+                  @if (campoInvalido('postulantes.' + index + '.lugarColegioProcedencia')) {
+                    <p [id]="postulanteErrorId(index, 'lugarColegioProcedencia')" class="field-error">
+                      Campo obligatorio.
+                    </p>
+                  }
+                </div>
+
+                <div class="md:col-span-2">
+                  <label class="label" [for]="postulanteId(index, 'referenciaZonaColegio')">
+                    Referencia de zona del colegio
+                  </label>
+                  <input
+                    [id]="postulanteId(index, 'referenciaZonaColegio')"
+                    formControlName="referenciaZonaColegio"
+                    class="input"
+                  />
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'nivel')">
+                    Nivel <span aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    [id]="postulanteId(index, 'nivel')"
+                    formControlName="nivel"
+                    class="input"
+                    (change)="cambiarNivel(index)"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.nivel')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.nivel')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.nivel') ? postulanteErrorId(index, 'nivel') : null"
+                  >
+                    <option value="">Selecciona</option>
+                    @for (nivel of niveles; track nivel) {
+                      <option [value]="nivel">{{ nivel }}</option>
+                    }
+                  </select>
+                  @if (campoInvalido('postulantes.' + index + '.nivel')) {
+                    <p [id]="postulanteErrorId(index, 'nivel')" class="field-error">
+                      Selecciona un nivel.
+                    </p>
+                  }
+                </div>
+
+                <div>
+                  <label class="label" [for]="postulanteId(index, 'grado')">
+                    Grado <span aria-hidden="true">*</span>
+                  </label>
+                  <select
+                    [id]="postulanteId(index, 'grado')"
+                    formControlName="grado"
+                    class="input"
+                    [class.input-invalid]="campoInvalido('postulantes.' + index + '.grado')"
+                    [attr.aria-invalid]="campoInvalido('postulantes.' + index + '.grado')"
+                    [attr.aria-describedby]="campoInvalido('postulantes.' + index + '.grado') ? postulanteErrorId(index, 'grado') : null"
+                  >
+                    <option value="">Selecciona</option>
+                    @for (grado of gradosDisponibles(index); track grado) {
+                      <option [value]="grado">{{ grado }}</option>
+                    }
+                  </select>
+                  @if (campoInvalido('postulantes.' + index + '.grado')) {
+                    <p [id]="postulanteErrorId(index, 'grado')" class="field-error">
+                      Selecciona un grado.
+                    </p>
+                  }
+                </div>
+              </div>
+            </section>
           </article>
         }
       </div>
 
       <button
         type="button"
-        class="w-fit rounded-md border border-yachay-800 px-5 py-3 text-sm font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white"
+        class="w-fit rounded-lg border border-public-ink bg-white px-5 py-3 text-sm font-black text-public-ink transition hover:-translate-y-0.5 hover:bg-public-ink hover:text-white"
         (click)="agregarPostulante()"
       >
-        + Registrar otro postulante
+        + Agregar otro postulante
       </button>
 
-      <section formGroupName="apoderado" class="rounded-lg border border-yachay-300 bg-white">
-        <div class="border-b border-yachay-300 px-5 py-5">
-          <p class="text-sm font-bold text-yachay-muted">Apoderado</p>
-          <h2 class="mt-1 text-2xl font-extrabold text-yachay-900">
-            Tutor legal responsable
+      <section formGroupName="apoderado" class="form-section">
+        <div class="border-b border-public-line pb-5">
+          <p class="text-xs font-black uppercase tracking-[0.2em] text-public-orange">
+            Apoderado
+          </p>
+          <h2 class="mt-2 text-2xl font-black text-public-ink">
+            Datos del apoderado
           </h2>
+          <p class="mt-1 text-sm font-semibold text-slate-600">
+            Registra al tutor legal que será responsable de la postulación.
+          </p>
         </div>
 
-        <div class="grid gap-8 p-5 lg:p-6">
-          <section>
-            <h3 class="text-lg font-extrabold text-yachay-900">Datos personales</h3>
+        <section class="pt-6" aria-labelledby="datos-apoderado">
+          <h3 id="datos-apoderado" class="text-lg font-black text-public-ink">
+            Identificación del apoderado
+          </h3>
+          <p class="mt-1 text-sm font-semibold text-slate-600">
+            Estos datos permiten validar la relación con el postulante.
+          </p>
 
-            <div class="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-              <div>
-                <label class="label" [for]="apoderadoId('apellidoPaterno')">
-                  Apellido paterno <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('apellidoPaterno')"
-                  formControlName="apellidoPaterno"
-                  autocomplete="family-name"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.apellidoPaterno')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.apellidoPaterno')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.apellidoPaterno') ? apoderadoErrorId('apellidoPaterno') : null"
-                />
-                @if (campoInvalido('apoderado.apellidoPaterno')) {
-                  <p [id]="apoderadoErrorId('apellidoPaterno')" class="field-error">
-                    Campo obligatorio.
-                  </p>
-                }
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('apellidoMaterno')">
-                  Apellido materno <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('apellidoMaterno')"
-                  formControlName="apellidoMaterno"
-                  autocomplete="family-name"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.apellidoMaterno')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.apellidoMaterno')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.apellidoMaterno') ? apoderadoErrorId('apellidoMaterno') : null"
-                />
-                @if (campoInvalido('apoderado.apellidoMaterno')) {
-                  <p [id]="apoderadoErrorId('apellidoMaterno')" class="field-error">
-                    Campo obligatorio.
-                  </p>
-                }
-              </div>
-
-              <div class="xl:col-span-2">
-                <label class="label" [for]="apoderadoId('nombres')">
-                  Nombres <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('nombres')"
-                  formControlName="nombres"
-                  autocomplete="given-name"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.nombres')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.nombres')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.nombres') ? apoderadoErrorId('nombres') : null"
-                />
-                @if (campoInvalido('apoderado.nombres')) {
-                  <p [id]="apoderadoErrorId('nombres')" class="field-error">
-                    Campo obligatorio.
-                  </p>
-                }
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('genero')">
-                  Género <span aria-hidden="true">*</span>
-                </label>
-                <select
-                  [id]="apoderadoId('genero')"
-                  formControlName="genero"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.genero')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.genero')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.genero') ? apoderadoErrorId('genero') : null"
-                >
-                  <option value="">Selecciona</option>
-                  @for (genero of generos; track genero) {
-                    <option [value]="genero">{{ genero }}</option>
-                  }
-                </select>
-                @if (campoInvalido('apoderado.genero')) {
-                  <p [id]="apoderadoErrorId('genero')" class="field-error">
-                    Selecciona una opción.
-                  </p>
-                }
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('documentoTipo')">
-                  Tipo de documento <span aria-hidden="true">*</span>
-                </label>
-                <select
-                  [id]="apoderadoId('documentoTipo')"
-                  formControlName="documentoTipo"
-                  class="input"
-                >
-                  <option value="DNI">DNI</option>
-                  <option value="CE">Carné de extranjería</option>
-                  <option value="Pasaporte">Pasaporte</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('documentoNumero')">
-                  Número de documento <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('documentoNumero')"
-                  formControlName="documentoNumero"
-                  inputmode="numeric"
-                  autocomplete="off"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.documentoNumero')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.documentoNumero')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.documentoNumero') ? apoderadoErrorId('documentoNumero') : null"
-                />
-                @if (campoInvalido('apoderado.documentoNumero')) {
-                  <p [id]="apoderadoErrorId('documentoNumero')" class="field-error">
-                    Ingresa al menos 8 caracteres.
-                  </p>
-                }
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('parentesco')">
-                  Parentesco <span aria-hidden="true">*</span>
-                </label>
-                <select
-                  [id]="apoderadoId('parentesco')"
-                  formControlName="parentesco"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.parentesco')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.parentesco')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.parentesco') ? apoderadoErrorId('parentesco') : null"
-                >
-                  <option value="">Selecciona</option>
-                  @for (parentesco of parentescos; track parentesco) {
-                    <option [value]="parentesco">{{ parentesco }}</option>
-                  }
-                </select>
-                @if (campoInvalido('apoderado.parentesco')) {
-                  <p [id]="apoderadoErrorId('parentesco')" class="field-error">
-                    Selecciona una opción.
-                  </p>
-                }
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('telefono')">Teléfono</label>
-                <input
-                  [id]="apoderadoId('telefono')"
-                  formControlName="telefono"
-                  inputmode="tel"
-                  autocomplete="tel"
-                  class="input"
-                />
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('celular')">
-                  Celular <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('celular')"
-                  formControlName="celular"
-                  inputmode="tel"
-                  autocomplete="tel"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.celular')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.celular')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.celular') ? apoderadoErrorId('celular') : null"
-                />
-                @if (campoInvalido('apoderado.celular')) {
-                  <p [id]="apoderadoErrorId('celular')" class="field-error">
-                    Ingresa al menos 9 caracteres.
-                  </p>
-                }
-              </div>
-
-              <div class="xl:col-span-2">
-                <label class="label" [for]="apoderadoId('correo')">
-                  Correo electrónico <span aria-hidden="true">*</span>
-                </label>
-                <input
-                  [id]="apoderadoId('correo')"
-                  type="email"
-                  formControlName="correo"
-                  autocomplete="email"
-                  class="input"
-                  [class.input-invalid]="campoInvalido('apoderado.correo')"
-                  [attr.aria-invalid]="campoInvalido('apoderado.correo')"
-                  [attr.aria-describedby]="campoInvalido('apoderado.correo') ? apoderadoErrorId('correo') : null"
-                />
-                @if (campoInvalido('apoderado.correo')) {
-                  <p [id]="apoderadoErrorId('correo')" class="field-error">
-                    Ingresa un correo válido.
-                  </p>
-                }
-              </div>
+          <div class="form-grid">
+            <div>
+              <label class="label" [for]="apoderadoId('apellidoPaterno')">
+                Apellido paterno <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('apellidoPaterno')"
+                formControlName="apellidoPaterno"
+                autocomplete="family-name"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.apellidoPaterno')"
+                [attr.aria-invalid]="campoInvalido('apoderado.apellidoPaterno')"
+                [attr.aria-describedby]="campoInvalido('apoderado.apellidoPaterno') ? apoderadoErrorId('apellidoPaterno') : null"
+              />
+              @if (campoInvalido('apoderado.apellidoPaterno')) {
+                <p [id]="apoderadoErrorId('apellidoPaterno')" class="field-error">
+                  Campo obligatorio.
+                </p>
+              }
             </div>
-          </section>
 
-          <section>
-            <h3 class="text-lg font-extrabold text-yachay-900">Datos laborales</h3>
-
-            <div class="mt-5 grid gap-5 md:grid-cols-2">
-              <div>
-                <label class="label" [for]="apoderadoId('profesion')">Profesión</label>
-                <input
-                  [id]="apoderadoId('profesion')"
-                  formControlName="profesion"
-                  class="input"
-                />
-              </div>
-
-              <div>
-                <label class="label" [for]="apoderadoId('centroTrabajo')">Centro de trabajo</label>
-                <input
-                  [id]="apoderadoId('centroTrabajo')"
-                  formControlName="centroTrabajo"
-                  class="input"
-                />
-              </div>
+            <div>
+              <label class="label" [for]="apoderadoId('apellidoMaterno')">
+                Apellido materno <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('apellidoMaterno')"
+                formControlName="apellidoMaterno"
+                autocomplete="family-name"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.apellidoMaterno')"
+                [attr.aria-invalid]="campoInvalido('apoderado.apellidoMaterno')"
+                [attr.aria-describedby]="campoInvalido('apoderado.apellidoMaterno') ? apoderadoErrorId('apellidoMaterno') : null"
+              />
+              @if (campoInvalido('apoderado.apellidoMaterno')) {
+                <p [id]="apoderadoErrorId('apellidoMaterno')" class="field-error">
+                  Campo obligatorio.
+                </p>
+              }
             </div>
-          </section>
-        </div>
+
+            <div class="xl:col-span-2">
+              <label class="label" [for]="apoderadoId('nombres')">
+                Nombres <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('nombres')"
+                formControlName="nombres"
+                autocomplete="given-name"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.nombres')"
+                [attr.aria-invalid]="campoInvalido('apoderado.nombres')"
+                [attr.aria-describedby]="campoInvalido('apoderado.nombres') ? apoderadoErrorId('nombres') : null"
+              />
+              @if (campoInvalido('apoderado.nombres')) {
+                <p [id]="apoderadoErrorId('nombres')" class="field-error">
+                  Campo obligatorio.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('genero')">
+                Género <span aria-hidden="true">*</span>
+              </label>
+              <select
+                [id]="apoderadoId('genero')"
+                formControlName="genero"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.genero')"
+                [attr.aria-invalid]="campoInvalido('apoderado.genero')"
+                [attr.aria-describedby]="campoInvalido('apoderado.genero') ? apoderadoErrorId('genero') : null"
+              >
+                <option value="">Selecciona</option>
+                @for (genero of generos; track genero) {
+                  <option [value]="genero">{{ genero }}</option>
+                }
+              </select>
+              @if (campoInvalido('apoderado.genero')) {
+                <p [id]="apoderadoErrorId('genero')" class="field-error">
+                  Selecciona una opción.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('documentoTipo')">
+                Tipo de documento <span aria-hidden="true">*</span>
+              </label>
+              <select
+                [id]="apoderadoId('documentoTipo')"
+                formControlName="documentoTipo"
+                class="input"
+              >
+                <option value="DNI">DNI</option>
+                <option value="CE">Carné de extranjería</option>
+                <option value="Pasaporte">Pasaporte</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('documentoNumero')">
+                Número de documento <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('documentoNumero')"
+                formControlName="documentoNumero"
+                inputmode="numeric"
+                autocomplete="off"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.documentoNumero')"
+                [attr.aria-invalid]="campoInvalido('apoderado.documentoNumero')"
+                [attr.aria-describedby]="campoInvalido('apoderado.documentoNumero') ? apoderadoErrorId('documentoNumero') : null"
+              />
+              @if (campoInvalido('apoderado.documentoNumero')) {
+                <p [id]="apoderadoErrorId('documentoNumero')" class="field-error">
+                  Ingresa al menos 8 caracteres.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('parentesco')">
+                Parentesco <span aria-hidden="true">*</span>
+              </label>
+              <select
+                [id]="apoderadoId('parentesco')"
+                formControlName="parentesco"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.parentesco')"
+                [attr.aria-invalid]="campoInvalido('apoderado.parentesco')"
+                [attr.aria-describedby]="campoInvalido('apoderado.parentesco') ? apoderadoErrorId('parentesco') : null"
+              >
+                <option value="">Selecciona</option>
+                @for (parentesco of parentescos; track parentesco) {
+                  <option [value]="parentesco">{{ parentesco }}</option>
+                }
+              </select>
+              @if (campoInvalido('apoderado.parentesco')) {
+                <p [id]="apoderadoErrorId('parentesco')" class="field-error">
+                  Selecciona una opción.
+                </p>
+              }
+            </div>
+          </div>
+        </section>
+
+        <section class="mt-8 border-t border-public-line pt-6" aria-labelledby="contacto-apoderado">
+          <h3 id="contacto-apoderado" class="text-lg font-black text-public-ink">
+            Contacto y notificaciones
+          </h3>
+          <p class="mt-1 text-sm font-semibold text-slate-600">
+            El colegio usará estos datos para comunicar el estado de la solicitud.
+          </p>
+
+          <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            <div>
+              <label class="label" [for]="apoderadoId('telefono')">Teléfono</label>
+              <input
+                [id]="apoderadoId('telefono')"
+                formControlName="telefono"
+                inputmode="tel"
+                autocomplete="tel"
+                class="input"
+              />
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('celular')">
+                Celular <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('celular')"
+                formControlName="celular"
+                inputmode="tel"
+                autocomplete="tel"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.celular')"
+                [attr.aria-invalid]="campoInvalido('apoderado.celular')"
+                [attr.aria-describedby]="campoInvalido('apoderado.celular') ? apoderadoErrorId('celular') : null"
+              />
+              @if (campoInvalido('apoderado.celular')) {
+                <p [id]="apoderadoErrorId('celular')" class="field-error">
+                  Ingresa al menos 9 caracteres.
+                </p>
+              }
+            </div>
+
+            <div class="xl:col-span-2">
+              <label class="label" [for]="apoderadoId('correo')">
+                Correo electrónico <span aria-hidden="true">*</span>
+              </label>
+              <input
+                [id]="apoderadoId('correo')"
+                type="email"
+                formControlName="correo"
+                autocomplete="email"
+                class="input"
+                [class.input-invalid]="campoInvalido('apoderado.correo')"
+                [attr.aria-invalid]="campoInvalido('apoderado.correo')"
+                [attr.aria-describedby]="campoInvalido('apoderado.correo') ? apoderadoErrorId('correo') : null"
+              />
+              @if (campoInvalido('apoderado.correo')) {
+                <p [id]="apoderadoErrorId('correo')" class="field-error">
+                  Ingresa un correo válido.
+                </p>
+              }
+            </div>
+
+            <div>
+              <label class="label" [for]="apoderadoId('profesion')">Profesión</label>
+              <input
+                [id]="apoderadoId('profesion')"
+                formControlName="profesion"
+                class="input"
+              />
+            </div>
+
+            <div class="xl:col-span-2">
+              <label class="label" [for]="apoderadoId('centroTrabajo')">
+                Centro de trabajo
+              </label>
+              <input
+                [id]="apoderadoId('centroTrabajo')"
+                formControlName="centroTrabajo"
+                class="input"
+              />
+            </div>
+
+            <label class="flex min-h-12 items-center gap-3 rounded-lg border border-public-line bg-public-paper px-4 py-3">
+              <input
+                type="checkbox"
+                formControlName="recibeNotificaciones"
+                class="h-5 w-5 rounded border-slate-300 accent-public-ink"
+              />
+              <span class="text-sm font-extrabold text-public-ink">
+                Recibe notificaciones
+              </span>
+            </label>
+          </div>
+        </section>
       </section>
 
-      <div class="rounded-lg border border-yachay-300 bg-white p-5 lg:p-6">
-        <p class="max-w-4xl text-sm font-semibold leading-7 text-yachay-muted">
-          Al enviar la solicitud, el administrador podrá revisar, aceptar o
-          rechazar la postulación. Si es aceptada, se asignará nivel, grado y
-          sección antes de generar las credenciales del estudiante.
-        </p>
+      <section class="rounded-lg border border-public-line bg-white shadow-sm">
+        <div class="grid gap-4 p-5 sm:p-6 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p class="text-sm font-black uppercase tracking-[0.2em] text-public-orange">
+              Confirmación
+            </p>
+            <p class="mt-2 max-w-4xl text-sm font-semibold leading-7 text-slate-700">
+              El correo del apoderado será usado para recibir notificaciones
+              académicas y administrativas relacionadas con el estudiante.
+            </p>
+            <p class="mt-2 max-w-4xl text-sm font-semibold leading-7 text-slate-700">
+              Al enviar la solicitud, administración podrá revisarla, aceptarla o
+              rechazarla. Si es aceptada, se asignará nivel, grado y sección antes
+              de generar las credenciales del estudiante.
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          [disabled]="loading()"
-          class="btn-primary mt-5 w-full sm:w-auto"
-        >
-          @if (loading()) {
-            Enviando postulación...
-          } @else {
-            Enviar postulación
-          }
-        </button>
-      </div>
+          <button
+            type="submit"
+            [disabled]="loading()"
+            class="inline-flex min-h-12 items-center justify-center rounded-lg border border-public-ink bg-public-ink px-6 py-3 text-sm font-black text-white transition hover:-translate-y-0.5 hover:bg-public-orange disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            @if (loading()) {
+              Enviando postulación...
+            } @else {
+              Enviar postulación
+            }
+          </button>
+        </div>
+      </section>
     </form>
   </section>
 </main>

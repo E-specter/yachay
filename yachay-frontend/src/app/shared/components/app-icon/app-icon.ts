@@ -17,6 +17,9 @@ export type AppIconName =
   | 'user'
   | 'settings'
   | 'chevron-down'
+  | 'chevron-left'
+  | 'chevron-right'
+  | 'arrow-left'
   | 'plus'
   | 'search'
   | 'clock'
@@ -143,6 +146,22 @@ export type AppIconName =
       @case ('chevron-down') {
         <svg [class]="className()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="m6 9 6 6 6-6" />
+        </svg>
+      }
+      @case ('chevron-left') {
+        <svg [class]="className()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m15 18-6-6 6-6" />
+        </svg>
+      }
+      @case ('chevron-right') {
+        <svg [class]="className()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="m9 18 6-6-6-6" />
+        </svg>
+      }
+      @case ('arrow-left') {
+        <svg [class]="className()" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5" />
+          <path d="m12 19-7-7 7-7" />
         </svg>
       }
       @case ('plus') {

@@ -1,18 +1,31 @@
 package edu.yachay.backend.identity.domain.models;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Entidad que representa un usuario del sistema.
- * Extendida de auth.users de Supabase, almacena información de autenticación básica.
- */
 @Entity
-@Table(name = "auth.users", schema = "auth")
+@Table(name = "auth_users")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,8 +34,8 @@ import java.util.Set;
 public class User {
 
     @Id
-    @Column(name = "id", columnDefinition = "UUID")
-    private java.util.UUID id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Column(name = "email", unique = true, nullable = false, length = 255)
     private String email;
@@ -32,6 +45,10 @@ public class User {
 
     @Column(name = "display_name", length = 255)
     private String displayName;
+
+    @Builder.Default
+    @Column(name = "provider_type", length = 50)
+    private String providerType = "local";
 
     @Column(name = "encrypted_password", nullable = false)
     private String encryptedPassword;
@@ -54,10 +71,10 @@ public class User {
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_roles",
-            schema = "public",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
+    @Builder.Default
     private Set<Role> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -65,9 +82,6 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        if (id == null) {
-            id = java.util.UUID.randomUUID();
-        }
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }

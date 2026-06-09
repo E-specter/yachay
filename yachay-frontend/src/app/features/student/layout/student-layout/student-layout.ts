@@ -38,6 +38,7 @@ export class StudentLayout {
 
   readonly navItems = [
     { label: 'Dashboard', path: '/alumno/dashboard', exact: true, icon: 'dashboard' },
+    { label: 'Calendario', path: '/alumno/calendario', exact: false, icon: 'calendar' },
     { label: 'Mis cursos', path: '/alumno/cursos', exact: false, icon: 'courses' },
     { label: 'Tareas', path: '/alumno/tareas', exact: false, icon: 'tasks' },
     { label: 'Notas', path: '/alumno/notas', exact: false, icon: 'grades' },

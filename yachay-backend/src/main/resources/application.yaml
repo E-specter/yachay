@@ -2,21 +2,46 @@ spring:
   application:
     name: backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/yachay
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL:jdbc:mysql://localhost:3306/yachay?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
     show-sql: false
     open-in-view: false
-
+  mail:
+    host: mail.tudominio.com
+    port: 465
+    username: cambiar_correo@tudominio.com
+    password: CAMBIAR_PASSWORD_CORREO
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
 server:
   port: 8080
   servlet:
-    context-path: /api/v1
+    context-path: /api
+
+jwt:
+  secret: ${JWT_SECRET:change_me_in_local}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+mail:
+  from: ${MAIL_FROM:notificaciones@yachay.edu.pe}
+
+ilovepdf:
+  public-key: ${ILOVEPDF_PUBLIC_KEY:}
+  secret-key: ${ILOVEPDF_SECRET_KEY:}
+
+whatsapp:
+  enabled: ${WHATSAPP_ENABLED:false}
+  token: ${WHATSAPP_TOKEN:}
+  phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID:}

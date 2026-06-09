@@ -33,7 +33,7 @@ export class AdminLayout {
   readonly userName = 'Jesus Gabriel';
   readonly roleLabel = 'Administrador';
   readonly sectionTitle = 'Panel administrativo';
-  readonly profilePath = '/admin/usuarios';
+  readonly profilePath = '/admin/perfil';
   readonly notificationCount = '9+';
 
   readonly navItems = [
@@ -47,6 +47,7 @@ export class AdminLayout {
     { label: 'Tareas', path: '/admin/tareas', exact: false, icon: 'tasks' },
     { label: 'Notas', path: '/admin/notas', exact: false, icon: 'grades' },
     { label: 'Comunicados', path: '/admin/comunicados', exact: false, icon: 'announcements' },
+    { label: 'Notificaciones', path: '/admin/notificaciones', exact: false, icon: 'notification' },
   ] as const satisfies readonly NavItem[];
 
   readonly sidebarClass = computed(() => [
