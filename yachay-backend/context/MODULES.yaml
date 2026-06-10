@@ -1,0 +1,381 @@
+---
+# CatchUp Platform - Module Registry
+# Single source of truth for all bounded contexts, adapters, and ports
+# Last updated: 2026-06-09
+
+modules:
+  
+  # ==== EXISTING MODULES ====
+  
+  - name: news
+    displayName: "News / Favorite Sources"
+    boundedContext: news
+    packageRoot: com.acme.catchup.platform.news
+    status: active
+    description: "Core module for managing favorite news sources. Implements core domain logic with hexagonal architecture."
+    
+    ports:
+      - name: FavoriteSourceRepository
+        location: news.domain.model.repositories
+        methods:
+          - save(FavoriteSource): FavoriteSource
+          - findById(Long): Optional<FavoriteSource>
+          - findAllByNewsApiKey(NewsApiKey): List<FavoriteSource>
+          - existsByNewsApiKeyAndSourceId(NewsApiKey, SourceId): boolean
+          - findByNewsApiKeyAndSourceId(NewsApiKey, SourceId): Optional<FavoriteSource>
+    
+    adapters:
+      - name: FavoriteSourcePersistenceAdapter
+        location: news.infrastructure.persistence.jpa
+        implements: FavoriteSourceRepository
+        technology: Spring Data JPA
+        scope: singleton
+        profile: all
+      
+      - name: SpringDataFavoriteSourceJpaRepository
+        location: news.infrastructure.persistence.jpa.repositories
+        technology: Spring Data JPA
+        scope: singleton
+        profile: all
+    
+    commands:
+      - name: CreateFavoriteSourceCommand
+        handler: FavoriteSourceCommandServiceImpl
+        input: "newsApiKey: NewsApiKey, sourceId: SourceId"
+        output: "Result<FavoriteSource, FavoriteSourceCommandFailure>"
+        transaction: write
+    
+    queries:
+      - name: GetFavoriteSourceByIdQuery
+        handler: FavoriteSourceQueryServiceImpl
+        input: "id: Long"
+        output: "Optional<FavoriteSource>"
+        transaction: readonly
+      
+      - name: GetAllFavoriteSourcesByNewsApiKeyQuery
+        handler: FavoriteSourceQueryServiceImpl
+        input: "newsApiKey: NewsApiKey"
+        output: "List<FavoriteSource>"
+        transaction: readonly
+      
+      - name: GetFavoriteSourceByNewsApiKeyAndSourceIdQuery
+        handler: FavoriteSourceQueryServiceImpl
+        input: "newsApiKey: NewsApiKey, sourceId: SourceId"
+        output: "Optional<FavoriteSource>"
+        transaction: readonly
+    
+    endpoints:
+      - method: POST
+        path: /api/v1/favorite-sources
+        handler: FavoriteSourcesController.createFavoriteSource
+      
+      - method: GET
+        path: /api/v1/favorite-sources/{id}
+        handler: FavoriteSourcesController.getFavoriteSourceById
+      
+      - method: GET
+        path: /api/v1/favorite-sources
+        handler: FavoriteSourcesController.getFavoriteSourcesWithParameters
+        params: ["newsApiKey (required)", "sourceId (optional)"]
+    
+    valueObjects:
+      - name: NewsApiKey
+        properties: ["value: String"]
+        validation: "length <= 256, pattern: ^[A-Za-z0-9._:-]+$"
+      
+      - name: SourceId
+        properties: ["value: String"]
+        validation: "length <= 256, pattern: ^[A-Za-z0-9._:-]+$"
+    
+    dependencies:
+      - shared
+    
+    testingStrategy:
+      unit: "FavoriteSourceTest (domain only, no Spring)"
+      integration: "FavoriteSourceIntegrationTest (@SpringBootTest)"
+      mocks: []
+    
+    configurationProperties: []
+    
+    knownLimitations: []
+    
+    documentation:
+      - "context/architecture-connectors-adapters.md"
+  
+  - name: shared
+    displayName: "Shared Infrastructure"
+    boundedContext: shared
+    packageRoot: com.acme.catchup.platform.shared
+    status: active
+    description: "Shared utilities, configurations, and cross-cutting concerns available to all modules."
+    
+    ports:
+      - name: Result (generic monad)
+        location: shared.application.result
+        methods:
+          - "success<T, E>(T): Result<T, E>"
+          - "failure<T, E>(E): Result<T, E>"
+          - "fold(Function<T, R>, Function<E, R>): R"
+    
+    adapters: []
+    
+    commands: []
+    
+    queries: []
+    
+    endpoints: []
+    
+    valueObjects: []
+    
+    dependencies: []
+    
+    documentation:
+      - "context/architecture-connectors-adapters.md"
+  
+  # ==== PLANNED / FUTURE MODULES ====
+  
+  - name: notifications
+    displayName: "Notifications & Email"
+    boundedContext: notifications
+    packageRoot: com.acme.catchup.platform.notifications
+    status: alpha
+    description: "Multi-channel notification delivery (email, in-app, SMS). Event-driven architecture with pluggable adapters."
+    
+    ports:
+      - name: NotificationService
+        location: shared.notifications
+        methods:
+          - sendEmail(EmailMessage): void
+          - sendInAppNotification(String userId, NotificationPayload): void
+    
+    adapters:
+      - name: SmtpNotificationAdapter
+        technology: Spring Mail / JavaMailSender
+        profile: prod
+        configuration:
+          - "spring.mail.host"
+          - "spring.mail.port"
+          - "spring.mail.username"
+          - "spring.mail.password"
+      
+      - name: LoggingNotificationAdapter
+        technology: SLF4J Logging
+        profile: dev
+        configuration: []
+      
+      - name: SendgridNotificationAdapter
+        technology: Sendgrid SDK
+        profile: prod
+        configuration:
+          - "app.notifications.sendgrid.api-key"
+    
+    commands:
+      - name: SendEmailCommand
+        handler: EmailCommandService
+        input: "to: String, subject: String, bodyHtml: String, bodyText: String"
+        output: "Result<String, NotificationFailure>"
+        transaction: write
+    
+    queries: []
+    
+    endpoints:
+      - method: POST
+        path: /api/v1/notifications/email
+        handler: NotificationController.sendEmail
+    
+    dependencies:
+      - shared
+    
+    testingStrategy:
+      unit: "NotificationDomainTest"
+      integration: "EmailAdapterIntegrationTest (mocks Sendgrid)"
+      mocks: ["Sendgrid SDK", "Spring Mail"]
+    
+    configurationProperties:
+      - "app.notifications.provider: [smtp|sendgrid|logging]"
+      - "app.notifications.retry-count: 3"
+      - "app.notifications.retry-delay-ms: 5000"
+    
+    knownLimitations:
+      - "No SMS support yet"
+      - "No webhook retry-store in DB (in-memory only)"
+    
+    documentation:
+      - "context/notifications-documents-feasibility.md"
+      - "context/modules-notifications.md (to be created)"
+  
+  - name: documents
+    displayName: "Document Management & Storage"
+    boundedContext: documents
+    packageRoot: com.acme.catchup.platform.documents
+    status: alpha
+    description: "Multi-format document storage and retrieval (PDF, XLSX, DOCX, MD). Cloud-agnostic adapter pattern for storage backends."
+    
+    ports:
+      - name: DocumentStorage
+        location: shared.documents
+        methods:
+          - "store(filename: String, content: InputStream, contentType: String): String (storageId)"
+          - "retrieve(storageId: String): Optional<InputStream>"
+          - "delete(storageId: String): void"
+      
+      - name: DocumentMetadataRepository
+        location: documents.domain.repositories
+        methods:
+          - "save(metadata: DocumentMetadata): DocumentMetadata"
+          - "findById(id: String): Optional<DocumentMetadata>"
+          - "findAllByOwner(owner: String): List<DocumentMetadata>"
+    
+    adapters:
+      - name: LocalFileSystemStorageAdapter
+        technology: File IO
+        profile: dev
+        configuration:
+          - "app.documents.storage.local.path: ./documents"
+      
+      - name: S3StorageAdapter
+        technology: AWS SDK S3
+        profile: prod
+        configuration:
+          - "app.documents.storage.s3.bucket"
+          - "app.documents.storage.s3.region"
+          - "aws.access-key-id"
+          - "aws.secret-access-key"
+      
+      - name: AzureBlobStorageAdapter
+        technology: Azure SDK
+        profile: prod
+        configuration:
+          - "app.documents.storage.azure.connection-string"
+          - "app.documents.storage.azure.container"
+    
+    commands:
+      - name: UploadDocumentCommand
+        handler: DocumentCommandService
+        input: "filename: String, content: InputStream, contentType: String, owner: String"
+        output: "Result<DocumentMetadata, DocumentFailure>"
+        transaction: write
+      
+      - name: DeleteDocumentCommand
+        handler: DocumentCommandService
+        input: "documentId: String"
+        output: "Result<Void, DocumentFailure>"
+        transaction: write
+    
+    queries:
+      - name: GetDocumentMetadataQuery
+        handler: DocumentQueryService
+        input: "documentId: String"
+        output: "Optional<DocumentMetadata>"
+        transaction: readonly
+      
+      - name: ListDocumentsByOwnerQuery
+        handler: DocumentQueryService
+        input: "owner: String, page: int, size: int"
+        output: "Page<DocumentMetadata>"
+        transaction: readonly
+    
+    endpoints:
+      - method: POST
+        path: /api/v1/documents/upload
+        handler: DocumentController.uploadDocument
+      
+      - method: GET
+        path: /api/v1/documents/{id}
+        handler: DocumentController.downloadDocument
+      
+      - method: DELETE
+        path: /api/v1/documents/{id}
+        handler: DocumentController.deleteDocument
+      
+      - method: GET
+        path: /api/v1/documents
+        handler: DocumentController.listDocuments
+        params: ["owner (required)", "page (optional)", "size (optional)"]
+    
+    valueObjects:
+      - name: DocumentId
+        properties: ["value: UUID"]
+      
+      - name: DocumentMetadata
+        properties: ["id: DocumentId", "filename: String", "contentType: String", "size: Long", "owner: String", "uploadedAt: Instant"]
+    
+    dependencies:
+      - shared
+    
+    testingStrategy:
+      unit: "DocumentDomainTest"
+      integration: "DocumentStorageIntegrationTest (mocks S3)"
+      mocks: ["AWS S3 SDK", "Azure SDK"]
+    
+    configurationProperties:
+      - "app.documents.storage.backend: [local|s3|azure]"
+      - "app.documents.storage.max-file-size-mb: 100"
+      - "app.documents.storage.allowed-mime-types: application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    
+    knownLimitations:
+      - "No virus scanning on upload"
+      - "No automatic format conversion (PDF conversion requires external service)"
+      - "No streaming for large file uploads yet"
+    
+    documentation:
+      - "context/notifications-documents-feasibility.md"
+      - "context/modules-documents.md (to be created)"
+  
+  - name: audit
+    displayName: "Audit & Compliance Logging"
+    boundedContext: audit
+    packageRoot: com.acme.catchup.platform.audit
+    status: planned
+    description: "Immutable audit trail for all user actions and system events. Compliance-ready with role-based filtering."
+    
+    status: planned
+    documentation:
+      - "context/modules-audit.md (to be created)"
+  
+  - name: users
+    displayName: "User Management & Authentication"
+    boundedContext: users
+    packageRoot: com.acme.catchup.platform.users
+    status: planned
+    description: "User registration, profile management, roles and permissions."
+    
+    status: planned
+    documentation:
+      - "context/modules-users.md (to be created)"
+
+# Global configuration guidelines
+configurationHierarchy:
+  - "application.properties (defaults)"
+  - "application-{profile}.properties (profile-specific overrides)"
+  - "environment variables (SPRING_CONFIG_OVERRIDE_...)"
+  - "@ConfigurationProperties (bound in code)"
+
+testingHierarchy:
+  - "Unit tests: domain classes, no Spring"
+  - "Slice tests: @DataJpaTest, @WebMvcTest"
+  - "Integration tests: @SpringBootTest"
+  - "E2E tests: running application with TestContainers"
+
+# Architectural constraints
+architecturalRules:
+  - "Domain layers must not reference Spring"
+  - "Domain layers must not reference JPA"
+  - "All external adapters must implement a port interface"
+  - "All responses crossing layer boundaries must use DTOs or Assemblers"
+  - "All configuration must be externalizable via @ConfigurationProperties"
+  - "All command/query results must use Result<T, E> monad"
+  - "All database constraints must be documented in domain value objects"
+
+# Next steps for module creation
+moduleCreationSteps:
+  1: "Review SKILL-context-documentation.md"
+  2: "Create modules-{name}.md following the template"
+  3: "Add entry to this MODULES.yaml"
+  4: "Update context/architecture-connectors-adapters.md"
+  5: "Generate code stubs using documented ports"
+  6: "Implement adapters following the guidelines"
+  7: "Write unit and integration tests"
+  8: "Update configuration examples in application.properties"
+  9: "Add module to documentation index"
+  10: "Code review focusing on architectural compliance"
