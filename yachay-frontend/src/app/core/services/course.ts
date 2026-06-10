@@ -3,13 +3,15 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import {
+  AcademicYearOption,
   Course,
   CreateCourseRequest,
+  SubjectOption,
   UpdateCourseRequest,
   UpdateCourseStatusRequest,
 } from '../models/course.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
@@ -17,8 +19,20 @@ const API_URL = 'http://localhost:8080/api';
 export class CourseService {
   private readonly http = inject(HttpClient);
 
+  list(): Observable<Course[]> {
+    return this.getCourses();
+  }
+
   getCourses(): Observable<Course[]> {
     return this.http.get<Course[]>(`${API_URL}/admin/cursos`);
+  }
+
+  getSubjects(): Observable<SubjectOption[]> {
+    return this.http.get<SubjectOption[]>(`${API_URL}/admin/materias`);
+  }
+
+  getAcademicYears(): Observable<AcademicYearOption[]> {
+    return this.http.get<AcademicYearOption[]>(`${API_URL}/admin/anios-academicos`);
   }
 
   getCourse(id: number): Observable<Course> {

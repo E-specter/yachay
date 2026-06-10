@@ -2,26 +2,10 @@ package edu.yachay.backend.academic.domain.models;
 
 import edu.yachay.backend.identity.domain.models.StudentProfile;
 import edu.yachay.backend.identity.domain.models.TeacherProfile;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import jakarta.persistence.*;
+import lombok.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.*;
 
 @Entity
 @Table(
@@ -56,6 +40,9 @@ public class GradeRecord {
 
     @Column(name = "score", nullable = false, precision = 4, scale = 1)
     private BigDecimal score;
+
+    @Column(name = "evaluation_type", length = 80)
+    private String evaluationType;
 
     @Column(name = "observation", length = 500)
     private String observation;

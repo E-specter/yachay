@@ -3,6 +3,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { API_URL } from '../config/api.config';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -11,7 +13,7 @@ export class ReportService {
   private readonly document = inject(DOCUMENT);
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = API_URL;
 
   downloadAlumnos(): Observable<Blob> {
     return this.download('/admin/reportes/alumnos.xlsx');

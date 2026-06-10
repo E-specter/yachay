@@ -2,10 +2,8 @@ package edu.yachay.backend.identity.domain.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
 /**
  * Entidad que representa el perfil específico de un tutor/apoderado.

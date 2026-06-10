@@ -15,9 +15,11 @@ export interface GradeRecord {
 export interface CreateGradeRecordRequest {
   alumnoId: number;
   cursoId: number;
-  docenteId: number;
+  docenteId?: number;
   bimestre: AcademicTerm;
   nota: number;
+  tipoEvaluacion?: string;
+  comentario?: string;
 }
 
 export interface UpdateGradeRecordRequest extends CreateGradeRecordRequest {

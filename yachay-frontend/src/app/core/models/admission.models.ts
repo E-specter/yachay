@@ -45,6 +45,31 @@ export interface AdmissionResponse {
   fechaRegistro: string;
 }
 
+export interface AdmissionApplication {
+  id: number;
+  postulante: string;
+  apoderado: string;
+  telefono?: string;
+  correo?: string;
+  nivel: string;
+  grado: string;
+  estado: 'Pendiente' | 'Aceptada' | 'Rechazada';
+  status: EstadoPostulacion;
+  observaciones?: string;
+  fechaRegistro?: string;
+  fechaActualizacion?: string;
+}
+
+export interface AdmissionDecisionRequest {
+  nivel?: string;
+  grado?: string;
+  seccion?: string;
+  generarCredenciales?: boolean;
+  enviarCorreo?: boolean;
+  observaciones?: string;
+  motivo?: string;
+}
+
 export interface Alumno {
   id: number;
   nombres: string;

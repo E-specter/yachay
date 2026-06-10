@@ -2,8 +2,7 @@ package edu.yachay.backend.identity.domain.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * Entidad que representa una institución educativa.

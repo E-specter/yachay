@@ -30,6 +30,7 @@ import edu.yachay.backend.identity.domain.repositories.SchoolRepository;
 import edu.yachay.backend.identity.domain.repositories.StudentProfileRepository;
 import edu.yachay.backend.identity.domain.repositories.TeacherProfileRepository;
 import edu.yachay.backend.identity.domain.repositories.UserRepository;
+import edu.yachay.backend.notification.PersistentNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -40,14 +41,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.*;
+import java.util.*;
 
 @Component
 public class DataSeeder implements CommandLineRunner {
@@ -69,6 +64,7 @@ public class DataSeeder implements CommandLineRunner {
     private final AnnouncementRepository announcementRepository;
     private final CalendarEventRepository calendarEventRepository;
     private final AdmissionApplicationRepository admissionApplicationRepository;
+    private final PersistentNotificationService persistentNotificationService;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public DataSeeder(
@@ -86,7 +82,8 @@ public class DataSeeder implements CommandLineRunner {
             GradeRecordRepository gradeRecordRepository,
             AnnouncementRepository announcementRepository,
             CalendarEventRepository calendarEventRepository,
-            AdmissionApplicationRepository admissionApplicationRepository
+            AdmissionApplicationRepository admissionApplicationRepository,
+            PersistentNotificationService persistentNotificationService
     ) {
         this.roleRepository = roleRepository;
         this.schoolRepository = schoolRepository;
@@ -103,6 +100,7 @@ public class DataSeeder implements CommandLineRunner {
         this.announcementRepository = announcementRepository;
         this.calendarEventRepository = calendarEventRepository;
         this.admissionApplicationRepository = admissionApplicationRepository;
+        this.persistentNotificationService = persistentNotificationService;
     }
 
     @Override
@@ -115,6 +113,7 @@ public class DataSeeder implements CommandLineRunner {
         List<StudentProfile> students = seedStudents(roles, school);
         seedAcademicData(school, teachers, students);
         seedAdmissionApplications();
+        seedNotifications();
     }
 
     private Map<String, Role> seedRoles() {
@@ -618,12 +617,86 @@ public class DataSeeder implements CommandLineRunner {
                 .student(student)
                 .title(title)
                 .eventType(eventType)
+                .audience(resolveAudience(eventType))
                 .dayOfWeek(dayOfWeek)
                 .eventDate(eventDate)
                 .startTime(startTime)
                 .endTime(endTime)
                 .description(description)
                 .build());
+    }
+
+    private String resolveAudience(String eventType) {
+        if ("COMUNICADO".equalsIgnoreCase(eventType)) {
+            return "TODOS";
+        }
+
+        if ("CURSO".equalsIgnoreCase(eventType) || "TAREA".equalsIgnoreCase(eventType) || "EVALUACION".equalsIgnoreCase(eventType)) {
+            return "ALUMNO";
+        }
+
+        return "TODOS";
+    }
+
+    private void seedNotifications() {
+        persistentNotificationService.createForRole(
+                "ADMINISTRADOR",
+                "Nueva postulacion recibida",
+                "Hay solicitudes de admision pendientes por revisar.",
+                "ADMISION",
+                "/admin/postulaciones"
+        );
+        persistentNotificationService.createForRole(
+                "ADMINISTRADOR",
+                "Reporte de alumnos disponible",
+                "El reporte XLSX de alumnos ya puede descargarse desde administracion.",
+                "REPORTE",
+                "/admin/alumnos"
+        );
+        persistentNotificationService.createForRole(
+                "ADMINISTRADOR",
+                "PDF de postulacion habilitado",
+                "Las fichas PDF de postulacion se generan desde datos reales.",
+                "DOCUMENTO",
+                "/admin/postulaciones"
+        );
+        persistentNotificationService.createForRole(
+                "DOCENTE",
+                "Nueva tarea asignada al curso",
+                "Revisa las tareas publicadas para tus cursos asignados.",
+                "TAREA",
+                "/docente/tareas"
+        );
+        persistentNotificationService.createForRole(
+                "DOCENTE",
+                "Comunicado institucional publicado",
+                "Hay un comunicado institucional disponible para revisar.",
+                "COMUNICADO",
+                "/docente/comunicados"
+        );
+        persistentNotificationService.createForRole(
+                "ALUMNO",
+                "Nueva nota registrada",
+                "Ya puedes revisar tus notas actualizadas.",
+                "NOTA",
+                "/alumno/notas"
+        );
+        persistentNotificationService.createForRole(
+                "ALUMNO",
+                "Evento academico programado",
+                "Tu calendario academico tiene eventos próximos.",
+                "CALENDARIO",
+                "/alumno/calendario"
+        );
+        persistentNotificationService.createForRole(
+                "ALUMNO",
+                "Nueva tarea disponible",
+                "Hay una tarea publicada para tus cursos.",
+                "TAREA",
+                "/alumno/tareas"
+        );
+
+        log.info("DataSeeder: notificaciones verificadas");
     }
 
     private record SeedUser(

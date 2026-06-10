@@ -25,7 +25,7 @@ Angular 21 + TailwindCSS v4
   |
   v
 Capa de Seguridad
-JWT + Guards en Angular / Spring Security en Backend
+JWT firmado en backend / Guards e interceptor en Angular
   |
   v
 Capa de Aplicacion
@@ -44,7 +44,7 @@ Capa de Datos
 MySQL
 ```
 
-SQLite puede seguir usandose en desarrollo local, pero la arquitectura oficial del proyecto queda preparada para MySQL en la capa de datos.
+MySQL es la base oficial del Avance 3.
 
 ## Layouts por rol
 
@@ -82,6 +82,7 @@ src/app
 |-- core
 |   |-- guards
 |   |-- interceptors
+|   |-- config
 |   |-- models
 |   `-- services
 |-- features
@@ -98,11 +99,11 @@ src/app
 `-- app.html
 ```
 
-`core` contiene elementos transversales como autenticacion, modelos, interceptors y servicios HTTP. `features` agrupa las pantallas por dominio funcional. `shared` contiene componentes visuales reutilizables como `AppIcon`, tarjetas de metricas, secciones, badges de estado, estados vacios y accesos rapidos.
+`core` contiene elementos transversales como autenticacion, configuracion de API, modelos, interceptors y servicios HTTP. `features` agrupa las pantallas por dominio funcional. `shared` contiene componentes visuales reutilizables como `AppIcon`, tarjetas de metricas, secciones, badges de estado, estados vacios y accesos rapidos.
 
 ## Auth
 
-`AuthService` centraliza la autenticacion del usuario, el manejo del token JWT y la sesion actual con signals. Como el proyecto tiene SSR, los accesos a `localStorage` se hacen solo cuando Angular esta en navegador.
+`AuthService` centraliza la autenticacion del usuario, el manejo del token JWT y la sesion actual con signals. Como el proyecto tiene SSR, los accesos a `localStorage` se hacen solo cuando Angular esta en navegador. El interceptor agrega `Authorization: Bearer <token>` a las peticiones protegidas y cierra sesion si el backend responde 401.
 
 Despues del login, el frontend redirige por rol:
 
@@ -123,7 +124,19 @@ Cada modulo protegido usa `authGuard` y `roleGuard` para separar rutas de admini
 
 ## Administracion Avance 3
 
-La administracion incluye botones de descarga XLSX en:
+La administracion consume API real para:
+
+- usuarios
+- alumnos
+- docentes
+- cursos
+- secciones
+- tareas
+- notas
+- comunicados
+- postulaciones
+
+Tambien incluye botones de descarga XLSX en:
 
 - `/admin/alumnos`
 - `/admin/docentes`
@@ -133,10 +146,19 @@ La administracion incluye botones de descarga XLSX en:
 
 Tambien existe la vista `/admin/notificaciones`, que permite probar correo SMTP y WhatsApp mock contra el backend. Si el backend no esta activo, los servicios muestran mensajes controlados sin romper la pantalla.
 
-Los botones de PDF preparados estan en:
+Los botones de PDF local real estan en:
 
 - `/admin/alumnos`: `Ficha PDF`
 - `/admin/postulaciones`: `Generar PDF`
+
+Los PDF se descargan como `Blob` desde:
+
+- `GET /api/admin/documentos/alumno/{id}/pdf`
+- `GET /api/admin/documentos/postulacion/{id}/pdf`
+
+## Documentacion Avance 3
+
+La documentacion tecnica central esta en `../docs`.
 
 ## Ejecutar
 

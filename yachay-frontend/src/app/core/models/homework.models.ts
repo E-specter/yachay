@@ -20,12 +20,15 @@ export interface CreateHomeworkRequest {
   titulo: string;
   descripcion: string;
   cursoId: number;
-  docenteId: number;
+  docenteId?: number;
   nivel: AcademicLevel;
   grado: string;
   seccion: SectionCode;
   fechaPublicacion: string;
   fechaEntrega: string;
+  puntajeMaximo?: number;
+  tipo?: 'TAREA' | 'PROYECTO' | 'EXAMEN' | 'PARTICIPACION';
+  permitirEntregaTardia?: boolean;
 }
 
 export interface UpdateHomeworkRequest extends CreateHomeworkRequest {

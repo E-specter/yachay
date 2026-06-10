@@ -11,7 +11,7 @@ import {
   ResetPasswordRequest,
 } from '../models/auth.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',

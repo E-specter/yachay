@@ -1,24 +1,9 @@
 package edu.yachay.backend.academic.domain.models;
 
 import edu.yachay.backend.identity.domain.models.TeacherProfile;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.*;
 
 @Entity
 @Table(name = "yachay_academic_tasks")
@@ -52,6 +37,15 @@ public class AcademicTask {
 
     @Column(name = "due_at", nullable = false)
     private LocalDateTime dueAt;
+
+    @Column(name = "max_score", precision = 5, scale = 2)
+    private java.math.BigDecimal maxScore;
+
+    @Column(name = "task_type", length = 40)
+    private String taskType;
+
+    @Column(name = "allow_late_submission")
+    private Boolean allowLateSubmission;
 
     @Column(name = "status", nullable = false, length = 30)
     private String status;

@@ -1,6 +1,6 @@
 # Yachay
 
-Yachay es un campus virtual para el Colegio Manuel Gonzales Prada. El proyecto se organiza en frontend Angular, backend Spring Boot y documentacion tecnica para entregas academicas.
+Yachay es un campus virtual para el Colegio Manuel Gonzales Prada. El proyecto integra frontend Angular, backend Spring Boot, MySQL, administracion academica, admision escolar, reportes XLSX y generacion local de PDF.
 
 ## Estructura
 
@@ -8,8 +8,8 @@ Yachay es un campus virtual para el Colegio Manuel Gonzales Prada. El proyecto s
 C:\E-specter\yachay
 |-- yachay-frontend   Angular 21 + TailwindCSS v4
 |-- yachay-backend    Spring Boot + JPA + MySQL
-|-- yachay-doc        Documentacion, PlantUML y guias de entrega
-`-- yachay-db         Recursos locales de base de datos si se requieren
+|-- yachay-doc        Documentacion oficial, diagramas y material tecnico
+|-- yachay-db         Recursos locales de base de datos
 ```
 
 ## Arquitectura oficial
@@ -23,7 +23,7 @@ Angular 21 + TailwindCSS v4
   |
   v
 Capa de Seguridad
-JWT + Guards en Angular / Spring Security en Backend
+JWT firmado en backend / Guards e interceptor en Angular
   |
   v
 Capa de Aplicacion
@@ -42,67 +42,29 @@ Capa de Datos
 MySQL
 ```
 
-MySQL es la base oficial del proyecto. No se usa SQLite en esta fase.
+MySQL es la base oficial de Avance 3.
 
-## Como iniciar MySQL y preparar la base de datos
+## Tecnologias
 
-Verificar MySQL:
+- Angular 21.
+- TailwindCSS v4.
+- Spring Boot 4.
+- JPA / Hibernate.
+- MySQL.
+- Apache POI para XLSX.
+- OpenPDF para PDF local.
+- BCrypt para passwords.
+- JJWT para tokens firmados.
 
-```powershell
-mysql --version
-```
-
-Iniciar MySQL en Windows si esta instalado como servicio:
-
-```powershell
-net start MySQL80
-```
-
-Si el servicio tiene otro nombre, revisar `services.msc`.
-
-Ingresar a MySQL:
-
-```powershell
-mysql -u root -p
-```
-
-Crear la base manualmente, aunque el backend tambien puede crearla:
-
-```sql
-CREATE DATABASE IF NOT EXISTS yachay CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-SHOW DATABASES;
-USE yachay;
-```
-
-Levantar backend con variables en PowerShell:
+## Ejecutar backend
 
 ```powershell
 cd C:\E-specter\yachay\yachay-backend
-$env:DB_URL="jdbc:mysql://localhost:3306/yachay?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima"
-$env:DB_USERNAME="root"
-$env:DB_PASSWORD="TU_PASSWORD_MYSQL"
-.\mvnw.cmd spring-boot:run
+Copy-Item src\main\resources\application-local.example.yaml src\main\resources\application-local.yaml
+.\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
 
-Al iniciar, Hibernate crea o actualiza tablas y el seeder carga datos iniciales si no existen.
-
-Revisar tablas y conteos:
-
-```sql
-SHOW TABLES;
-SELECT COUNT(*) FROM usuarios;
-SELECT COUNT(*) FROM alumnos;
-SELECT COUNT(*) FROM docentes;
-SELECT COUNT(*) FROM cursos;
-```
-
-Los nombres reales de tablas pueden variar segun las entidades presentes en el backend actual.
-
-## Credenciales de prueba
-
-- `admin@yachay.edu.pe` / `Admin123456`
-- `docente1@yachay.edu.pe` / `Docente123456`
-- `alumno1@yachay.edu.pe` / `Alumno123456`
+`application-local.yaml` debe contener las credenciales locales de MySQL y no debe subirse a Git.
 
 ## Ejecutar frontend
 
@@ -112,15 +74,63 @@ npm install
 npm start
 ```
 
-## Ejecutar backend
+## Credenciales demo
+
+- `admin@yachay.edu.pe` / `Admin123456`
+- `docente1@yachay.edu.pe` / `Docente123456`
+- `alumno1@yachay.edu.pe` / `Alumno123456`
+
+## Funcionalidades Avance 3
+
+- Login real con usuarios en MySQL.
+- DataSeeder idempotente.
+- Roles de administrador, docente, alumno y apoderado.
+- Panel administrativo.
+- CRUD administrativo principal.
+- Postulaciones reales.
+- Reportes XLSX reales.
+- PDF local de alumno y postulacion.
+- Correo SMTP y WhatsApp en modo controlado.
+
+## Documentacion tecnica
+
+La documentacion oficial vive en [yachay-doc](yachay-doc/README.md).
+
+Documentos principales:
+
+- [Arquitectura general](yachay-doc/Documentacion/01_arquitectura_general.md)
+- [Backend arquitectura](yachay-doc/Documentacion/02_backend_arquitectura.md)
+- [Frontend arquitectura](yachay-doc/Documentacion/03_frontend_arquitectura.md)
+- [Base de datos](yachay-doc/Documentacion/04_base_de_datos.md)
+- [Endpoints API](yachay-doc/Documentacion/05_endpoints_api.md)
+- [Seguridad JWT](yachay-doc/Documentacion/08_seguridad_jwt.md)
+- [Reportes y PDF](yachay-doc/Documentacion/09_reportes_y_pdf.md)
+
+## Builds
+
+Backend:
 
 ```powershell
 cd C:\E-specter\yachay\yachay-backend
-.\mvnw.cmd spring-boot:run
+.\mvnw.cmd clean package -DskipTests "-Djava.version=17"
 ```
 
-## Avance 3
+Frontend:
 
-El Avance 3 agrega configuracion por variables de entorno, correo SMTP, reportes XLSX, preparacion de documentos PDF con I Love PDF y mock controlado de WhatsApp.
+```powershell
+cd C:\E-specter\yachay\yachay-frontend
+npm run build
+```
 
-La guia tecnica de APIs esta en [yachay-doc/apis-avance-3.md](yachay-doc/apis-avance-3.md).
+## Seguridad de archivos
+
+No subir:
+
+- `yachay-backend/src/main/resources/application-local.yaml`
+- `.env`
+- tokens
+- passwords reales
+- logs
+- `target/`
+- `node_modules/`
+- `dist/`

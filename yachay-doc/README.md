@@ -1,12 +1,69 @@
-# yachay-doc
-Documentación de Yachay
+# Yachay Doc
 
-Este repositorio toma sentido dentro del sistema de software desarrollado Yachay
+Documentacion oficial del proyecto Yachay para el Avance 3. Esta carpeta concentra los documentos tecnicos, diagramas y materiales de exposicion del campus virtual del Colegio Manuel Gonzales Prada.
 
-## ¿Qué es Yachay?
-Yachay es un sistema de campus virtual que implementa us Estilo por Capas
+## Organizacion
 
-# Repositorios
-- Database  : https://github.com/E-specter/yachay-db
-- Backend   : https://github.com/E-specter/yachay-backend
-- Frontend  : https://github.com/E-specter/yachay-frontend
+```txt
+yachay-doc
+|-- README.md
+|-- apis-avance-3.md
+|-- Documentacion
+|   |-- 01_arquitectura_general.md
+|   |-- 02_backend_arquitectura.md
+|   |-- 03_frontend_arquitectura.md
+|   |-- 04_base_de_datos.md
+|   |-- 05_endpoints_api.md
+|   |-- 06_instalacion_local.md
+|   |-- 07_revision_tecnica_avance_3.md
+|   |-- 08_seguridad_jwt.md
+|   |-- 09_reportes_y_pdf.md
+|   `-- 10_siguiente_fase_calendario_notificaciones.md
+|-- Diagramas
+|   |-- arquitectura.drawio
+|   `-- arquitectura_avance_3.drawio
+`-- Bloc
+    `-- Bosquejos.excalidraw.png
+```
+
+## Documentos principales
+
+- `01_arquitectura_general.md`: vision por N capas del sistema.
+- `02_backend_arquitectura.md`: paquetes, patrones, entidades, repositorios, services y seguridad.
+- `03_frontend_arquitectura.md`: estructura Angular, layouts, guards, interceptor y services.
+- `04_base_de_datos.md`: tablas principales de MySQL y relaciones.
+- `05_endpoints_api.md`: endpoints reales del Avance 3.
+- `06_instalacion_local.md`: pasos para ejecutar backend y frontend.
+- `07_revision_tecnica_avance_3.md`: hallazgos positivos, pendientes y recomendaciones.
+- `08_seguridad_jwt.md`: JWT firmado, claims, rutas protegidas y permisos por rol.
+- `09_reportes_y_pdf.md`: XLSX con Apache POI y PDF local con OpenPDF.
+- `10_siguiente_fase_calendario_notificaciones.md`: trabajo recomendado para calendario y notificaciones reales.
+
+## Diagramas
+
+- `Diagramas/arquitectura_avance_3.drawio`: diagrama oficial actualizado para la exposicion.
+- `Diagramas/arquitectura.drawio`: diagrama previo conservado como referencia historica.
+
+## Estado Avance 3
+
+El sistema documentado incluye:
+
+- Frontend Angular 21 con TailwindCSS v4.
+- Backend Spring Boot con JPA y MySQL.
+- Login real con BCrypt.
+- JWT firmado y validado por backend.
+- Guards e interceptor JWT en Angular.
+- Panel administrativo con CRUD principal.
+- Postulaciones reales.
+- Reportes XLSX reales.
+- PDF local real con OpenPDF.
+- DataSeeder idempotente.
+
+## Pendientes recomendados
+
+- Extraer logica administrativa desde controladores hacia services de aplicacion.
+- Completar endpoints reales para dashboards docente/alumno.
+- Implementar calendario academico real por rol.
+- Implementar notificaciones persistidas y campana real.
+- Agregar Flyway o Liquibase para migraciones de base de datos.
+- Consolidar paquetes documentales o futuros dentro de la arquitectura productiva.

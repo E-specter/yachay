@@ -1,30 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { Observable } from 'rxjs';
 
 import {
   AdminUser,
-  AdminUserRole,
   CreateAdminUserRequest,
   ResetAdminUserPasswordResponse,
   UpdateAdminUserRequest,
   UpdateAdminUserStatusRequest,
 } from '../models/user.models';
 
-const API_URL = 'http://localhost:8080/api';
-
-interface BackendUser {
-  id: string | number;
-  email: string;
-  displayName?: string;
-  roleNames?: string[];
-  profile?: {
-    firstName?: string;
-    lastName?: string;
-    isActive?: boolean;
-  };
-  createdAt?: string;
-}
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
@@ -32,10 +18,12 @@ interface BackendUser {
 export class UserService {
   private readonly http = inject(HttpClient);
 
+  list(): Observable<AdminUser[]> {
+    return this.getUsers();
+  }
+
   getUsers(): Observable<AdminUser[]> {
-    return this.http.get<BackendUser[]>(`${API_URL}/admin/usuarios`).pipe(
-      map((users) => users.map((user) => this.toAdminUser(user))),
-    );
+    return this.http.get<AdminUser[]>(`${API_URL}/admin/usuarios`);
   }
 
   createUser(payload: CreateAdminUserRequest): Observable<AdminUser> {
@@ -55,35 +43,5 @@ export class UserService {
       `${API_URL}/admin/usuarios/${id}/reset-password`,
       {},
     );
-  }
-
-  private toAdminUser(user: BackendUser): AdminUser {
-    const displayNameParts = (user.displayName ?? '').trim().split(/\s+/).filter(Boolean);
-    const firstName = user.profile?.firstName ?? displayNameParts[0] ?? '';
-    const lastName = user.profile?.lastName ?? displayNameParts.slice(1).join(' ');
-
-    return {
-      id: Number(user.id),
-      nombres: firstName,
-      apellidos: lastName,
-      email: user.email,
-      rol: this.toRole(user.roleNames),
-      estado: user.profile?.isActive === false ? 'INACTIVO' : 'ACTIVO',
-      fechaCreacion: user.createdAt ? user.createdAt.slice(0, 10) : '',
-    };
-  }
-
-  private toRole(roleNames: string[] | undefined): AdminUserRole {
-    const normalized = (roleNames ?? []).map((role) => role.toUpperCase());
-
-    if (normalized.some((role) => role === 'ADMIN' || role === 'ADMINISTRADOR')) {
-      return 'ADMINISTRADOR';
-    }
-
-    if (normalized.some((role) => role === 'TEACHER' || role === 'PROFESOR' || role === 'DOCENTE')) {
-      return 'DOCENTE';
-    }
-
-    return 'ALUMNO';
   }
 }

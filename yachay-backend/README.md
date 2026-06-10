@@ -1,6 +1,6 @@
 # Yachay Backend
 
-Backend Spring Boot del campus virtual Yachay. Expone una API REST para autenticacion, gestion academica, reportes XLSX, correo, documentos PDF preparados e integraciones externas controladas.
+Backend Spring Boot del campus virtual Yachay. Expone una API REST para autenticacion, gestion academica, reportes XLSX, correo, documentos PDF locales e integraciones externas controladas.
 
 ## Stack
 
@@ -13,6 +13,7 @@ Backend Spring Boot del campus virtual Yachay. Expone una API REST para autentic
 - Bean Validation.
 - Spring Mail.
 - Apache POI para exportacion XLSX.
+- OpenPDF para generacion local de PDF.
 
 ## Arquitectura
 
@@ -25,7 +26,7 @@ Capa de Presentacion
 Angular 21 + TailwindCSS v4
   ↓
 Capa de Seguridad
-JWT + Guards en Angular / Spring Security en Backend
+JWT firmado en backend / Guards e interceptor en Angular
   ↓
 Capa de Aplicacion
 Controllers REST en Spring Boot
@@ -40,7 +41,7 @@ Capa de Datos
 MySQL
 ```
 
-Dentro del backend, los paquetes separan controllers, servicios, modelos, repositorios y configuracion para mantener responsabilidades claras.
+Dentro del backend, los paquetes separan controllers, servicios, modelos, repositorios y configuracion para mantener responsabilidades claras. La autenticacion valida usuarios reales en MySQL, verifica passwords con BCrypt y devuelve un JWT firmado. Spring Security valida ese token en cada request protegida y aplica permisos por rol.
 
 ## Configuracion
 
@@ -162,7 +163,12 @@ WhatsApp mock:
 
 - `POST /api/admin/notificaciones/whatsapp/test`
 
-Documentos PDF preparados:
+Documentos PDF locales:
+
+- `GET /api/admin/documentos/postulacion/{id}/pdf`
+- `GET /api/admin/documentos/alumno/{id}/pdf`
+
+Compatibilidad futura I Love PDF:
 
 - `POST /api/admin/documentos/postulacion/{id}/pdf`
 - `POST /api/admin/documentos/alumno/{id}/pdf`
@@ -173,7 +179,7 @@ El servicio de correo usa `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSW
 
 ## I Love PDF
 
-La integracion queda preparada con `ILOVEPDF_PUBLIC_KEY` e `ILOVEPDF_SECRET_KEY`. Si faltan, los endpoints responden con un mensaje controlado indicando que la integracion no esta configurada.
+La integracion queda preparada con `ILOVEPDF_PUBLIC_KEY` e `ILOVEPDF_SECRET_KEY`. El PDF basico del Avance 3 no depende de I Love PDF; se genera localmente con OpenPDF.
 
 ## WhatsApp Mock
 
@@ -187,6 +193,18 @@ cd C:\E-specter\yachay\yachay-backend
 ```
 
 Para entrega formal se recomienda compilar y ejecutar con JDK 21.
+
+## Documentacion Avance 3
+
+La documentacion tecnica central esta en `../docs`:
+
+- arquitectura general
+- arquitectura backend
+- arquitectura frontend
+- base de datos
+- endpoints
+- instalacion local
+- revision tecnica Avance 3
 
 ## Archivos Que No Deben Subirse
 

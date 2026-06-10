@@ -21,6 +21,24 @@
     </button>
   </div>
 
+  @if (successMessage()) {
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-bold text-yachay-muted">
+      Cargando postulaciones...
+    </div>
+  }
+
   <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
     <table class="w-full min-w-[72rem] border-collapse text-left text-sm">
       <caption class="sr-only">Lista de postulaciones de admision</caption>
@@ -35,7 +53,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (postulacion of postulaciones; track postulacion.id) {
+        @for (postulacion of postulaciones(); track postulacion.id) {
           <tr class="border-b border-yachay-300 last:border-b-0">
             <td class="px-5 py-4 font-bold text-yachay-900">
               {{ postulacion.postulante }}
@@ -50,7 +68,7 @@
               {{ postulacion.grado }}
             </td>
             <td class="px-5 py-4">
-              <span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">
+              <span class="rounded-lg border px-3 py-2 text-xs font-extrabold" [class]="statusClass(postulacion.status)">
                 {{ postulacion.estado }}
               </span>
             </td>

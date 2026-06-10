@@ -2,9 +2,7 @@ package edu.yachay.backend.identity.domain.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * Entidad que representa el perfil unificado de un usuario.

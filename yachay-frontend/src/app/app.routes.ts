@@ -128,6 +128,14 @@ export const routes: Routes = [
         title: 'Notas | Yachay',
       },
       {
+        path: 'calendario',
+        loadComponent: () =>
+          import('./features/admin/pages/calendario/calendario').then(
+            (m) => m.AdminCalendario,
+          ),
+        title: 'Calendario | Yachay',
+      },
+      {
         path: 'comunicados',
         loadComponent: () =>
           import('./features/admin/pages/comunicados/comunicados').then(
@@ -142,6 +150,14 @@ export const routes: Routes = [
             (m) => m.AdminNotificaciones,
           ),
         title: 'Notificaciones | Yachay',
+      },
+      {
+        path: 'configuracion',
+        loadComponent: () =>
+          import('./features/admin/pages/configuracion/configuracion').then(
+            (m) => m.AdminConfiguracion,
+          ),
+        title: 'Configuración | Yachay',
       },
     ],
   },
@@ -200,12 +216,28 @@ export const routes: Routes = [
         title: 'Notas docente | Yachay',
       },
       {
+        path: 'calendario',
+        loadComponent: () =>
+          import('./features/teacher/pages/calendario/calendario').then(
+            (m) => m.TeacherCalendario,
+          ),
+        title: 'Calendario docente | Yachay',
+      },
+      {
         path: 'comunicados',
         loadComponent: () =>
           import('./features/teacher/pages/comunicados/comunicados').then(
             (m) => m.TeacherComunicados,
-          ),
+        ),
         title: 'Comunicados docente | Yachay',
+      },
+      {
+        path: 'notificaciones',
+        loadComponent: () =>
+          import('./features/teacher/pages/notificaciones/notificaciones').then(
+            (m) => m.TeacherNotificaciones,
+          ),
+        title: 'Notificaciones docente | Yachay',
       },
       {
         path: 'perfil',
@@ -292,8 +324,16 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/student/pages/comunicados/comunicados').then(
             (m) => m.StudentComunicados,
-          ),
+        ),
         title: 'Comunicados alumno | Yachay',
+      },
+      {
+        path: 'notificaciones',
+        loadComponent: () =>
+          import('./features/student/pages/notificaciones/notificaciones').then(
+            (m) => m.StudentNotificaciones,
+          ),
+        title: 'Notificaciones alumno | Yachay',
       },
       {
         path: 'comunicados/:id',

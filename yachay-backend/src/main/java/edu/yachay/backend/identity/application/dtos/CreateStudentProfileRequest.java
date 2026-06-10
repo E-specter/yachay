@@ -4,8 +4,7 @@ import lombok.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
-import java.time.LocalDate;
+import java.time.*;
 
 /**
  * DTO para crear o actualizar perfiles de estudiante.

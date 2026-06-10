@@ -1,0 +1,26 @@
+# Workspace
+.vscode/
+.idea/
+*.log
+
+# Frontend
+yachay-frontend/node_modules/
+yachay-frontend/dist/
+yachay-frontend/.angular/
+yachay-frontend/coverage/
+
+# Backend
+yachay-backend/target/
+yachay-backend/.env
+yachay-backend/run-backend.ps1
+yachay-backend/src/main/resources/application-local.yaml
+
+# Local database and generated files
+yachay-db/*.db
+yachay-db/*.sqlite
+database/*.db
+database/*.sqlite
+
+# OS
+.DS_Store
+Thumbs.db

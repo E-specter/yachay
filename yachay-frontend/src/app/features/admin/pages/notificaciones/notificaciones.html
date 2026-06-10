@@ -1,12 +1,68 @@
 <section class="grid gap-6">
   <div class="flex flex-col gap-3">
-    <p class="text-sm font-bold text-yachay-org-dark">Integraciones</p>
+    <p class="text-sm font-bold text-yachay-org-dark">Centro de avisos</p>
     <h1 class="text-3xl font-extrabold text-yachay-900">Notificaciones</h1>
     <p class="max-w-3xl text-sm font-medium leading-7 text-yachay-muted">
-      Pruebas controladas para correo institucional y WhatsApp mock. Estas integraciones se usan para
-      confirmaciones de postulacion, aceptacion o rechazo, comunicados y avisos administrativos.
+      Notificaciones persistidas para el administrador e integraciones de correo institucional y WhatsApp en modo controlado.
     </p>
   </div>
+
+  <section class="rounded-lg border border-yachay-300 bg-white p-6 shadow-sm">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h2 class="text-xl font-extrabold text-yachay-900">Avisos administrativos</h2>
+        <p class="mt-2 text-sm font-semibold text-yachay-muted">Avisos del usuario autenticado organizados por estado de lectura.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" class="rounded-lg border border-yachay-300 bg-yachay-100 px-4 py-2 text-sm font-black text-yachay-900 transition hover:bg-white" (click)="loadNotifications()">
+          Actualizar
+        </button>
+        <button type="button" class="rounded-lg bg-yachay-900 px-4 py-2 text-sm font-black text-white transition hover:bg-yachay-org-dark" (click)="markAllAsRead()">
+          Marcar todas como leídas
+        </button>
+      </div>
+    </div>
+
+    @if (listSuccessMessage()) {
+      <div class="mt-5 rounded-lg border border-green-soft bg-green-soft/15 px-4 py-3 text-sm font-black text-ink-dark">{{ listSuccessMessage() }}</div>
+    }
+
+    @if (listErrorMessage()) {
+      <div class="mt-5 rounded-lg border border-public-orange bg-public-orange/10 px-4 py-3 text-sm font-black text-ink-dark">{{ listErrorMessage() }}</div>
+    }
+
+    @if (loading()) {
+      <div class="mt-5 rounded-lg border border-yachay-300 bg-yachay-100 p-6 text-sm font-black text-yachay-muted">
+        Cargando notificaciones...
+      </div>
+    } @else if (notifications().length === 0) {
+      <div class="mt-5 rounded-lg border border-dashed border-yachay-300 bg-yachay-100 p-8 text-center">
+        <app-icon name="notification" className="mx-auto h-10 w-10 text-yachay-muted" />
+        <h3 class="mt-4 text-lg font-black text-yachay-900">No tienes notificaciones pendientes.</h3>
+      </div>
+    } @else {
+      <div class="mt-5 grid gap-3">
+        @for (notification of notifications(); track notification.id) {
+          <article class="rounded-lg border border-yachay-300 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div class="flex gap-3">
+                <span class="mt-1 size-3 rounded-full" [class.bg-green-soft]="!notification.read" [class.bg-slate-300]="notification.read"></span>
+                <div>
+                  <p class="text-xs font-black uppercase tracking-wide text-yachay-org-dark">{{ notification.type }}</p>
+                  <h3 class="mt-1 text-lg font-black text-yachay-900">{{ notification.title }}</h3>
+                  <p class="mt-1 text-sm font-semibold leading-6 text-yachay-muted">{{ notification.body }}</p>
+                  <p class="mt-2 text-xs font-black text-slate-500">{{ formattedDate(notification.createdAt) }}</p>
+                </div>
+              </div>
+              <button type="button" class="rounded-lg border border-yachay-300 bg-yachay-100 px-4 py-2 text-xs font-black text-yachay-900 transition hover:bg-white" [disabled]="notification.read" (click)="markAsRead(notification)">
+                {{ notification.read ? 'Leída' : 'Marcar como leída' }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
 
   <div class="grid gap-6 xl:grid-cols-2">
     <form
@@ -55,7 +111,7 @@
       (ngSubmit)="sendWhatsapp()"
     >
       <div class="mb-6">
-        <h2 class="text-xl font-extrabold text-yachay-900">WhatsApp mock</h2>
+        <h2 class="text-xl font-extrabold text-yachay-900">WhatsApp controlado</h2>
         <p class="mt-2 text-sm font-medium leading-6 text-yachay-muted">
           El flujo queda preparado para WhatsApp Cloud API, pero por defecto no envia mensajes reales.
         </p>

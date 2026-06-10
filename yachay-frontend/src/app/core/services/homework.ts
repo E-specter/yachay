@@ -9,13 +9,17 @@ import {
   UpdateHomeworkStatusRequest,
 } from '../models/homework.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HomeworkService {
   private readonly http = inject(HttpClient);
+
+  list(): Observable<Homework[]> {
+    return this.getHomeworks();
+  }
 
   getHomeworks(): Observable<Homework[]> {
     return this.http.get<Homework[]>(`${API_URL}/admin/tareas`);

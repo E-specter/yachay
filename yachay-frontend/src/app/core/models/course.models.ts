@@ -27,8 +27,28 @@ export interface CreateCourseRequest {
   codigo: string;
   nivel: AcademicLevel;
   grado: string;
+  seccion?: string;
   area: CourseArea;
+  materia?: string;
+  materiaId?: number;
   docenteId?: number;
+  anioAcademicoId?: number;
+  aula?: string;
+  maximoEstudiantes?: number;
+  activo?: boolean;
+}
+
+export interface SubjectOption {
+  id: number;
+  codigo: string;
+  nombre: string;
+  area: string;
+}
+
+export interface AcademicYearOption {
+  id: number;
+  anio: number;
+  activo: boolean;
 }
 
 export interface UpdateCourseRequest extends CreateCourseRequest {

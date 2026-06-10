@@ -17,8 +17,12 @@ export interface CreateSchoolSectionRequest {
   nivel: AcademicLevel;
   grado: string;
   seccion: SectionCode;
+  nombre?: SectionCode;
   tutorId?: number;
+  aula?: string;
+  anioAcademicoId?: number;
   capacidad: number;
+  activo?: boolean;
 }
 
 export interface UpdateSchoolSectionRequest extends CreateSchoolSectionRequest {

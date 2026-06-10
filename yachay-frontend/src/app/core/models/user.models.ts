@@ -1,4 +1,4 @@
-export type AdminUserRole = 'ADMINISTRADOR' | 'DOCENTE' | 'ALUMNO';
+export type AdminUserRole = 'ADMINISTRADOR' | 'DOCENTE' | 'ALUMNO' | 'APODERADO';
 export type AdminUserStatus = 'ACTIVO' | 'INACTIVO';
 
 export interface AdminUser {
@@ -15,7 +15,9 @@ export interface CreateAdminUserRequest {
   nombres: string;
   apellidos: string;
   email: string;
+  passwordTemporal?: string;
   rol: AdminUserRole;
+  activo?: boolean;
 }
 
 export interface UpdateAdminUserRequest extends CreateAdminUserRequest {

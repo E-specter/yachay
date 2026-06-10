@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 
 import { StudentDashboard } from '../models/student-dashboard.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',

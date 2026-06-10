@@ -1,17 +1,26 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
-import { NotificationService } from '../../../../core/services/notification';
+import {
+  NotificationService,
+  UserNotification,
+} from '../../../../core/services/notification';
+import { AppIcon } from '../../../../shared/components/app-icon/app-icon';
 
 @Component({
   selector: 'app-admin-notificaciones',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AppIcon],
   templateUrl: './notificaciones.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AdminNotificaciones {
+export class AdminNotificaciones implements OnInit {
   private readonly fb = inject(FormBuilder).nonNullable;
   private readonly notificationService = inject(NotificationService);
+
+  readonly notifications = signal<UserNotification[]>([]);
+  readonly loading = signal(false);
+  readonly listErrorMessage = signal('');
+  readonly listSuccessMessage = signal('');
 
   readonly emailLoading = signal(false);
   readonly whatsappLoading = signal(false);
@@ -30,6 +39,56 @@ export class AdminNotificaciones {
     to: ['+51999999999', [Validators.required]],
     message: ['Mensaje de prueba Yachay', [Validators.required]],
   });
+
+  ngOnInit(): void {
+    this.loadNotifications();
+  }
+
+  loadNotifications(): void {
+    this.loading.set(true);
+    this.listErrorMessage.set('');
+
+    this.notificationService.list('ADMINISTRADOR').subscribe({
+      next: (notifications) => {
+        this.notifications.set(notifications);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        console.error('Error cargando notificaciones administrador', error);
+        this.listErrorMessage.set('No se pudieron cargar las notificaciones administrativas.');
+        this.loading.set(false);
+      },
+    });
+  }
+
+  markAsRead(notification: UserNotification): void {
+    if (notification.read) return;
+
+    this.notificationService.markAsRead('ADMINISTRADOR', notification.id).subscribe({
+      next: (updated) => {
+        this.notifications.update((items) =>
+          items.map((item) => (item.id === updated.id ? updated : item)),
+        );
+      },
+      error: (error) => {
+        console.error('Error marcando notificacion administrador', error);
+        this.listErrorMessage.set('No se pudo actualizar la notificación.');
+      },
+    });
+  }
+
+  markAllAsRead(): void {
+    this.notificationService.markAllAsRead('ADMINISTRADOR').subscribe({
+      next: (notifications) => {
+        this.notifications.set(notifications);
+        this.listSuccessMessage.set('Notificaciones marcadas como leídas.');
+      },
+      error: (error) => {
+        console.error('Error marcando todas las notificaciones administrador', error);
+        this.listErrorMessage.set('No se pudieron actualizar las notificaciones.');
+      },
+    });
+  }
 
   sendEmail(): void {
     this.emailMessage.set('');
@@ -87,5 +146,12 @@ export class AdminNotificaciones {
     if (success === true) return 'border-green-200 bg-green-50 text-green-800';
     if (success === false) return 'border-red-200 bg-red-50 text-red-800';
     return 'border-yachay-300 bg-white text-yachay-muted';
+  }
+
+  formattedDate(value: string): string {
+    return new Intl.DateTimeFormat('es-PE', {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(new Date(value));
   }
 }

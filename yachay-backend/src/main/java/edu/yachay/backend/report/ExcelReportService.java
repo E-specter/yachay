@@ -2,29 +2,16 @@ package edu.yachay.backend.report;
 
 import edu.yachay.backend.admissions.domain.models.AdmissionApplication;
 import edu.yachay.backend.admissions.domain.repositories.AdmissionApplicationRepository;
-import edu.yachay.backend.identity.domain.models.Profile;
-import edu.yachay.backend.identity.domain.models.Role;
-import edu.yachay.backend.identity.domain.models.StudentProfile;
-import edu.yachay.backend.identity.domain.models.TeacherProfile;
-import edu.yachay.backend.identity.domain.models.User;
-import edu.yachay.backend.identity.domain.repositories.StudentProfileRepository;
-import edu.yachay.backend.identity.domain.repositories.TeacherProfileRepository;
-import edu.yachay.backend.identity.domain.repositories.UserRepository;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import edu.yachay.backend.identity.domain.models.*;
+import edu.yachay.backend.identity.domain.repositories.*;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.util.stream.Collectors;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class ExcelReportService {

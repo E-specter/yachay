@@ -1,93 +1,149 @@
 <section class="grid gap-6">
-  <div class="rounded-lg border border-yachay-300 bg-white p-5 shadow-sm">
+  <div class="rounded-lg border border-brown/10 bg-white p-6 shadow-sm">
     <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
       <div>
-        <p class="text-sm font-black uppercase tracking-wide text-yachay-800">Calendario académico</p>
-        <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">{{ monthTitle }}</h1>
-        <p class="mt-2 text-sm font-semibold text-yachay-muted">{{ weekTitle }}</p>
+        <p class="text-sm font-black uppercase tracking-wide text-brown">Calendario académico</p>
+        <h1 class="mt-2 text-3xl font-black text-ink-dark">Mi semana en Yachay</h1>
+        <p class="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-600">
+          Cursos, tareas, evaluaciones y comunicados obtenidos desde el campus.
+        </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-2">
         <button type="button" class="btn-primary" (click)="goToday()">Hoy</button>
-        <button type="button" class="grid size-12 place-items-center rounded-lg border border-yachay-300 bg-white text-yachay-800 transition hover:bg-yachay-100" aria-label="Semana anterior" (click)="goPrevious()">
+        <button type="button" class="grid size-12 place-items-center rounded-lg border border-brown/10 bg-white text-ink-dark transition hover:bg-cloud" aria-label="Semana anterior" (click)="goPrevious()">
           <app-icon name="chevron-left" className="h-5 w-5" />
         </button>
-        <button type="button" class="grid size-12 place-items-center rounded-lg border border-yachay-300 bg-white text-yachay-800 transition hover:bg-yachay-100" aria-label="Semana siguiente" (click)="goNext()">
+        <button type="button" class="grid size-12 place-items-center rounded-lg border border-brown/10 bg-white text-ink-dark transition hover:bg-cloud" aria-label="Semana siguiente" (click)="goNext()">
           <app-icon name="chevron-right" className="h-5 w-5" />
+        </button>
+        <button type="button" class="rounded-lg border border-brown/10 bg-cloud px-5 py-3 text-sm font-black text-ink-dark transition hover:bg-white" (click)="loadEvents()">
+          Actualizar
         </button>
       </div>
     </div>
   </div>
 
   @if (notice()) {
-    <div class="rounded-lg border border-yachay-success bg-yachay-success/10 px-4 py-3 text-sm font-bold text-yachay-success">
+    <div class="rounded-lg border border-green-soft bg-green-soft/15 px-4 py-3 text-sm font-black text-ink-dark">
       {{ notice() }}
     </div>
   }
 
+  @if (errorMessage()) {
+    <div class="rounded-lg border border-public-orange bg-public-orange/10 px-4 py-3 text-sm font-black text-ink-dark">
+      {{ errorMessage() }}
+    </div>
+  }
+
   <div class="grid gap-6 xl:grid-cols-[18rem_1fr]">
-    <aside class="grid gap-4 self-start rounded-lg border border-yachay-300 bg-white p-5 shadow-sm">
+    <aside class="grid gap-4 self-start rounded-lg border border-brown/10 bg-white p-5 shadow-sm">
       <div>
-        <h2 class="text-lg font-extrabold text-yachay-900">Filtros</h2>
-        <p class="mt-1 text-sm font-semibold text-yachay-muted">Activa o desactiva eventos.</p>
+        <h2 class="text-lg font-black text-ink-dark">Filtros</h2>
+        <p class="mt-1 text-sm font-semibold text-slate-600">Revisa tus eventos por tipo.</p>
       </div>
 
-      <div class="grid gap-3">
-        @for (filter of filters; track filter.type) {
-          <button type="button" class="flex items-center justify-between rounded-lg border border-yachay-300 bg-yachay-100 px-3 py-3 text-left transition hover:bg-white" (click)="toggleType(filter.type)">
-            <span class="flex items-center gap-3">
-              <span [class]="'size-3 rounded-full ' + filter.color"></span>
-              <span class="text-sm font-extrabold text-yachay-900">{{ filter.label }}</span>
-            </span>
-            @if (activeTypes().includes(filter.type)) {
-              <app-icon name="check" className="h-4 w-4 text-yachay-success" />
+      <div class="grid gap-2">
+        <button
+          type="button"
+          class="flex items-center justify-between rounded-lg border border-brown/10 px-3 py-3 text-left transition hover:bg-cloud"
+          [class.bg-ink-dark]="selectedType() === 'TODOS'"
+          [class.text-white]="selectedType() === 'TODOS'"
+          [class.bg-white]="selectedType() !== 'TODOS'"
+          [class.text-ink-dark]="selectedType() !== 'TODOS'"
+          (click)="setFilter('TODOS')"
+        >
+          <span class="text-sm font-black">Todos</span>
+          @if (selectedType() === 'TODOS') {
+            <app-icon name="check" className="h-4 w-4" />
+          }
+        </button>
+
+        @for (type of eventTypes; track type) {
+          <button
+            type="button"
+            class="flex items-center justify-between rounded-lg border border-brown/10 px-3 py-3 text-left transition hover:bg-cloud"
+            [class.bg-ink-dark]="selectedType() === type"
+            [class.text-white]="selectedType() === type"
+            [class.bg-white]="selectedType() !== type"
+            [class.text-ink-dark]="selectedType() !== type"
+            (click)="setFilter(type)"
+          >
+            <span class="text-sm font-black">{{ type }}</span>
+            @if (selectedType() === type) {
+              <app-icon name="check" className="h-4 w-4" />
             }
           </button>
         }
       </div>
     </aside>
 
-    <div class="overflow-hidden rounded-lg border border-yachay-300 bg-white shadow-sm">
-      <div class="grid min-w-[58rem] grid-cols-[5rem_repeat(5,minmax(10rem,1fr))] border-b border-yachay-300 bg-yachay-100">
-        <div class="border-r border-yachay-300 px-3 py-4 text-xs font-black uppercase tracking-wide text-yachay-muted">Hora</div>
-        @for (day of weekDays; track day.key) {
-          <div class="border-r border-yachay-300 px-4 py-4 last:border-r-0">
-            <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">{{ day.label }}</p>
-            <p class="mt-1 text-2xl font-black text-yachay-900">{{ day.date }}</p>
+    <div class="grid gap-5">
+      <div class="rounded-lg border border-brown/10 bg-white p-5 shadow-sm">
+        <div class="flex items-center justify-between gap-3">
+          <h2 class="text-xl font-black text-ink-dark">Vista semanal</h2>
+          <span class="rounded-full bg-cloud px-3 py-1 text-xs font-black text-brown">8:00 a.m. - 2:00 p.m.</span>
+        </div>
+
+        @if (loading()) {
+          <div class="mt-5 rounded-lg border border-brown/10 bg-cloud p-6 text-sm font-black text-slate-600">
+            Cargando calendario...
+          </div>
+        } @else if (weeklyEvents().length === 0) {
+          <div class="mt-5 rounded-lg border border-dashed border-brown/20 bg-cloud p-8 text-center">
+            <app-icon name="calendar" className="mx-auto h-10 w-10 text-brown" />
+            <h3 class="mt-4 text-lg font-black text-ink-dark">No hay eventos próximos</h3>
+            <p class="mt-2 text-sm font-semibold text-slate-600">Tus clases y actividades aparecerán cuando estén registradas.</p>
+          </div>
+        } @else {
+          <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            @for (event of weeklyEvents(); track event.id) {
+              <article [class]="'rounded-lg border-l-4 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ' + eventClass(event.eventType)">
+                <p class="text-xs font-black uppercase tracking-wide">{{ event.eventType }}</p>
+                <h3 class="mt-1 text-base font-black">{{ event.title }}</h3>
+                <p class="mt-2 text-xs font-black opacity-80">{{ timeRange(event) }}</p>
+                @if (event.courseName) {
+                  <p class="mt-2 text-sm font-semibold opacity-80">{{ event.courseName }}</p>
+                }
+              </article>
+            }
           </div>
         }
       </div>
 
-      <div class="overflow-x-auto">
-        <div class="grid min-w-[58rem] grid-cols-[5rem_repeat(5,minmax(10rem,1fr))]">
-          <div class="grid">
-            @for (slot of timeSlots; track slot) {
-              <div class="min-h-32 border-b border-yachay-300 px-3 py-3 text-xs font-black text-yachay-muted">
-                {{ slot }}
+      @if (groupedEvents().length > 0) {
+        <div class="grid gap-5">
+          @for (group of groupedEvents(); track group.date) {
+            <section class="rounded-lg border border-brown/10 bg-white p-5 shadow-sm">
+              <h2 class="text-lg font-black capitalize text-ink-dark">{{ group.label }}</h2>
+              <div class="mt-4 grid gap-3">
+                @for (event of group.events; track event.id) {
+                  <article [class]="'rounded-lg border-l-4 p-4 shadow-sm ' + eventClass(event.eventType)">
+                    <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <p class="text-xs font-black uppercase tracking-wide">{{ event.eventType }}</p>
+                        <h3 class="mt-1 text-lg font-black">{{ event.title }}</h3>
+                        @if (event.description) {
+                          <p class="mt-1 text-sm font-semibold opacity-80">{{ event.description }}</p>
+                        }
+                      </div>
+                      <span class="rounded-full bg-white/70 px-3 py-1 text-xs font-black">{{ timeRange(event) }}</span>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2 text-xs font-black opacity-80">
+                      @if (event.courseName) {
+                        <span class="rounded-full bg-white/70 px-3 py-1">{{ event.courseName }}</span>
+                      }
+                      @if (event.sectionName) {
+                        <span class="rounded-full bg-white/70 px-3 py-1">{{ event.sectionName }}</span>
+                      }
+                    </div>
+                  </article>
+                }
               </div>
-            }
-          </div>
-
-          @for (day of weekDays; track day.key) {
-            <div class="grid border-l border-yachay-300">
-              @for (slot of timeSlots; track slot) {
-                <div class="min-h-32 border-b border-yachay-300 bg-white p-2">
-                  <div class="grid gap-2">
-                    @for (event of eventsFor(day.key, slot); track event.id) {
-                      <article [class]="'rounded-lg border-l-4 p-2 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ' + eventClass(event.type)">
-                        <p class="text-xs font-black uppercase tracking-wide">{{ event.type }}</p>
-                        <h3 class="mt-1 text-sm font-black leading-5">{{ event.title }}</h3>
-                        <p class="mt-1 text-xs font-semibold opacity-80">{{ event.startTime }} - {{ event.endTime }}</p>
-                        <p class="mt-1 text-xs font-semibold opacity-80">{{ event.subtitle }}</p>
-                      </article>
-                    }
-                  </div>
-                </div>
-              }
-            </div>
+            </section>
           }
         </div>
-      </div>
+      }
     </div>
   </div>
 </section>

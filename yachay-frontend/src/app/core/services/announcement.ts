@@ -9,13 +9,17 @@ import {
   UpdateAnnouncementStatusRequest,
 } from '../models/announcement.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AnnouncementService {
   private readonly http = inject(HttpClient);
+
+  list(): Observable<Announcement[]> {
+    return this.getAnnouncements();
+  }
 
   getAnnouncements(): Observable<Announcement[]> {
     return this.http.get<Announcement[]>(`${API_URL}/admin/comunicados`);

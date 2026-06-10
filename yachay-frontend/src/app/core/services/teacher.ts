@@ -9,13 +9,17 @@ import {
   UpdateTeacherStatusRequest,
 } from '../models/teacher.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TeacherService {
   private readonly http = inject(HttpClient);
+
+  list(): Observable<Teacher[]> {
+    return this.getTeachers();
+  }
 
   getTeachers(): Observable<Teacher[]> {
     return this.http.get<Teacher[]>(`${API_URL}/admin/docentes`);

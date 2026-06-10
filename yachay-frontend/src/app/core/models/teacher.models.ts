@@ -16,11 +16,15 @@ export interface Teacher {
 export interface CreateTeacherRequest {
   nombres: string;
   apellidos: string;
+  passwordTemporal?: string;
+  codigoEmpleado?: string;
   documentoTipo: string;
   documentoNumero: string;
   email: string;
   especialidad: string;
   telefono: string;
+  fechaContratacion?: string;
+  activo?: boolean;
 }
 
 export interface UpdateTeacherRequest extends CreateTeacherRequest {

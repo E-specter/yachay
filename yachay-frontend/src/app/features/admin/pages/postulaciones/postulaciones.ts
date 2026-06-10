@@ -1,16 +1,10 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { AdmissionApplication } from '../../../../core/models/admission.models';
+import { AdmissionService } from '../../../../core/services/admission';
 import { DocumentService } from '../../../../core/services/document';
 import { ReportService } from '../../../../core/services/report';
-
-interface PostulacionMock {
-  id: number;
-  postulante: string;
-  apoderado: string;
-  nivel: string;
-  grado: string;
-  estado: 'Pendiente' | 'Aceptada' | 'Rechazada';
-}
 
 @Component({
   selector: 'app-postulaciones',
@@ -20,35 +14,18 @@ interface PostulacionMock {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Postulaciones {
+  private readonly admissionService = inject(AdmissionService);
   private readonly reportService = inject(ReportService);
   private readonly documentService = inject(DocumentService);
 
-  readonly postulaciones: readonly PostulacionMock[] = [
-    {
-      id: 1,
-      postulante: 'Maria Fernanda Salazar Rojas',
-      apoderado: 'Rosa Rojas Perez',
-      nivel: 'Primaria',
-      grado: '3 Primaria',
-      estado: 'Pendiente',
-    },
-    {
-      id: 2,
-      postulante: 'Luis Alberto Torres Quispe',
-      apoderado: 'Carlos Torres Medina',
-      nivel: 'Inicial',
-      grado: '5 anos',
-      estado: 'Aceptada',
-    },
-    {
-      id: 3,
-      postulante: 'Ana Paula Huaman Soto',
-      apoderado: 'Elena Soto Vargas',
-      nivel: 'Secundaria',
-      grado: '1 Secundaria',
-      estado: 'Rechazada',
-    },
-  ];
+  readonly postulaciones = signal<AdmissionApplication[]>([]);
+  readonly loading = signal(false);
+  readonly errorMessage = signal('');
+  readonly successMessage = signal('');
+
+  constructor() {
+    this.loadPostulaciones();
+  }
 
   downloadExcel(): void {
     const filename = 'postulaciones.xlsx';
@@ -59,32 +36,94 @@ export class Postulaciones {
     });
   }
 
-  generatePdf(postulacion: PostulacionMock): void {
-    this.documentService.generateAdmissionPdf(postulacion.id).subscribe({
-      next: (response) => this.showAction(response.message),
-      error: () => this.showAction('No se pudo generar el PDF de postulacion. Verifica que el backend este activo.'),
+  generatePdf(postulacion: AdmissionApplication): void {
+    const filename = `postulacion-${postulacion.id}.pdf`;
+    this.documentService.downloadAdmissionPdf(postulacion.id).subscribe({
+      next: (blob) => {
+        this.documentService.downloadFile(blob, filename);
+        this.successMessage.set('PDF generado correctamente.');
+      },
+      error: (error) => {
+        this.errorMessage.set('No se pudo generar el PDF. Revisa el backend.');
+        this.documentService.logDownloadError('Error generando PDF de postulación', error);
+      },
     });
   }
 
-  viewPostulacion(postulacion: PostulacionMock): void {
-    this.showAction(`Postulacion: ${postulacion.postulante}`);
+  viewPostulacion(postulacion: AdmissionApplication): void {
+    this.successMessage.set(`Postulación seleccionada: ${postulacion.postulante}`);
   }
 
-  acceptPostulacion(postulacion: PostulacionMock): void {
-    this.showAction(`Aceptar postulacion: ${postulacion.postulante}`);
+  acceptPostulacion(postulacion: AdmissionApplication): void {
+    this.admissionService.acceptApplication(postulacion.id, {
+      nivel: postulacion.nivel,
+      grado: postulacion.grado,
+      seccion: 'A',
+      generarCredenciales: true,
+      enviarCorreo: true,
+      observaciones: 'Postulación aceptada desde administración.',
+    }).subscribe({
+      next: () => {
+        this.successMessage.set('Postulación aceptada correctamente.');
+        this.loadPostulaciones();
+      },
+      error: (error) => this.handleSaveError('Error aceptando postulación', error),
+    });
   }
 
-  rejectPostulacion(postulacion: PostulacionMock): void {
-    this.showAction(`Rechazar postulacion: ${postulacion.postulante}`);
+  rejectPostulacion(postulacion: AdmissionApplication): void {
+    this.admissionService.rejectApplication(postulacion.id, {
+      motivo: 'Solicitud rechazada desde administración.',
+      enviarCorreo: true,
+    }).subscribe({
+      next: () => {
+        this.successMessage.set('Postulación rechazada correctamente.');
+        this.loadPostulaciones();
+      },
+      error: (error) => this.handleSaveError('Error rechazando postulación', error),
+    });
   }
 
-  assignSection(postulacion: PostulacionMock): void {
-    this.showAction(`Asignar seccion a: ${postulacion.postulante}`);
+  assignSection(postulacion: AdmissionApplication): void {
+    this.successMessage.set(`Asignación preparada para ${postulacion.postulante}: sección A.`);
   }
 
-  private showAction(message: string): void {
-    if (typeof window !== 'undefined') {
-      window.alert(message);
+  statusClass(status: AdmissionApplication['status']): string {
+    if (status === 'ACEPTADA') return 'border-green-200 bg-green-50 text-green-700';
+    if (status === 'RECHAZADA') return 'border-red-200 bg-red-50 text-red-700';
+    return 'border-yellow-200 bg-yellow-50 text-yellow-800';
+  }
+
+  private loadPostulaciones(): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+    this.admissionService.listApplications().subscribe({
+      next: (postulaciones) => {
+        this.postulaciones.set(postulaciones);
+        this.loading.set(false);
+      },
+      error: (error) => {
+        this.loading.set(false);
+        this.errorMessage.set('No se pudo conectar con el servidor. Verifica que el backend esté activo en http://localhost:8080/api y que MySQL esté iniciado.');
+        this.logHttpError('Error cargando postulaciones', error);
+      },
+    });
+  }
+
+  private handleSaveError(label: string, error: unknown): void {
+    this.errorMessage.set('No se pudo guardar. Verifica los datos o la conexión con el servidor.');
+    this.logHttpError(label, error);
+  }
+
+  private logHttpError(label: string, error: unknown): void {
+    if (error instanceof HttpErrorResponse) {
+      console.error(label, {
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        message: error.message,
+        error: error.error,
+      });
     }
   }
 }

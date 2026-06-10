@@ -22,12 +22,16 @@ export interface CreateStudentRequest {
   codigo: string;
   nombres: string;
   apellidos: string;
+  email?: string;
+  passwordTemporal?: string;
   documentoTipo: string;
   documentoNumero: string;
   correoInstitucional: string;
   nivel: AcademicLevel;
   grado: string;
   seccion: SectionCode;
+  fechaMatricula?: string;
+  activo?: boolean;
   apoderadoId?: number;
 }
 

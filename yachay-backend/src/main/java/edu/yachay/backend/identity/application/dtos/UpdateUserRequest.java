@@ -3,8 +3,7 @@ package edu.yachay.backend.identity.application.dtos;
 import lombok.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
-
-import java.time.LocalDate;
+import java.time.*;
 
 /**
  * DTO para solicitudes de actualización de usuarios.

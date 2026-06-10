@@ -15,10 +15,10 @@ spring:
     show-sql: false
     open-in-view: false
   mail:
-    host: mail.tudominio.com
-    port: 465
-    username: cambiar_correo@tudominio.com
-    password: CAMBIAR_PASSWORD_CORREO
+    host: ${MAIL_HOST:mail.tudominio.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:cambiar_correo@tudominio.com}
+    password: ${MAIL_PASSWORD:}
     properties:
       mail:
         smtp:
@@ -36,6 +36,7 @@ jwt:
 
 mail:
   from: ${MAIL_FROM:notificaciones@yachay.edu.pe}
+  from-name: ${MAIL_FROM_NAME:Yachay}
 
 ilovepdf:
   public-key: ${ILOVEPDF_PUBLIC_KEY:}

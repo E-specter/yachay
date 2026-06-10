@@ -1,9 +1,7 @@
 package edu.yachay.backend.identity.application.dtos;
 
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.time.LocalDate;
+import java.time.*;
 
 /**
  * DTO para representar un Perfil de Docente.

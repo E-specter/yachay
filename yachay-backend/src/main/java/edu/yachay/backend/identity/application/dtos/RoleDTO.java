@@ -1,8 +1,7 @@
 package edu.yachay.backend.identity.application.dtos;
 
 import lombok.*;
-
-import java.time.LocalDateTime;
+import java.time.*;
 
 /**
  * DTO para representar un Rol en las respuestas de la API.

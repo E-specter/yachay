@@ -2,24 +2,9 @@ package edu.yachay.backend.academic.domain.models;
 
 import edu.yachay.backend.identity.domain.models.School;
 import edu.yachay.backend.identity.domain.models.TeacherProfile;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.*;
+import java.time.*;
 
 @Entity
 @Table(name = "yachay_courses")
@@ -61,6 +46,12 @@ public class Course {
 
     @Column(name = "section", nullable = false, length = 20)
     private String section;
+
+    @Column(name = "room", length = 80)
+    private String room;
+
+    @Column(name = "max_students")
+    private Integer maxStudents;
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;

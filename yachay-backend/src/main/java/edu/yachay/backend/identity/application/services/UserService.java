@@ -1,26 +1,16 @@
 package edu.yachay.backend.identity.application.services;
 
-import edu.yachay.backend.identity.application.dtos.CreateUserRequest;
-import edu.yachay.backend.identity.application.dtos.UpdateUserRequest;
-import edu.yachay.backend.identity.application.dtos.UserDTO;
+import edu.yachay.backend.identity.application.dtos.*;
 import edu.yachay.backend.identity.application.ports.inputs.UserServicePort;
-import edu.yachay.backend.identity.domain.exceptions.ResourceConflictException;
-import edu.yachay.backend.identity.domain.exceptions.ResourceNotFoundException;
-import edu.yachay.backend.identity.domain.models.Profile;
-import edu.yachay.backend.identity.domain.models.Role;
-import edu.yachay.backend.identity.domain.models.User;
-import edu.yachay.backend.identity.domain.repositories.ProfileRepository;
-import edu.yachay.backend.identity.domain.repositories.RoleRepository;
-import edu.yachay.backend.identity.domain.repositories.UserRepository;
+import edu.yachay.backend.identity.domain.exceptions.*;
+import edu.yachay.backend.identity.domain.models.*;
+import edu.yachay.backend.identity.domain.repositories.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor

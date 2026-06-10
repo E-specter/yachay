@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row">
-      <button type="button" class="btn-primary w-full sm:w-auto">
+      <button type="button" class="btn-primary w-full sm:w-auto" (click)="openCreateModal()">
         Nuevo curso
       </button>
       <button
@@ -20,6 +20,24 @@
       </button>
     </div>
   </div>
+
+  @if (successMessage()) {
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">
+      {{ successMessage() }}
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
+      {{ errorMessage() }}
+    </div>
+  }
+
+  @if (loading()) {
+    <div class="rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-bold text-yachay-muted">
+      Cargando cursos...
+    </div>
+  }
 
   <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
     <label class="sr-only" for="cursos-search">Buscar cursos</label>
@@ -65,8 +83,8 @@
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
                 <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="viewCourse(course)">Ver</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Activar/Inactivar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="openCreateModal()">Editar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="toggleStatus(course)">Activar/Inactivar</button>
               </div>
             </td>
           </tr>
@@ -80,4 +98,103 @@
       </tbody>
     </table>
   </div>
+
+  @if (modalOpen()) {
+    <div class="fixed inset-0 z-50 grid place-items-center bg-ink-dark/50 p-4">
+      <form class="w-full max-w-4xl rounded-lg bg-white p-6 shadow-2xl" [formGroup]="form" (ngSubmit)="createCourse()">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-ink-dark">Nuevo curso</h2>
+            <p class="mt-1 text-sm font-semibold text-yachay-muted">Asocia materia, docente, aula y año académico desde datos reales.</p>
+          </div>
+          <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-sm font-black text-yachay-800" (click)="closeCreateModal()">Cerrar</button>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <label class="grid gap-2">
+            <span class="label">Nombre del curso</span>
+            <input class="input" formControlName="nombre" />
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Código</span>
+            <input class="input" formControlName="codigo" />
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Materia</span>
+            <select class="input" formControlName="materiaId">
+              <option [value]="0">Seleccionar materia</option>
+              @for (subject of subjects(); track subject.id) {
+                <option [value]="subject.id">{{ subject.nombre }}</option>
+              }
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Docente</span>
+            <select class="input" formControlName="docenteId">
+              <option [value]="0">Seleccionar docente</option>
+              @for (teacher of teachers(); track teacher.id) {
+                <option [value]="teacher.id">{{ teacher.nombres }} {{ teacher.apellidos }}</option>
+              }
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Año académico</span>
+            <select class="input" formControlName="anioAcademicoId">
+              <option [value]="0">Seleccionar año</option>
+              @for (year of academicYears(); track year.id) {
+                <option [value]="year.id">{{ year.anio }}</option>
+              }
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Nivel</span>
+            <select class="input" formControlName="nivel">
+              <option value="Inicial">Inicial</option>
+              <option value="Primaria">Primaria</option>
+              <option value="Secundaria">Secundaria</option>
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Grado</span>
+            <input class="input" formControlName="grado" />
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Sección</span>
+            <select class="input" formControlName="seccion">
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="E">E</option>
+              <option value="F">F</option>
+            </select>
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Área</span>
+            <input class="input" formControlName="area" />
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Aula</span>
+            <input class="input" formControlName="aula" />
+          </label>
+          <label class="grid gap-2">
+            <span class="label">Máximo estudiantes</span>
+            <input class="input" type="number" min="1" formControlName="maximoEstudiantes" />
+          </label>
+        </div>
+
+        <label class="mt-4 flex items-center gap-3 text-sm font-bold text-yachay-900">
+          <input type="checkbox" formControlName="activo" />
+          Curso activo
+        </label>
+
+        <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <button type="button" class="rounded-lg border border-yachay-300 px-5 py-3 text-sm font-extrabold text-yachay-800" (click)="closeCreateModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">
+            {{ saving() ? 'Guardando...' : 'Guardar curso' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

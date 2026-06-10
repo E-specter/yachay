@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-col gap-3 sm:flex-row">
-      <button type="button" class="btn-primary w-full sm:w-auto">
+      <button type="button" class="btn-primary w-full sm:w-auto" (click)="openCreateModal()">
         Nuevo alumno
       </button>
       <button
@@ -20,6 +20,12 @@
       </button>
     </div>
   </div>
+
+  @if (successMessage()) {
+    <div class="rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-sm font-bold text-green-700">
+      {{ successMessage() }}
+    </div>
+  }
 
   <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
     <label class="sr-only" for="alumnos-search">Buscar alumnos</label>
@@ -35,6 +41,18 @@
   </div>
 
   <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
+    @if (errorMessage()) {
+      <div class="border-b border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="border-b border-yachay-300 bg-yachay-100 px-5 py-4 text-sm font-bold text-yachay-muted">
+        Cargando alumnos...
+      </div>
+    }
+
     <table class="w-full min-w-[88rem] border-collapse text-left text-sm">
       <caption class="sr-only">Alumnos registrados</caption>
       <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
@@ -87,4 +105,44 @@
       </tbody>
     </table>
   </div>
+
+  @if (modalOpen()) {
+    <div class="fixed inset-0 z-50 grid place-items-center bg-ink-dark/40 p-4 backdrop-blur-sm">
+      <form class="w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl" [formGroup]="form" (ngSubmit)="createStudent()">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-black text-yachay-900">Nuevo alumno</h2>
+            <p class="mt-1 text-sm font-semibold text-yachay-muted">Crea el usuario del alumno y su perfil académico.</p>
+          </div>
+          <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-sm font-black" (click)="closeCreateModal()">Cerrar</button>
+        </div>
+
+        <div class="mt-6 grid gap-4 md:grid-cols-2">
+          <label><span class="label">Nombres</span><input class="input" formControlName="nombres" /></label>
+          <label><span class="label">Apellidos</span><input class="input" formControlName="apellidos" /></label>
+          <label><span class="label">Correo institucional</span><input class="input" type="email" formControlName="email" /></label>
+          <label><span class="label">Contraseña temporal</span><input class="input" formControlName="passwordTemporal" /></label>
+          <label><span class="label">Código</span><input class="input" formControlName="codigo" /></label>
+          <label><span class="label">Grado</span><input class="input" formControlName="grado" /></label>
+          <label>
+            <span class="label">Sección</span>
+            <select class="input" formControlName="seccion">
+              <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+              <option value="D">D</option><option value="E">E</option><option value="F">F</option>
+            </select>
+          </label>
+          <label><span class="label">Fecha matrícula</span><input class="input" type="date" formControlName="fechaMatricula" /></label>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="mt-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{{ errorMessage() }}</div>
+        }
+
+        <div class="mt-6 flex justify-end gap-3">
+          <button type="button" class="rounded-lg border border-yachay-300 px-5 py-3 text-sm font-black" (click)="closeCreateModal()">Cancelar</button>
+          <button type="submit" class="btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando...' : 'Guardar alumno' }}</button>
+        </div>
+      </form>
+    </div>
+  }
 </section>

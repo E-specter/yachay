@@ -9,13 +9,17 @@ import {
   UpdateSchoolSectionStatusRequest,
 } from '../models/section.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SectionService {
   private readonly http = inject(HttpClient);
+
+  list(): Observable<SchoolSection[]> {
+    return this.getSections();
+  }
 
   getSections(): Observable<SchoolSection[]> {
     return this.http.get<SchoolSection[]>(`${API_URL}/admin/secciones`);

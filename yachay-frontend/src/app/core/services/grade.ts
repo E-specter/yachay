@@ -9,13 +9,17 @@ import {
   UpdateGradeRecordStatusRequest,
 } from '../models/grade.models';
 
-const API_URL = 'http://localhost:8080/api';
+import { API_URL } from '../config/api.config';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GradeService {
   private readonly http = inject(HttpClient);
+
+  list(): Observable<GradeRecord[]> {
+    return this.getGrades();
+  }
 
   getGrades(): Observable<GradeRecord[]> {
     return this.http.get<GradeRecord[]>(`${API_URL}/admin/notas`);

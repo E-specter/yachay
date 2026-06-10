@@ -2,30 +2,28 @@ package edu.yachay.backend.admissions;
 
 import edu.yachay.backend.admissions.domain.models.AdmissionApplication;
 import edu.yachay.backend.admissions.domain.repositories.AdmissionApplicationRepository;
-import edu.yachay.backend.admissions.dto.AdmissionApplicationResponse;
-import edu.yachay.backend.admissions.dto.AdmissionDecisionRequest;
+import edu.yachay.backend.admissions.dto.*;
+import edu.yachay.backend.notification.PersistentNotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @RestController
 @RequestMapping("/admin/postulaciones")
 public class AdmissionApplicationController {
 
     private final AdmissionApplicationRepository admissionApplicationRepository;
+    private final PersistentNotificationService persistentNotificationService;
 
-    public AdmissionApplicationController(AdmissionApplicationRepository admissionApplicationRepository) {
+    public AdmissionApplicationController(
+            AdmissionApplicationRepository admissionApplicationRepository,
+            PersistentNotificationService persistentNotificationService
+    ) {
         this.admissionApplicationRepository = admissionApplicationRepository;
+        this.persistentNotificationService = persistentNotificationService;
     }
 
     @GetMapping
@@ -54,6 +52,13 @@ public class AdmissionApplicationController {
         AdmissionApplication application = findApplication(id);
         application.setStatus("ACEPTADA");
         application.setObservations(resolveObservation(request, "Postulacion aceptada desde administracion."));
+        persistentNotificationService.createForRole(
+                "ADMINISTRADOR",
+                "Postulacion aceptada",
+                application.studentFullName() + " fue aceptado para " + application.getGrade(),
+                "ADMISION",
+                "/admin/postulaciones"
+        );
 
         return ResponseEntity.ok(toResponse(admissionApplicationRepository.save(application)));
     }
@@ -67,6 +72,13 @@ public class AdmissionApplicationController {
         AdmissionApplication application = findApplication(id);
         application.setStatus("RECHAZADA");
         application.setObservations(resolveObservation(request, "Postulacion rechazada desde administracion."));
+        persistentNotificationService.createForRole(
+                "ADMINISTRADOR",
+                "Postulacion rechazada",
+                application.studentFullName() + " fue rechazado para " + application.getGrade(),
+                "ADMISION",
+                "/admin/postulaciones"
+        );
 
         return ResponseEntity.ok(toResponse(admissionApplicationRepository.save(application)));
     }

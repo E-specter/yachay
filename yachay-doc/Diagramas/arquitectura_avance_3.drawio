@@ -1,0 +1,116 @@
+<mxfile host="app.diagrams.net" modified="2026-06-10T20:30:00.000Z" agent="Codex" version="24.7.17" type="device">
+  <diagram id="arquitectura-avance-3" name="Arquitectura Avance 3">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="Yachay - Arquitectura Avance 3" style="text;html=1;fontSize=30;fontStyle=1;fontColor=#0D0D0D;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="420" y="20" width="900" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="frontend" value="Capa de Presentacion&#xa;Angular 21 + TailwindCSS v4" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=18;fillColor=#77F2F2;strokeColor=#0D0D0D;fontColor=#0D0D0D;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="70" y="110" width="410" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-core" value="Core&#xa;- AuthService&#xa;- Interceptor JWT&#xa;- AuthGuard / RoleGuard&#xa;- API_URL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFFFFF;strokeColor=#77F2F2;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="90" y="220" width="180" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-features" value="Features&#xa;- Auth&#xa;- Admission&#xa;- Admin&#xa;- Student&#xa;- Teacher" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFFFFF;strokeColor=#77F2F2;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="290" y="220" width="170" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="frontend-shared" value="Shared Components&#xa;- AppIcon SVG&#xa;- Cards&#xa;- Badges&#xa;- Empty states" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EFFFFF;strokeColor=#77F2F2;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="90" y="390" width="370" height="100" as="geometry" />
+        </mxCell>
+
+        <mxCell id="security" value="Capa de Seguridad&#xa;JWT + Spring Security" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=18;fillColor=#66F2A3;strokeColor=#0D0D0D;fontColor=#0D0D0D;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="600" y="110" width="430" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="security-backend" value="Backend Security&#xa;- SecurityConfig&#xa;- JwtService&#xa;- JwtAuthFilter&#xa;- SecurityContext&#xa;- ADMINISTRADOR / DOCENTE / ALUMNO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FFF7;strokeColor=#66F2A3;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="620" y="220" width="190" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="security-frontend" value="Angular Security&#xa;- authInterceptor&#xa;- authGuard&#xa;- roleGuard&#xa;- localStorage validado para SSR" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FFF7;strokeColor=#66F2A3;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="830" y="220" width="180" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="backend" value="Capa de Aplicacion y Negocio&#xa;Spring Boot REST API" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=18;fillColor=#F29F05;strokeColor=#0D0D0D;fontColor=#0D0D0D;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1130" y="110" width="520" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-auth" value="Auth&#xa;- AuthController&#xa;- AuthService&#xa;- Login JWT" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="220" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-identity" value="Identity&#xa;- Users&#xa;- Roles&#xa;- Profiles&#xa;- Students&#xa;- Teachers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="220" width="140" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-academic" value="Academic&#xa;- Courses&#xa;- Sections&#xa;- Tasks&#xa;- Grades&#xa;- Announcements&#xa;- Calendar events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="220" width="140" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-admission" value="Admissions&#xa;- Applications&#xa;- Accept / Reject&#xa;- Guardian data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="360" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-report" value="Report&#xa;- ReportController&#xa;- ExcelReportService&#xa;- Apache POI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="400" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-document" value="Document&#xa;- DocumentController&#xa;- DocumentService&#xa;- OpenPDF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1490" y="420" width="140" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-config" value="Config&#xa;- DataSeeder&#xa;- CORS&#xa;- Local profile" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1150" y="510" width="160" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="backend-notification" value="Notification&#xa;- SMTP&#xa;- WhatsApp controlado" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF7E6;strokeColor=#F29F05;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1330" y="550" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="database" value="Capa de Datos&#xa;MySQL" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=18;fillColor=#F25D27;strokeColor=#0D0D0D;fontColor=#FFFFFF;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="610" y="590" width="470" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tables-identity" value="Identidad&#xa;auth_users&#xa;roles&#xa;profiles&#xa;student_profiles&#xa;teacher_profiles" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0EB;strokeColor=#F25D27;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="610" y="700" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="tables-admission" value="Admision&#xa;yachay_admission_applications" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0EB;strokeColor=#F25D27;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="780" y="700" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="tables-academic" value="Academico&#xa;yachay_courses&#xa;yachay_sections&#xa;yachay_academic_tasks&#xa;yachay_grade_records&#xa;yachay_announcements&#xa;yachay_calendar_events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0EB;strokeColor=#F25D27;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="950" y="700" width="210" height="170" as="geometry" />
+        </mxCell>
+
+        <mxCell id="flows" value="Flujos principales" style="rounded=1;whiteSpace=wrap;html=1;fontStyle=1;fontSize=18;fillColor=#0D0D0D;strokeColor=#0D0D0D;fontColor=#FFFFFF;arcSize=10;" vertex="1" parent="1">
+          <mxGeometry x="90" y="760" width="390" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-login" value="1. Login&#xa;Angular Login -> AuthController -> AuthService -> MySQL -> JWT -> Interceptor" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#0D0D0D;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="90" y="850" width="390" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-admin" value="2. CRUD Admin&#xa;Admin UI -> Angular Services -> /api/admin/** -> Controllers -> Repositories -> MySQL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#0D0D0D;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="90" y="940" width="390" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-report" value="3. Reportes&#xa;ReportService -> ReportController -> ExcelReportService -> Apache POI -> XLSX" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#0D0D0D;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="520" y="940" width="380" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-pdf" value="4. PDF&#xa;DocumentService Angular -> DocumentController -> OpenPDF -> PDF" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#0D0D0D;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="930" y="940" width="340" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="flow-security" value="5. Seguridad&#xa;Authorization Bearer JWT -> JwtAuthFilter -> SecurityContext -> permisos por rol" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F7F7F7;strokeColor=#0D0D0D;fontColor=#0D0D0D;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="940" width="330" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="edge-front-security" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D0D0D;endArrow=block;endFill=1;" edge="1" parent="1" source="frontend" target="security">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-security-backend" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D0D0D;endArrow=block;endFill=1;" edge="1" parent="1" source="security" target="backend">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-backend-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0D0D0D;endArrow=block;endFill=1;" edge="1" parent="1" source="backend" target="database">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-auth-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F25D27;endArrow=block;endFill=1;" edge="1" parent="1" source="backend-auth" target="tables-identity">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-academic-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F25D27;endArrow=block;endFill=1;" edge="1" parent="1" source="backend-academic" target="tables-academic">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge-admission-db" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F25D27;endArrow=block;endFill=1;" edge="1" parent="1" source="backend-admission" target="tables-admission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

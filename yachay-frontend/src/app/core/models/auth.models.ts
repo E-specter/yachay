@@ -11,6 +11,8 @@ export interface AuthUser {
   apellidos: string;
   email: string;
   role: UserRole;
+  displayName?: string;
+  roles?: UserRole[];
 }
 
 export interface LoginResponse {

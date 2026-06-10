@@ -1,6 +1,6 @@
 package edu.yachay.backend.admissions.dto;
 
-import java.time.LocalDateTime;
+import java.time.*;
 
 public record AdmissionApplicationResponse(
         Long id,
