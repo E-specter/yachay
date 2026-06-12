@@ -31,18 +31,33 @@ Endpoints:
 
 Contenido de ficha de alumno:
 
-- Datos principales del alumno.
-- Correo institucional.
-- Grado, seccion y codigo.
-- Colegio.
-- Fecha de generacion.
+- Encabezado institucional: Yachay Campus Virtual y Colegio Manuel Gonzales Prada.
+- Seccion de datos personales.
+- Seccion de datos academicos.
+- Seccion de estado del registro.
+- Tablas de dos columnas `Campo | Valor`.
+- Pie de pagina con fecha/hora de generacion y nota informativa.
 
 Contenido de ficha de postulacion:
 
-- Datos del postulante.
-- Datos del apoderado.
-- Nivel, grado, estado y observaciones.
-- Fecha de registro y fecha de generacion.
+- Encabezado institucional: Yachay Campus Virtual y Colegio Manuel Gonzales Prada.
+- Seccion de datos del postulante.
+- Seccion de datos del apoderado.
+- Seccion de informacion de admision.
+- Tablas de dos columnas `Campo | Valor`.
+- Pie de pagina con fecha/hora de generacion y nota informativa.
+
+## Implementacion PDF
+
+`DocumentService` mantiene una implementacion simple con metodos privados para:
+
+- encabezado del documento
+- secciones
+- tablas campo/valor
+- filas
+- pie de pagina
+
+Esto permite explicar el codigo con claridad durante la exposicion sin introducir nuevas librerias ni patrones complejos.
 
 ## Seguridad
 

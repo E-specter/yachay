@@ -18,7 +18,8 @@ yachay-doc
 |   |-- 07_revision_tecnica_avance_3.md
 |   |-- 08_seguridad_jwt.md
 |   |-- 09_reportes_y_pdf.md
-|   `-- 10_siguiente_fase_calendario_notificaciones.md
+|   |-- 10_siguiente_fase_calendario_notificaciones.md
+|   `-- 11_modulos_backend_activos_y_futuros.md
 |-- Diagramas
 |   |-- arquitectura.drawio
 |   `-- arquitectura_avance_3.drawio
@@ -37,7 +38,8 @@ yachay-doc
 - `07_revision_tecnica_avance_3.md`: hallazgos positivos, pendientes y recomendaciones.
 - `08_seguridad_jwt.md`: JWT firmado, claims, rutas protegidas y permisos por rol.
 - `09_reportes_y_pdf.md`: XLSX con Apache POI y PDF local con OpenPDF.
-- `10_siguiente_fase_calendario_notificaciones.md`: trabajo recomendado para calendario y notificaciones reales.
+- `10_siguiente_fase_calendario_notificaciones.md`: calendario y notificaciones reales por rol.
+- `11_modulos_backend_activos_y_futuros.md`: paquetes productivos y modulos futuros retirados del arbol Java.
 
 ## Diagramas
 
@@ -57,13 +59,14 @@ El sistema documentado incluye:
 - Postulaciones reales.
 - Reportes XLSX reales.
 - PDF local real con OpenPDF.
+- Calendario academico real por rol.
+- Notificaciones persistidas por usuario.
 - DataSeeder idempotente.
 
 ## Pendientes recomendados
 
 - Extraer logica administrativa desde controladores hacia services de aplicacion.
 - Completar endpoints reales para dashboards docente/alumno.
-- Implementar calendario academico real por rol.
-- Implementar notificaciones persistidas y campana real.
 - Agregar Flyway o Liquibase para migraciones de base de datos.
-- Consolidar paquetes documentales o futuros dentro de la arquitectura productiva.
+- Completar endpoints reales para dashboards docente/alumno.
+- Extraer logica administrativa restante desde controladores hacia services.

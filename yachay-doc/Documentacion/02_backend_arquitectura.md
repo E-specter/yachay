@@ -43,7 +43,7 @@ edu.yachay.backend
 - Controller Pattern: controladores REST exponen endpoints HTTP.
 - DTO Pattern: los endpoints usan requests/responses en lugar de exponer entidades cuando aplica.
 - Repository Pattern: Spring Data JPA concentra acceso a datos.
-- Service Layer: presente en auth, identity, document, notification y report.
+- Service Layer: presente en auth, identity, document, notification, report y calendario.
 - Dependency Injection: constructores inyectan repositorios y servicios.
 - Global Exception Handler: centraliza respuestas de error.
 - Data Seeder idempotente: carga roles, usuarios demo, colegio, datos academicos y postulaciones sin duplicar.
@@ -71,11 +71,14 @@ Academico:
 - `GradeRecord`
 - `Announcement`
 - `CalendarEvent`
-- `Notification`
 
 Admision:
 
 - `AdmissionApplication`
+
+Notificaciones:
+
+- `Notification`
 
 ## Repositorios
 
@@ -101,13 +104,14 @@ Los DTOs estan en:
 
 - `identity` tiene una estructura mas cercana a arquitectura hexagonal: application ports, services, domain, repositories e infrastructure adapters.
 - `academic` y `admissions` estan mas orientados a una estructura por dominio simple.
-- `AdminAcademicController` y `AdminIdentityReadController` usan repositorios directamente. Funciona para Avance 3, pero la siguiente mejora debe mover esa logica a services de aplicacion.
-- Hay paquetes con solo `readme.md`: `attendance`, `calendar`, `common`, `communication`, `contents`, `notifications`, `resources`, `shared`. No estan vacios, pero son documentales o futuros. Se conservan por trazabilidad de arquitectura, aunque conviene mover su contenido a `docs` o implementarlos cuando entren al alcance.
-- `notification` contiene codigo real de notificaciones persistidas, correo y WhatsApp. El paquete documental `notifications` debe consolidarse en una fase de limpieza.
+- `AdminAcademicController` y `AdminIdentityReadController` aun usan repositorios directamente. Funciona para Avance 3, pero la siguiente mejora debe mover esa logica a services de aplicacion.
+- Los paquetes documentales sin codigo Java productivo fueron retirados del arbol `src/main/java` y consolidados en `yachay-doc/Documentacion/11_modulos_backend_activos_y_futuros.md`.
+- `notification` contiene codigo real de notificaciones persistidas, correo y WhatsApp.
 
 ## Calendario y notificaciones
 
 - `CalendarController` expone endpoints para `/admin/calendario`, `/docente/calendario` y `/alumno/calendario`.
+- `CalendarService` contiene filtrado por rol, armado de respuestas, validacion de rangos y creacion de notificaciones.
 - El administrador consulta todos los eventos y puede crear eventos.
 - El docente consulta eventos generales, eventos para docentes y eventos asociados a sus cursos.
 - El alumno consulta eventos generales, eventos para alumnos y eventos asociados a sus cursos matriculados.

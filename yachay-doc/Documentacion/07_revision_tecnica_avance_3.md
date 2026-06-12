@@ -36,8 +36,9 @@ Correcto:
 Hallazgos:
 
 - `AdminAcademicController` y `AdminIdentityReadController` concentran logica que deberia migrarse a services.
-- Algunos paquetes solo contienen `readme.md` y representan modulos futuros.
-- Existe `notification` con codigo real y `notifications` documental. Conviene consolidar.
+- `CalendarController` fue reducido a capa REST y delega logica en `CalendarService`.
+- Los paquetes Java documentales sin codigo productivo fueron retirados del arbol backend.
+- `notification` queda como paquete productivo unico para notificaciones persistidas, correo y WhatsApp.
 
 ## Revision frontend
 
@@ -65,7 +66,7 @@ Hallazgos:
 
 No se encontraron carpetas vacias.
 
-Paquetes backend con solo documentacion:
+Paquetes backend documentales retirados:
 
 - `attendance`
 - `calendar`
@@ -76,11 +77,13 @@ Paquetes backend con solo documentacion:
 - `resources`
 - `shared`
 
-Decision: se conservan para no romper trazabilidad de arquitectura, pero se documentan como paquetes futuros o documentales. En una fase posterior se deben implementar o retirar del arbol `src/main/java` y mover su contenido a `docs`.
+Decision: se retiraron del arbol `src/main/java` porque solo contenian `readme.md` vacio y no tenian referencias de codigo. El alcance futuro se documento en `11_modulos_backend_activos_y_futuros.md`.
 
 ## Archivos eliminados
 
-No se eliminaron archivos en esta revision porque no habia carpetas vacias y los paquetes documentales pueden tener valor para la presentacion de arquitectura.
+- `readme.md` vacios en paquetes documentales.
+- Carpetas Java documentales sin codigo productivo: `attendance`, `calendar`, `common`, `communication`, `contents`, `notifications`, `resources`, `shared`.
+- `identity/readme.md` se retiro del codigo porque estaba desactualizado; la explicacion vigente quedo en `11_modulos_backend_activos_y_futuros.md`.
 
 ## Archivos reutilizados
 
@@ -97,6 +100,7 @@ Corregido o verificado:
 - `.env` esta ignorado.
 - Se agrego `.gitignore` raiz para reforzar proteccion de archivos locales.
 - OpenPDF genera PDF sin requerir llaves externas.
+- `DocumentService` genera fichas PDF con encabezado institucional, secciones, tablas campo/valor y pie informativo.
 - JWT firmado protege rutas backend por rol.
 
 Pendiente:
@@ -123,6 +127,7 @@ No se borraron tablas. Si la base tiene tablas antiguas no asociadas a entidades
 - `yachay-doc/Documentacion/08_seguridad_jwt.md`
 - `yachay-doc/Documentacion/09_reportes_y_pdf.md`
 - `yachay-doc/Documentacion/10_siguiente_fase_calendario_notificaciones.md`
+- `yachay-doc/Documentacion/11_modulos_backend_activos_y_futuros.md`
 
 ## Validacion esperada
 
@@ -142,3 +147,4 @@ npm run build
 2. Completar endpoints reales para dashboard docente/alumno.
 3. Ordenar modulos futuros y documentales.
 4. Agregar pruebas automatizadas para seguridad y reportes.
+5. Agregar pruebas automatizadas para generacion PDF.

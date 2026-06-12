@@ -1,14 +1,24 @@
 package edu.yachay.backend.document;
 
-import com.lowagie.text.*;
-import com.lowagie.text.pdf.*;
-
+import com.lowagie.text.Document;
+import com.lowagie.text.DocumentException;
+import com.lowagie.text.Element;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.Phrase;
+import com.lowagie.text.pdf.PdfPCell;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import edu.yachay.backend.admissions.domain.models.AdmissionApplication;
 import edu.yachay.backend.admissions.domain.repositories.AdmissionApplicationRepository;
 import edu.yachay.backend.document.dto.DocumentResponse;
-import edu.yachay.backend.identity.domain.models.*;
+import edu.yachay.backend.identity.domain.models.Profile;
+import edu.yachay.backend.identity.domain.models.School;
+import edu.yachay.backend.identity.domain.models.StudentProfile;
+import edu.yachay.backend.identity.domain.models.User;
 import edu.yachay.backend.identity.domain.repositories.StudentProfileRepository;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +35,13 @@ public class DocumentService {
 
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DATETIME_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private static final Color INK = new Color(13, 13, 13);
+    private static final Color TEXT = new Color(31, 41, 55);
+    private static final Color MUTED = new Color(92, 102, 115);
+    private static final Color LINE = new Color(214, 222, 230);
+    private static final Color SOFT = new Color(240, 241, 242);
+    private static final Color AQUA = new Color(119, 242, 242);
 
     private final IlovePdfClient ilovePdfClient;
     private final StudentProfileRepository studentProfileRepository;
@@ -57,36 +74,54 @@ public class DocumentService {
         User user = profile != null ? profile.getUser() : null;
         School school = student.getSchool();
 
-        return createPdf("Yachay - Ficha del Alumno", table -> {
-            addRow(table, "ID alumno", student.getId());
-            addRow(table, "Nombres", profile != null ? profile.getFirstName() : "");
-            addRow(table, "Apellidos", profile != null ? profile.getLastName() : "");
-            addRow(table, "Correo institucional", user != null ? user.getEmail() : "");
-            addRow(table, "Grado", student.getGradeLevel() + " Primaria");
-            addRow(table, "Sección", student.getSection());
-            addRow(table, "Código de estudiante", student.getStudentCode());
-            addRow(table, "Estado", profile == null || Boolean.TRUE.equals(profile.getIsActive()) ? "ACTIVO" : "INACTIVO");
-            addRow(table, "Fecha de matrícula", formatDate(student.getEnrollmentDate()));
-            addRow(table, "Colegio", school != null ? school.getName() : "Colegio Manuel Gonzales Prada");
+        return createPdf("Ficha del Alumno", document -> {
+            addSection(document, "Datos personales", table -> {
+                addRow(table, "ID alumno", student.getId());
+                addRow(table, "Nombres", profile != null ? profile.getFirstName() : "");
+                addRow(table, "Apellidos", profile != null ? profile.getLastName() : "");
+                addRow(table, "Correo institucional", user != null ? user.getEmail() : "");
+            });
+
+            addSection(document, "Datos academicos", table -> {
+                addRow(table, "Colegio", school != null ? school.getName() : "Colegio Manuel Gonzales Prada");
+                addRow(table, "Codigo de estudiante", student.getStudentCode());
+                addRow(table, "Grado", student.getGradeLevel() + " Primaria");
+                addRow(table, "Seccion", student.getSection());
+                addRow(table, "Fecha de matricula", formatDate(student.getEnrollmentDate()));
+            });
+
+            addSection(document, "Estado del registro", table -> {
+                addRow(table, "Estado", profile == null || Boolean.TRUE.equals(profile.getIsActive()) ? "ACTIVO" : "INACTIVO");
+                addRow(table, "Fecha de generacion", formatDateTime(LocalDateTime.now()));
+            });
         });
     }
 
     @Transactional(readOnly = true)
     public byte[] buildAdmissionPdf(Long admissionId) {
         AdmissionApplication application = admissionApplicationRepository.findById(admissionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Postulación no encontrada."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Postulacion no encontrada."));
 
-        return createPdf("Yachay - Ficha de Postulación", table -> {
-            addRow(table, "ID postulación", application.getId());
-            addRow(table, "Postulante", application.studentFullName());
-            addRow(table, "Apoderado", application.guardianFullName());
-            addRow(table, "Teléfono del apoderado", application.getGuardianPhone());
-            addRow(table, "Correo del apoderado", application.getGuardianEmail());
-            addRow(table, "Nivel", application.getLevel());
-            addRow(table, "Grado", application.getGrade());
-            addRow(table, "Estado", displayStatus(application.getStatus()));
-            addRow(table, "Observaciones", application.getObservations());
-            addRow(table, "Fecha de registro", formatDateTime(application.getCreatedAt()));
+        return createPdf("Ficha de Postulacion", document -> {
+            addSection(document, "Datos del postulante", table -> {
+                addRow(table, "ID postulacion", application.getId());
+                addRow(table, "Postulante", application.studentFullName());
+                addRow(table, "Nivel", application.getLevel());
+                addRow(table, "Grado", application.getGrade());
+            });
+
+            addSection(document, "Datos del apoderado", table -> {
+                addRow(table, "Apoderado", application.guardianFullName());
+                addRow(table, "Telefono", application.getGuardianPhone());
+                addRow(table, "Correo", application.getGuardianEmail());
+            });
+
+            addSection(document, "Informacion de admision", table -> {
+                addRow(table, "Estado", displayStatus(application.getStatus()));
+                addRow(table, "Observaciones", application.getObservations());
+                addRow(table, "Fecha de registro", formatDateTime(application.getCreatedAt()));
+                addRow(table, "Fecha de generacion", formatDateTime(LocalDateTime.now()));
+            });
         });
     }
 
@@ -97,38 +132,15 @@ public class DocumentService {
         return new DocumentResponse(configured, message, documentType, entityId, configured);
     }
 
-    private byte[] createPdf(String title, PdfTableWriter tableWriter) {
+    private byte[] createPdf(String subtitle, PdfContentWriter contentWriter) {
         try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            Document document = new Document(PageSize.A4, 48, 48, 48, 48);
+            Document document = new Document(PageSize.A4, 48, 48, 42, 42);
             PdfWriter.getInstance(document, outputStream);
             document.open();
 
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18, new Color(13, 13, 13));
-            Font subtitleFont = FontFactory.getFont(FontFactory.HELVETICA, 10, new Color(90, 90, 90));
-
-            Paragraph heading = new Paragraph(title, titleFont);
-            heading.setAlignment(Element.ALIGN_CENTER);
-            heading.setSpacingAfter(8);
-            document.add(heading);
-
-            Paragraph subtitle = new Paragraph("Colegio Manuel Gonzales Prada", subtitleFont);
-            subtitle.setAlignment(Element.ALIGN_CENTER);
-            subtitle.setSpacingAfter(24);
-            document.add(subtitle);
-
-            PdfPTable table = new PdfPTable(2);
-            table.setWidthPercentage(100);
-            table.setWidths(new float[]{32, 68});
-            tableWriter.write(table);
-            document.add(table);
-
-            Paragraph footer = new Paragraph(
-                    "Documento generado por Yachay Campus Virtual\nFecha de generación: " + formatDateTime(LocalDateTime.now()),
-                    subtitleFont
-            );
-            footer.setSpacingBefore(28);
-            footer.setAlignment(Element.ALIGN_CENTER);
-            document.add(footer);
+            addHeader(document, subtitle);
+            contentWriter.write(document);
+            addFooter(document);
 
             document.close();
             return outputStream.toByteArray();
@@ -139,20 +151,79 @@ public class DocumentService {
         }
     }
 
+    private void addHeader(Document document, String subtitle) throws DocumentException {
+        Paragraph title = new Paragraph("Yachay Campus Virtual", font(20, Font.BOLD, INK));
+        title.setAlignment(Element.ALIGN_CENTER);
+        title.setSpacingAfter(4);
+        document.add(title);
+
+        Paragraph documentType = new Paragraph(subtitle, font(14, Font.BOLD, TEXT));
+        documentType.setAlignment(Element.ALIGN_CENTER);
+        documentType.setSpacingAfter(6);
+        document.add(documentType);
+
+        Paragraph school = new Paragraph("Colegio Manuel Gonzales Prada", font(10, Font.NORMAL, MUTED));
+        school.setAlignment(Element.ALIGN_CENTER);
+        school.setSpacingAfter(14);
+        document.add(school);
+
+        PdfPTable divider = new PdfPTable(1);
+        divider.setWidthPercentage(100);
+        PdfPCell cell = new PdfPCell(new Phrase(" "));
+        cell.setFixedHeight(4);
+        cell.setBorder(PdfPCell.NO_BORDER);
+        cell.setBackgroundColor(AQUA);
+        divider.addCell(cell);
+        divider.setSpacingAfter(18);
+        document.add(divider);
+    }
+
+    private void addSection(Document document, String title, PdfTableWriter tableWriter) throws DocumentException {
+        Paragraph sectionTitle = new Paragraph(title, font(12, Font.BOLD, INK));
+        sectionTitle.setSpacingBefore(8);
+        sectionTitle.setSpacingAfter(8);
+        document.add(sectionTitle);
+
+        PdfPTable table = createFieldTable();
+        tableWriter.write(table);
+        table.setSpacingAfter(12);
+        document.add(table);
+    }
+
+    private PdfPTable createFieldTable() throws DocumentException {
+        PdfPTable table = new PdfPTable(2);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{34, 66});
+        return table;
+    }
+
+    private void addFooter(Document document) throws DocumentException {
+        Paragraph footer = new Paragraph(
+                "Documento generado por Yachay Campus Virtual\n"
+                        + "Fecha y hora de generacion: " + formatDateTime(LocalDateTime.now()) + "\n"
+                        + "Este documento es informativo y fue generado automaticamente por el sistema.",
+                font(8, Font.NORMAL, MUTED)
+        );
+        footer.setSpacingBefore(22);
+        footer.setAlignment(Element.ALIGN_CENTER);
+        document.add(footer);
+    }
+
     private void addRow(PdfPTable table, String label, Object value) {
-        Font labelFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 10, new Color(13, 13, 13));
-        Font valueFont = FontFactory.getFont(FontFactory.HELVETICA, 10, new Color(31, 41, 55));
+        table.addCell(createCell(label, font(10, Font.BOLD, INK), SOFT));
+        table.addCell(createCell(value != null ? String.valueOf(value) : "", font(10, Font.NORMAL, TEXT), Color.WHITE));
+    }
 
-        PdfPCell labelCell = new PdfPCell(new Phrase(label, labelFont));
-        labelCell.setPadding(9);
-        labelCell.setBackgroundColor(new Color(240, 241, 242));
-        labelCell.setBorderColor(new Color(210, 220, 230));
-        table.addCell(labelCell);
+    private PdfPCell createCell(String text, Font font, Color background) {
+        PdfPCell cell = new PdfPCell(new Phrase(text != null ? text : "", font));
+        cell.setPadding(9);
+        cell.setBackgroundColor(background);
+        cell.setBorderColor(LINE);
+        return cell;
+    }
 
-        PdfPCell valueCell = new PdfPCell(new Phrase(value != null ? String.valueOf(value) : "", valueFont));
-        valueCell.setPadding(9);
-        valueCell.setBorderColor(new Color(210, 220, 230));
-        table.addCell(valueCell);
+    private Font font(float size, int style, Color color) {
+        return FontFactory.getFont(FontFactory.HELVETICA, size, style, color);
     }
 
     private String displayStatus(String status) {
@@ -170,6 +241,11 @@ public class DocumentService {
 
     private String formatDateTime(LocalDateTime dateTime) {
         return dateTime != null ? dateTime.format(DATETIME_FORMAT) : "";
+    }
+
+    @FunctionalInterface
+    private interface PdfContentWriter {
+        void write(Document document) throws DocumentException;
     }
 
     @FunctionalInterface
