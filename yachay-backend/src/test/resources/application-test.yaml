@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:yachay_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  mail:
+    host: localhost
+    port: 2525
+    username: test-user
+    password: test-password
+
+mail:
+  from: test@yachay.invalid
+  from-name: Yachay Test
+
+app:
+  seed:
+    enabled: false
+  cors:
+    allowed-origins: http://localhost:4200
+  frontend-url: http://localhost:4200
+
+jwt:
+  secret: test_only_secret_with_at_least_32_chars_1234567890
+  expiration: 3600000

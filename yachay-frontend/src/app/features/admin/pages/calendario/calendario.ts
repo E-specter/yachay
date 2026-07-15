@@ -32,6 +32,7 @@ export class AdminCalendario implements OnInit {
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
   readonly formOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly selectedType = signal('TODOS');
 
   readonly eventTypes = [
@@ -111,13 +112,21 @@ export class AdminCalendario implements OnInit {
   }
 
   openForm(): void {
+    this.editingId.set(null);
     this.successMessage.set('');
     this.errorMessage.set('');
     this.formOpen.set(true);
   }
 
+  editEvent(event: AcademicCalendarEvent): void {
+    this.editingId.set(event.id);
+    this.form.reset({ titulo: event.title, descripcion: event.description ?? '', fechaInicio: event.startDateTime.slice(0, 16), fechaFin: event.endDateTime.slice(0, 16), tipo: event.eventType, cursoId: event.courseId ? String(event.courseId) : '', seccion: event.sectionName ?? '', publicoObjetivo: event.audience ?? 'TODOS' });
+    this.errorMessage.set(''); this.formOpen.set(true);
+  }
+
   closeForm(): void {
     this.formOpen.set(false);
+    this.editingId.set(null);
     this.form.reset({
       titulo: '',
       descripcion: '',
@@ -153,10 +162,11 @@ export class AdminCalendario implements OnInit {
     };
 
     this.saving.set(true);
-    this.calendarService.createAdminEvent(payload).subscribe({
+    const request = this.editingId() ? this.calendarService.updateAdminEvent(this.editingId()!, payload) : this.calendarService.createAdminEvent(payload);
+    request.subscribe({
       next: (event) => {
         this.events.update((events) => [event, ...events]);
-        this.successMessage.set('Evento creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Evento actualizado correctamente.' : 'Evento creado correctamente.');
         this.saving.set(false);
         this.closeForm();
         this.loadEvents();
@@ -167,6 +177,10 @@ export class AdminCalendario implements OnInit {
         this.saving.set(false);
       },
     });
+  }
+
+  archiveEvent(event: AcademicCalendarEvent): void {
+    this.calendarService.archiveAdminEvent(event.id).subscribe({ next: () => { this.successMessage.set(event.status === 'ARCHIVADO' ? 'Evento reactivado.' : 'Evento archivado.'); this.loadEvents(); }, error: () => this.errorMessage.set('No se pudo cambiar el estado del evento.') });
   }
 
   setFilter(type: string): void {

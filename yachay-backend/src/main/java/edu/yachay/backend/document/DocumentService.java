@@ -91,10 +91,9 @@ public class DocumentService {
     }
 
     private DocumentResponse response(String documentType, Long entityId) {
-        boolean configured = ilovePdfClient.isConfigured();
         String message = ilovePdfClient.prepareGeneration(documentType, entityId);
 
-        return new DocumentResponse(configured, message, documentType, entityId, configured);
+        return new DocumentResponse(false, message, documentType, entityId, false);
     }
 
     private byte[] createPdf(String title, PdfTableWriter tableWriter) {
@@ -123,7 +122,7 @@ public class DocumentService {
             document.add(table);
 
             Paragraph footer = new Paragraph(
-                    "Documento generado por Yachay Campus Virtual\nFecha de generación: " + formatDateTime(LocalDateTime.now()),
+                    "Documento generado por el sistema académico Yachay\nFecha de generación: " + formatDateTime(LocalDateTime.now()),
                     subtitleFont
             );
             footer.setSpacingBefore(28);

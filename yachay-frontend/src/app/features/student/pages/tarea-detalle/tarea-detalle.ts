@@ -1,67 +1,21 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-
+import { StudentPortalService } from '../../../../core/services/student-portal';
 import { AppIcon } from '../../../../shared/components/app-icon/app-icon';
 
-type HomeworkStatus = 'PENDIENTE' | 'ENTREGADA' | 'CALIFICADA';
+type HomeworkDetail = { id: number; titulo: string; curso: string; docente: string; fechaPublicacion: string; fechaEntrega: string; estado: 'PENDIENTE' | 'ENTREGADA' | 'VENCIDA' | 'CALIFICADA'; descripcion: string; instrucciones: string; recurso: string; contenidoEntrega: string; fechaEntregaReal: string; };
+const EMPTY: HomeworkDetail = { id: 0, titulo: '', curso: '', docente: '', fechaPublicacion: '', fechaEntrega: '', estado: 'PENDIENTE', descripcion: '', instrucciones: '', recurso: '', contenidoEntrega: '', fechaEntregaReal: '' };
 
-type HomeworkDetail = {
-  id: number;
-  titulo: string;
-  curso: string;
-  docente: string;
-  fechaPublicacion: string;
-  fechaEntrega: string;
-  estado: HomeworkStatus;
-  descripcion: string;
-  instrucciones: string;
-  recurso: string;
-};
-
-const HOMEWORKS: readonly HomeworkDetail[] = [
-  {
-    id: 1,
-    titulo: 'Resolución de problemas',
-    curso: 'Matemática III',
-    docente: 'Rosa Vargas',
-    fechaPublicacion: '2026-05-05',
-    fechaEntrega: '2026-05-12',
-    estado: 'PENDIENTE',
-    descripcion: 'Ejercicios de multiplicación, división y situaciones problemáticas.',
-    instrucciones: 'Resolver los ejercicios del 1 al 12 en el cuaderno. Revisar procedimiento y respuesta final.',
-    recurso: 'Guía de práctica - Matemática III.pdf',
-  },
-  {
-    id: 2,
-    titulo: 'Lectura guiada',
-    curso: 'Comunicación I',
-    docente: 'Luis Herrera',
-    fechaPublicacion: '2026-05-04',
-    fechaEntrega: '2026-05-11',
-    estado: 'ENTREGADA',
-    descripcion: 'Comprensión lectora sobre cuento breve.',
-    instrucciones: 'Leer el texto asignado y responder las preguntas de inferencia.',
-    recurso: 'Lectura complementaria.docx',
-  },
-];
-
-@Component({
-  selector: 'app-tarea-detalle',
-  imports: [RouterLink, AppIcon],
-  templateUrl: './tarea-detalle.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class TareaDetalle {
-  private readonly route = inject(ActivatedRoute);
-  private readonly id = Number(this.route.snapshot.paramMap.get('id') ?? 1);
-  private readonly baseHomework = HOMEWORKS.find((item) => item.id === this.id) ?? HOMEWORKS[0];
-
-  readonly status = signal<HomeworkStatus>(this.baseHomework.estado);
-  readonly successMessage = signal('');
-  readonly homework = computed(() => ({ ...this.baseHomework, estado: this.status() }));
-
-  simulateDelivery(): void {
-    this.status.set('ENTREGADA');
-    this.successMessage.set('Entrega simulada correctamente. El backend se conectará en una siguiente fase.');
+@Component({ selector: 'app-tarea-detalle', imports: [RouterLink, AppIcon], templateUrl: './tarea-detalle.html', changeDetection: ChangeDetectionStrategy.OnPush })
+export class TareaDetalle implements OnInit {
+  private readonly route = inject(ActivatedRoute); private readonly portal = inject(StudentPortalService); private readonly id = Number(this.route.snapshot.paramMap.get('id'));
+  readonly homework = signal<HomeworkDetail>(EMPTY); readonly content = signal(''); readonly successMessage = signal(''); readonly errorMessage = signal(''); readonly submitting = signal(false);
+  ngOnInit(): void { this.load(); }
+  load(): void { this.errorMessage.set(''); this.portal.getHomework<HomeworkDetail>(this.id).subscribe({ next: (item) => { this.homework.set(item); this.content.set(item.contenidoEntrega ?? ''); }, error: () => this.errorMessage.set('No se pudo cargar la tarea.') }); }
+  updateContent(event: Event): void { this.content.set((event.target as HTMLTextAreaElement).value); }
+  submitDelivery(): void {
+    if (!this.content().trim()) { this.errorMessage.set('Escribe el contenido de la entrega.'); return; }
+    this.submitting.set(true); this.errorMessage.set(''); this.successMessage.set('');
+    this.portal.submitHomework(this.id, { contenido: this.content().trim() }).subscribe({ next: () => { this.successMessage.set('Tarea entregada correctamente.'); this.submitting.set(false); this.load(); }, error: () => { this.errorMessage.set('No se pudo registrar la entrega. Revisa la fecha límite.'); this.submitting.set(false); } });
   }
 }

@@ -24,9 +24,9 @@ public class IlovePdfClient {
 
     public String prepareGeneration(String documentType, Long entityId) {
         if (!isConfigured()) {
-            return "I Love PDF no esta configurado. Configure las llaves con variables de entorno o con el perfil local.";
+            return "CONFIGURACION_PENDIENTE: I Love PDF no esta configurado; los PDF basicos usan OpenPDF local.";
         }
 
-        return "Integracion I Love PDF preparada para generar " + documentType + " con id " + entityId + ".";
+        return "CONFIGURACION_PENDIENTE: I Love PDF tiene credenciales, pero no fue validado como servicio operativo.";
     }
 }

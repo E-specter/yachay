@@ -1,47 +1,35 @@
 <section class="grid gap-6">
   <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
     <div>
-      <p class="text-sm font-bold text-yachay-org-dark">Admision</p>
-      <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">
-        Postulaciones
-      </h1>
+      <p class="text-sm font-bold text-yachay-org-dark">Admisión</p>
+      <h1 class="mt-2 text-3xl font-extrabold text-yachay-900">Postulaciones</h1>
       <p class="mt-3 max-w-3xl text-sm font-medium leading-7 text-yachay-muted">
-        Revision inicial de solicitudes publicas. Al aceptar una postulacion,
-        el flujo futuro crea el alumno, asigna nivel, grado y seccion,
-        genera usuario institucional y vincula al apoderado para notificaciones.
+        Revisión de solicitudes públicas. Al aceptar una postulación se crea el alumno,
+        se asigna nivel, grado y sección, se genera su usuario institucional y se vinculan
+        los datos del apoderado para notificaciones.
       </p>
     </div>
 
-    <button
-      type="button"
-      class="rounded-lg border border-yachay-800 bg-white px-5 py-3 text-sm font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white"
-      (click)="downloadExcel()"
-    >
+    <button type="button" class="rounded-lg border border-yachay-800 bg-white px-5 py-3 text-sm font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white" (click)="downloadExcel()">
       Descargar Excel
     </button>
   </div>
 
   @if (successMessage()) {
-    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">
-      {{ successMessage() }}
-    </div>
+    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">{{ successMessage() }}</div>
   }
 
   @if (errorMessage()) {
-    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">
-      {{ errorMessage() }}
-    </div>
+    <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{{ errorMessage() }}</div>
   }
 
   @if (loading()) {
-    <div class="rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-bold text-yachay-muted">
-      Cargando postulaciones...
-    </div>
+    <div class="rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-bold text-yachay-muted">Cargando postulaciones...</div>
   }
 
   <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
     <table class="w-full min-w-[72rem] border-collapse text-left text-sm">
-      <caption class="sr-only">Lista de postulaciones de admision</caption>
+      <caption class="sr-only">Lista de postulaciones de admisión</caption>
       <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
         <tr>
           <th scope="col" class="px-5 py-4 font-extrabold">Postulante</th>
@@ -55,40 +43,20 @@
       <tbody>
         @for (postulacion of postulaciones(); track postulacion.id) {
           <tr class="border-b border-yachay-300 last:border-b-0">
-            <td class="px-5 py-4 font-bold text-yachay-900">
-              {{ postulacion.postulante }}
-            </td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">
-              {{ postulacion.apoderado }}
-            </td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">
-              {{ postulacion.nivel }}
-            </td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">
-              {{ postulacion.grado }}
-            </td>
+            <td class="px-5 py-4 font-bold text-yachay-900">{{ postulacion.postulante }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ postulacion.apoderado }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ postulacion.nivel }}</td>
+            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ postulacion.grado }}</td>
             <td class="px-5 py-4">
-              <span class="rounded-lg border px-3 py-2 text-xs font-extrabold" [class]="statusClass(postulacion.status)">
-                {{ postulacion.estado }}
-              </span>
+              <span class="rounded-lg border px-3 py-2 text-xs font-extrabold" [class]="statusClass(postulacion.status)">{{ postulacion.estado }}</span>
             </td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-800 px-3 py-2 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white" (click)="viewPostulacion(postulacion)">
-                  Ver
-                </button>
-                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white" (click)="acceptPostulacion(postulacion)">
-                  Aceptar
-                </button>
-                <button type="button" class="rounded-lg border border-yachay-danger px-3 py-2 text-xs font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white" (click)="rejectPostulacion(postulacion)">
-                  Rechazar
-                </button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-muted transition hover:bg-yachay-100" (click)="assignSection(postulacion)">
-                  Asignar seccion
-                </button>
-                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white" (click)="generatePdf(postulacion)">
-                  Generar PDF
-                </button>
+                <button type="button" class="rounded-lg border border-yachay-800 px-3 py-2 text-xs font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white" (click)="viewPostulacion(postulacion)">Ver</button>
+                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white disabled:cursor-not-allowed disabled:opacity-50" [disabled]="postulacion.status === 'ACEPTADA'" (click)="acceptPostulacion(postulacion)">Aceptar</button>
+                <button type="button" class="rounded-lg border border-yachay-danger px-3 py-2 text-xs font-extrabold text-yachay-danger transition hover:bg-yachay-danger hover:text-white disabled:cursor-not-allowed disabled:opacity-50" [disabled]="postulacion.status === 'RECHAZADA'" (click)="rejectPostulacion(postulacion)">Rechazar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-muted transition hover:bg-yachay-100" (click)="assignSection(postulacion)">Asignar sección</button>
+                <button type="button" class="rounded-lg border border-yachay-success px-3 py-2 text-xs font-extrabold text-yachay-success transition hover:bg-yachay-success hover:text-white" (click)="generatePdf(postulacion)">Generar PDF</button>
               </div>
             </td>
           </tr>
@@ -97,3 +65,48 @@
     </table>
   </div>
 </section>
+
+@if (decisionMode(); as mode) {
+  <div class="fixed inset-0 z-[70] grid place-items-center bg-black/45 p-4" role="dialog" aria-modal="true" aria-labelledby="decision-title">
+    <form class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl" [formGroup]="decisionForm" (ngSubmit)="submitDecision()">
+      <p class="text-sm font-bold text-yachay-org-dark">Decisión de admisión</p>
+      <h2 id="decision-title" class="mt-2 text-2xl font-extrabold text-yachay-900">
+        {{ mode === 'REJECT' ? 'Rechazar postulación' : mode === 'ACCEPT' ? 'Aceptar postulación' : 'Asignar sección' }}
+      </h2>
+      <p class="mt-2 text-sm font-medium text-yachay-muted">{{ selectedApplication()?.postulante }}</p>
+
+      @if (mode !== 'REJECT') {
+        <label class="mt-5 block text-sm font-extrabold text-yachay-900" for="decision-section">Sección</label>
+        <select id="decision-section" class="mt-2 w-full rounded-lg border border-yachay-300 bg-white px-4 py-3 text-sm font-semibold" formControlName="section">
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+        </select>
+        @if (decisionForm.controls.section.touched && decisionForm.controls.section.invalid) {
+          <p class="mt-2 text-xs font-bold text-yachay-danger">Selecciona una sección válida.</p>
+        }
+      }
+
+      @if (mode !== 'ASSIGN') {
+        <label class="mt-5 block text-sm font-extrabold text-yachay-900" for="decision-reason">
+          {{ mode === 'REJECT' ? 'Motivo del rechazo' : 'Observaciones (opcional)' }}
+        </label>
+        <textarea id="decision-reason" class="mt-2 min-h-28 w-full rounded-lg border border-yachay-300 px-4 py-3 text-sm font-semibold" formControlName="reason" [attr.aria-required]="mode === 'REJECT'" maxlength="500"></textarea>
+        @if (decisionForm.controls.reason.touched && decisionForm.controls.reason.hasError('required')) {
+          <p class="mt-2 text-xs font-bold text-yachay-danger">El motivo es obligatorio.</p>
+        } @else if (decisionForm.controls.reason.touched && decisionForm.controls.reason.hasError('minlength')) {
+          <p class="mt-2 text-xs font-bold text-yachay-danger">Escribe al menos 5 caracteres.</p>
+        }
+      }
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button type="button" class="rounded-lg border border-yachay-300 px-5 py-3 text-sm font-extrabold text-yachay-muted" [disabled]="savingDecision()" (click)="closeDecision()">Cancelar</button>
+        <button type="submit" class="rounded-lg bg-yachay-800 px-5 py-3 text-sm font-extrabold text-white disabled:cursor-not-allowed disabled:opacity-60" [disabled]="savingDecision()">
+          {{ savingDecision() ? 'Guardando...' : 'Confirmar' }}
+        </button>
+      </div>
+    </form>
+  </div>
+}

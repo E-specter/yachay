@@ -11,6 +11,8 @@ export interface Teacher {
   telefono: string;
   estado: TeacherStatus;
   fechaCreacion: string;
+  codigoEmpleado?: string;
+  fechaContratacion?: string;
 }
 
 export interface CreateTeacherRequest {

@@ -33,6 +33,9 @@ public class School {
     @Column(name = "phone", length = 20)
     private String phone;
 
+    @Column(name = "email", length = 255)
+    private String email;
+
     @Column(name = "logo_url", length = 500)
     private String logoUrl;
 

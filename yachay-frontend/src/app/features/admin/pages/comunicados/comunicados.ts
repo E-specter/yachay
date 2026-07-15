@@ -23,6 +23,7 @@ export class Comunicados {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -51,6 +52,7 @@ export class Comunicados {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       titulo: '',
       contenido: '',
@@ -61,6 +63,12 @@ export class Comunicados {
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
+  }
+
+  editAnnouncement(announcement: Announcement): void {
+    this.editingId.set(announcement.id);
+    this.form.reset({ titulo: announcement.titulo, contenido: announcement.contenido, destinatario: announcement.destinatario, fechaPublicacion: announcement.fechaPublicacion.slice(0, 16), fechaExpiracion: announcement.fechaExpiracion?.slice(0, 16) ?? '', fijado: announcement.fijado ?? false });
+    this.errorMessage.set(''); this.modalOpen.set(true);
   }
 
   closeCreateModal(): void {
@@ -79,7 +87,7 @@ export class Comunicados {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.announcementService.createAnnouncement({
+    const payload = {
       titulo: raw.titulo,
       contenido: raw.contenido,
       destinatario: raw.destinatario as AnnouncementRecipient,
@@ -87,11 +95,15 @@ export class Comunicados {
       fechaPublicacion: raw.fechaPublicacion,
       fechaExpiracion: raw.fechaExpiracion || undefined,
       fijado: raw.fijado,
-    }).subscribe({
+      cursoId: this.editingId() ? this.announcements().find((item) => item.id === this.editingId())?.cursoId : undefined,
+      estado: this.editingId() ? this.announcements().find((item) => item.id === this.editingId())?.estado ?? 'PUBLICADO' as const : 'PUBLICADO' as const,
+    };
+    const request = this.editingId() ? this.announcementService.updateAnnouncement(this.editingId()!, payload) : this.announcementService.createAnnouncement(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Comunicado actualizado correctamente.' : 'Registro creado correctamente.');
         this.loadAnnouncements();
       },
       error: (error) => this.handleSaveError(error),
@@ -117,7 +129,10 @@ export class Comunicados {
   }
 
   viewAnnouncement(announcement: Announcement): void {
-    this.successMessage.set(`Comunicado seleccionado: ${announcement.titulo}`);
+    this.announcementService.getAnnouncement(announcement.id).subscribe({
+      next: (item) => this.successMessage.set(`${item.titulo}: ${item.contenido}`),
+      error: (error) => this.handleSaveError(error),
+    });
   }
 
   statusClass(status: AnnouncementStatus): string {

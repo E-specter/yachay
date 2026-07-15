@@ -1,40 +1,10 @@
 <section class="grid gap-6">
-  <div class="flex flex-col gap-3">
-    <p class="text-xs font-black uppercase tracking-wide text-brown">Sistema</p>
-    <h1 class="text-3xl font-extrabold text-yachay-900">Configuración</h1>
-    <p class="max-w-3xl text-sm font-medium leading-6 text-yachay-muted">
-      Parámetros generales del campus virtual y estado de integración para la entrega actual.
-    </p>
-  </div>
-
-  @if (savedMessage()) {
-    <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">
-      {{ savedMessage() }}
-    </div>
-  }
-
-  <div class="rounded-lg border border-yachay-300 bg-white p-5 shadow-sm">
-    <div class="grid gap-4 md:grid-cols-2">
-      <label class="grid gap-2">
-        <span class="text-xs font-black uppercase tracking-wide text-brown">Nombre de institución</span>
-        <input class="input" value="Colegio Manuel Gonzales Prada" />
-      </label>
-
-      <label class="grid gap-2">
-        <span class="text-xs font-black uppercase tracking-wide text-brown">Versión visible</span>
-        <input class="input" value="Avance 3" />
-      </label>
-    </div>
-
-    <div class="mt-5 flex flex-col gap-3 sm:flex-row">
-      <button type="button" class="btn-primary" (click)="saveLocalSettings()">Guardar cambios</button>
-      <button
-        type="button"
-        class="rounded-lg border border-yachay-800 bg-white px-5 py-3 text-sm font-extrabold text-yachay-800 transition hover:bg-yachay-800 hover:text-white"
-        (click)="restoreDefaults()"
-      >
-        Restaurar
-      </button>
-    </div>
-  </div>
+  <div><p class="text-xs font-black uppercase tracking-wide text-brown">Sistema</p><h1 class="text-3xl font-extrabold text-yachay-900">Configuración</h1><p class="max-w-3xl text-sm font-medium text-yachay-muted">Parámetros generales persistidos e indicadores seguros de integración.</p></div>
+  @if (savedMessage()) { <div class="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold text-green-700">{{ savedMessage() }}</div> }
+  @if (errorMessage()) { <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{{ errorMessage() }}</div> }
+  <form class="rounded-lg border border-yachay-300 bg-white p-5 shadow-sm" [formGroup]="form" (ngSubmit)="saveSettings()">
+    <div class="grid gap-4 md:grid-cols-2"><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">Nombre de institución</span><input class="input" formControlName="nombreInstitucion" /></label><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">Versión visible</span><input class="input" formControlName="versionVisible" /></label><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">Correo institucional</span><input type="email" class="input" formControlName="correoInstitucional" /></label><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">Teléfono</span><input class="input" formControlName="telefono" /></label><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">Dirección</span><input class="input" formControlName="direccion" /></label><label class="grid gap-2"><span class="text-xs font-black uppercase text-brown">URL del logo</span><input class="input" formControlName="logoUrl" /></label></div>
+    <div class="mt-5 grid gap-3 sm:grid-cols-2"><p class="rounded-lg border p-3 text-sm font-black">Correo: {{ integration().correo ? 'CONFIGURADO' : 'PENDIENTE DE VARIABLES DE ENTORNO' }}</p><p class="rounded-lg border p-3 text-sm font-black">WhatsApp: {{ integration().whatsapp ? 'HABILITADO' : 'PENDIENTE / DESHABILITADO' }}</p></div>
+    <div class="mt-5 flex gap-3"><button type="submit" class="btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando...' : 'Guardar cambios' }}</button><button type="button" class="rounded-lg border border-yachay-800 px-5 py-3 text-sm font-extrabold" [disabled]="saving()" (click)="restoreDefaults()">Restaurar</button></div>
+  </form>
 </section>

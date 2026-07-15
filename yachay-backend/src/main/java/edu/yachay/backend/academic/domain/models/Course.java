@@ -44,6 +44,9 @@ public class Course {
     @Column(name = "grade_level", nullable = false)
     private Short gradeLevel;
 
+    @Column(name = "education_level", length = 30)
+    private String educationLevel;
+
     @Column(name = "section", nullable = false, length = 20)
     private String section;
 

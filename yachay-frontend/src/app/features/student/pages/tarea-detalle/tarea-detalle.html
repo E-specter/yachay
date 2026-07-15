@@ -9,6 +9,9 @@
       {{ successMessage() }}
     </div>
   }
+  @if (errorMessage()) {
+    <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{{ errorMessage() }}</div>
+  }
 
   <article class="overflow-hidden rounded-lg border border-yachay-300 bg-white shadow-sm">
     <div class="bg-ink-dark p-6 text-white">
@@ -43,7 +46,9 @@
           <p class="text-xs font-black uppercase tracking-wide text-yachay-muted">Recurso</p>
           <p class="mt-2 text-sm font-bold text-yachay-900">{{ homework().recurso }}</p>
         </div>
-        <button type="button" class="btn-primary" (click)="simulateDelivery()">Simular entrega</button>
+        <label class="text-xs font-black uppercase tracking-wide text-yachay-muted" for="delivery-content">Contenido de la entrega</label>
+        <textarea id="delivery-content" class="input min-h-32" [value]="content()" (input)="updateContent($event)" [disabled]="homework().estado === 'CALIFICADA'"></textarea>
+        <button type="button" class="btn-primary" (click)="submitDelivery()" [disabled]="submitting() || homework().estado === 'CALIFICADA'">{{ submitting() ? 'Guardando...' : 'Entregar tarea' }}</button>
       </aside>
     </div>
   </article>

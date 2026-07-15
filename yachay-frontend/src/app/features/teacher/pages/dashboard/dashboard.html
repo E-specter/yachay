@@ -13,14 +13,14 @@
 
       <div class="rounded-lg border border-white/20 bg-white/10 p-5">
         <p class="text-sm font-black text-white">Prioridad</p>
-        <p class="mt-3 text-4xl font-black text-green-soft">45</p>
+        <p class="mt-3 text-4xl font-black text-green-soft">{{ pendingReviews() }}</p>
         <p class="mt-2 text-sm font-semibold leading-6 text-cloud">entregas esperan revision antes del cierre semanal.</p>
       </div>
     </div>
   </div>
 
   <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-    @for (stat of stats; track stat.label) {
+    @for (stat of stats(); track stat.label) {
       <app-stat-card
         [label]="stat.label"
         [value]="stat.value"
@@ -46,7 +46,7 @@
   <div class="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
     <app-section-card title="Mis cursos de hoy" subtitle="Horario y aulas asignadas." actionLabel="Ver cursos" actionLink="/docente/cursos">
       <div class="grid gap-3">
-        @for (course of todayCourses; track course.hora) {
+        @for (course of todayCourses(); track course.curso) {
           <article class="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 rounded-lg border border-slate-200 p-4">
             <p class="text-sm font-black text-blue">{{ course.hora }}</p>
             <div>
@@ -71,7 +71,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            @for (task of dashboard.reviewTasks; track task.id) {
+            @for (task of dashboard().reviewTasks; track task.id) {
               <tr class="text-sm font-semibold text-ink">
                 <td class="py-4 font-black">{{ task.titulo }}</td>
                 <td class="py-4">{{ task.curso }}</td>
@@ -88,7 +88,7 @@
   <div class="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
     <app-section-card title="Alumnos con seguimiento" subtitle="Alertas academicas para intervencion temprana." actionLabel="Ver alumnos" actionLink="/docente/alumnos">
       <div class="grid gap-3">
-        @for (student of lowPerformance; track student.alumno) {
+        @for (student of lowPerformance(); track student.alumno) {
           <article class="grid gap-3 rounded-lg border border-slate-200 p-4 md:grid-cols-[1fr_auto] md:items-center">
             <div>
               <p class="font-black text-ink">{{ student.alumno }}</p>
@@ -102,7 +102,7 @@
 
     <app-section-card title="Calendario docente" subtitle="Clases y actividades de la semana.">
       <div class="grid gap-3">
-        @for (item of weeklyCalendar; track item.day) {
+        @for (item of weeklyCalendar(); track item.day + item.event) {
           <article class="grid grid-cols-[3.5rem_1fr] gap-4 rounded-lg border border-slate-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <span class="grid size-11 place-items-center rounded-lg bg-cloud text-brown">
               <app-icon name="calendar" className="h-5 w-5" />
@@ -122,7 +122,7 @@
   <div class="grid gap-6 xl:grid-cols-[1fr_0.9fr]">
     <app-section-card title="Actividad reciente" subtitle="Movimientos docentes y academicos.">
       <div class="grid gap-3">
-        @for (item of recentActivity; track item.title) {
+        @for (item of recentActivity(); track item.title) {
           <article class="grid grid-cols-[3rem_1fr] gap-4 rounded-lg border border-slate-200 p-4">
             <span class="grid size-11 place-items-center rounded-lg bg-sky-soft/35 text-brown">
               <app-icon [name]="item.icon" className="h-5 w-5" />
@@ -136,9 +136,9 @@
       </div>
     </app-section-card>
 
-    <app-section-card title="Ultimos comunicados" subtitle="Mensajes publicados o en preparacion.">
+    <app-section-card title="Ultimos comunicados" subtitle="Mensajes institucionales y académicos recientes.">
       <div class="grid gap-3">
-        @for (announcement of dashboard.announcements; track announcement.id) {
+        @for (announcement of dashboard().announcements; track announcement.id) {
           <article class="flex items-center justify-between gap-4 rounded-lg border border-slate-200 p-4">
             <div>
               <p class="font-black text-ink">{{ announcement.titulo }}</p>

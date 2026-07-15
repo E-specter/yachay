@@ -42,6 +42,14 @@ export class CalendarService {
     );
   }
 
+  updateAdminEvent(id: number, payload: CreateCalendarEventRequest): Observable<AcademicCalendarEvent> {
+    return this.http.put<AcademicCalendarEvent>(`${API_URL}/admin/calendario/${id}`, payload);
+  }
+
+  archiveAdminEvent(id: number): Observable<AcademicCalendarEvent> {
+    return this.http.patch<AcademicCalendarEvent>(`${API_URL}/admin/calendario/${id}/archivar`, {});
+  }
+
   private rolePath(role: CalendarRole): string {
     if (role === 'ADMINISTRADOR') return 'admin';
     if (role === 'DOCENTE') return 'docente';

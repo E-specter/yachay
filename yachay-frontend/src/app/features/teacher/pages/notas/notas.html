@@ -1,57 +1,7 @@
 <section class="grid gap-6">
-  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-    <div>
-      <h1 class="text-3xl font-extrabold text-yachay-900">Notas</h1>
-      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Registro y revisión de calificaciones por curso.</p>
-    </div>
-    <button type="button" class="btn-primary w-full sm:w-auto">Registrar nota</button>
-  </div>
-
-  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
-    <input type="search" class="input" placeholder="Buscar alumno, curso o bimestre" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar notas" />
-    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
-      <option value="TODOS">Todos</option>
-      <option value="REGISTRADA">Registrada</option>
-      <option value="OBSERVADA">Observada</option>
-      <option value="ANULADA">Anulada</option>
-    </select>
-  </div>
-
-  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
-    <table class="w-full min-w-[78rem] border-collapse text-left text-sm">
-      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
-        <tr>
-          <th class="px-5 py-4 font-extrabold" scope="col">Alumno</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Bimestre</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Nota</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Observación</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Registro</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (grade of filteredGrades(); track grade.id) {
-          <tr class="border-b border-yachay-300 last:border-b-0">
-            <td class="px-5 py-4 font-bold text-yachay-900">{{ grade.alumno }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.curso }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-900">{{ grade.bimestre }}</td>
-            <td class="px-5 py-4 text-lg font-extrabold text-yachay-900">{{ grade.nota }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.observacion }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ grade.fechaRegistro }}</td>
-            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ grade.estado }}</span></td>
-            <td class="px-5 py-4">
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar nota</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Anular nota</button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="8" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay notas para los filtros seleccionados.</td></tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><h1 class="text-3xl font-extrabold text-yachay-900">Notas</h1><p class="mt-2 text-sm font-medium text-yachay-muted">Registro y revisión de calificaciones por curso.</p></div><button type="button" class="btn-primary" (click)="openNew()">Registrar nota</button></div>
+  @if (successMessage()) { <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm font-black text-green-700">{{ successMessage() }}</div> } @if (errorMessage()) { <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{{ errorMessage() }}</div> }
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]"><input type="search" class="input" placeholder="Buscar alumno, curso o bimestre" [value]="search()" (input)="updateSearch($event)" /><select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)"><option value="TODOS">Todos</option><option value="REGISTRADA">Registrada</option><option value="PUBLICADA">Publicada</option><option value="ANULADA">Anulada</option></select></div>
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white"><table class="w-full min-w-[78rem] border-collapse text-left text-sm"><thead class="border-b bg-yachay-100"><tr><th class="px-5 py-4">Alumno</th><th class="px-5 py-4">Curso</th><th class="px-5 py-4">Bimestre</th><th class="px-5 py-4">Nota</th><th class="px-5 py-4">Observación</th><th class="px-5 py-4">Registro</th><th class="px-5 py-4">Estado</th><th class="px-5 py-4">Acciones</th></tr></thead><tbody>@for (grade of filteredGrades(); track grade.id) { <tr class="border-b"><td class="px-5 py-4 font-bold">{{ grade.alumno }}</td><td class="px-5 py-4">{{ grade.curso }}</td><td class="px-5 py-4">{{ grade.bimestre }}</td><td class="px-5 py-4 text-lg font-extrabold">{{ grade.nota }}</td><td class="px-5 py-4">{{ grade.observacion }}</td><td class="px-5 py-4">{{ grade.fechaRegistro }}</td><td class="px-5 py-4">{{ grade.estado }}</td><td class="px-5 py-4"><div class="flex gap-2"><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="openEdit(grade)">Editar nota</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" [disabled]="grade.estado === 'ANULADA'" (click)="annul(grade)">Anular nota</button></div></td></tr> } @empty { <tr><td colspan="8" class="px-5 py-10 text-center">No hay notas.</td></tr> }</tbody></table></div>
 </section>
+@if (modalOpen()) { <div class="fixed inset-0 z-[100] grid place-items-center bg-black/50 p-4"><form class="grid w-full max-w-2xl gap-4 rounded-lg bg-white p-6" [formGroup]="form" (ngSubmit)="save()"><div class="flex justify-between"><h2 class="text-xl font-extrabold">{{ editingId() ? 'Editar nota' : 'Registrar nota' }}</h2><button type="button" (click)="closeModal()">Cerrar</button></div><label class="grid gap-2 text-sm font-black">Curso<select class="input" formControlName="cursoId">@for (course of courses(); track course.id) { <option [value]="course.id">{{ course.nombre }}</option> }</select></label><label class="grid gap-2 text-sm font-black">Alumno<select class="input" formControlName="alumnoId">@for (student of students(); track student.id) { <option [value]="student.id">{{ student.nombres }} {{ student.apellidos }} · {{ student.curso }}</option> }</select></label><label class="grid gap-2 text-sm font-black">Bimestre<select class="input" formControlName="bimestre"><option>I</option><option>II</option><option>III</option><option>IV</option></select></label><label class="grid gap-2 text-sm font-black">Nota<input type="number" min="0" max="20" step="0.1" class="input" formControlName="nota" /></label><label class="grid gap-2 text-sm font-black">Observación<textarea class="input min-h-24" formControlName="observacion"></textarea></label><button type="submit" class="btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando...' : 'Guardar nota' }}</button></form></div> }

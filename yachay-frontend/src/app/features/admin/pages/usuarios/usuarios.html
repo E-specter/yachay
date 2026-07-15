@@ -85,7 +85,7 @@
             <td class="px-5 py-4 font-semibold text-yachay-muted">{{ user.fechaCreacion }}</td>
             <td class="px-5 py-4">
               <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="openCreateModal()">Editar</button>
+                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="editUser(user)">Editar</button>
                 <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="toggleStatus(user)">{{ nextStatusLabel(user.estado) }}</button>
                 <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="resetPassword(user)">Resetear</button>
               </div>
@@ -107,7 +107,7 @@
       <form class="w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl" [formGroup]="form" (ngSubmit)="createUser()">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h2 class="text-2xl font-black text-yachay-900">Nuevo usuario</h2>
+            <h2 class="text-2xl font-black text-yachay-900">{{ editingId() ? 'Editar usuario' : 'Nuevo usuario' }}</h2>
             <p class="mt-1 text-sm font-semibold text-yachay-muted">Crea una cuenta interna con contraseña temporal.</p>
           </div>
           <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-sm font-black" (click)="closeCreateModal()">Cerrar</button>

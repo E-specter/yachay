@@ -15,5 +15,7 @@ public interface TeacherProfileRepository extends JpaRepository<TeacherProfile, 
 
     Optional<TeacherProfile> findByProfileId(Integer profileId);
 
+    Optional<TeacherProfile> findByProfile_User_Id(Long userId);
+
     boolean existsByEmployeeId(String employeeId);
 }

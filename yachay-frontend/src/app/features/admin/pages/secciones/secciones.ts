@@ -32,6 +32,7 @@ export class Secciones {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -63,6 +64,7 @@ export class Secciones {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     const firstTeacher = this.teachers()[0];
     const activeYear = this.academicYears().find((year) => year.activo) ?? this.academicYears()[0];
     this.form.reset({
@@ -77,6 +79,12 @@ export class Secciones {
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
+  }
+
+  editSection(section: SchoolSection): void {
+    this.editingId.set(section.id);
+    this.form.reset({ nivel: section.nivel, grado: section.grado, seccion: section.seccion, tutorId: section.tutorId ?? 0, aula: section.aula ?? '', anioAcademicoId: section.anioAcademicoId ?? 0, capacidad: section.capacidad, activo: section.estado === 'ACTIVO' });
+    this.errorMessage.set(''); this.modalOpen.set(true);
   }
 
   closeCreateModal(): void {
@@ -96,7 +104,7 @@ export class Secciones {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.sectionService.createSection({
+    const payload = {
       nivel: raw.nivel as AcademicLevel,
       grado: raw.grado,
       seccion: raw.seccion as SectionCode,
@@ -106,11 +114,14 @@ export class Secciones {
       anioAcademicoId: Number(raw.anioAcademicoId),
       capacidad: raw.capacidad,
       activo: raw.activo,
-    }).subscribe({
+      estado: raw.activo ? 'ACTIVO' as const : 'INACTIVO' as const,
+    };
+    const request = this.editingId() ? this.sectionService.updateSection(this.editingId()!, payload) : this.sectionService.createSection(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Sección actualizada correctamente.' : 'Registro creado correctamente.');
         this.loadSections();
       },
       error: (error) => this.handleSaveError(error),
@@ -137,7 +148,7 @@ export class Secciones {
   }
 
   viewSection(section: SchoolSection): void {
-    this.successMessage.set(`Sección seleccionada: ${section.nivel} ${section.grado} ${section.seccion}`);
+    this.sectionService.getSection(section.id).subscribe({ next: (item) => this.successMessage.set(`${item.nivel} ${item.grado} ${item.seccion} · Tutor: ${item.tutor} · ${item.matriculados}/${item.capacidad}`), error: (error) => this.handleSaveError(error) });
   }
 
   statusClass(status: SchoolSectionStatus): string {

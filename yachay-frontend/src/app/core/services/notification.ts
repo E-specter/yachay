@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject, tap } from 'rxjs';
 
 import { API_URL } from '../config/api.config';
 import { UserRole } from '../models/auth.models';
@@ -37,6 +37,9 @@ export interface UserNotification {
 })
 export class NotificationService {
   private readonly http = inject(HttpClient);
+  private readonly changesSubject = new Subject<UserRole>();
+
+  readonly changes$ = this.changesSubject.asObservable();
 
   list(role: UserRole): Observable<UserNotification[]> {
     return this.http.get<UserNotification[]>(
@@ -48,14 +51,14 @@ export class NotificationService {
     return this.http.patch<UserNotification>(
       `${API_URL}/${this.rolePath(role)}/notificaciones/${id}/leido`,
       {},
-    );
+    ).pipe(tap(() => this.changesSubject.next(role)));
   }
 
   markAllAsRead(role: UserRole): Observable<UserNotification[]> {
     return this.http.patch<UserNotification[]>(
       `${API_URL}/${this.rolePath(role)}/notificaciones/leidas`,
       {},
-    );
+    ).pipe(tap(() => this.changesSubject.next(role)));
   }
 
   sendTestEmail(payload: EmailTestPayload): Observable<NotificationResponse> {

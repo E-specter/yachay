@@ -88,11 +88,44 @@ public class CalendarController {
                 .dayOfWeek(spanishDay(request.fechaInicio().getDayOfWeek()))
                 .startTime(request.fechaInicio().toLocalTime())
                 .endTime(request.fechaFin().toLocalTime())
+                .status("ACTIVO")
                 .build();
 
         CalendarEvent saved = calendarEventRepository.save(event);
         notifyCalendarEvent(saved);
         return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(saved));
+    }
+
+    @PutMapping("/admin/calendario/{id}")
+    @Transactional
+    public ResponseEntity<CalendarEventResponse> updateEvent(@PathVariable Integer id,
+                                                             @Valid @RequestBody CreateCalendarEventRequest request) {
+        CalendarEvent event = calendarEventRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado."));
+        if (!request.fechaFin().isAfter(request.fechaInicio())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha fin debe ser posterior a la fecha inicio.");
+        }
+        Course course = request.cursoId() == null ? null : courseRepository.findById(request.cursoId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Curso no encontrado."));
+        event.setCourse(course);
+        event.setTitle(request.titulo().trim());
+        event.setDescription(request.descripcion());
+        event.setEventType(request.tipo());
+        event.setAudience(request.publicoObjetivo() == null ? "TODOS" : request.publicoObjetivo());
+        event.setEventDate(request.fechaInicio().toLocalDate());
+        event.setDayOfWeek(spanishDay(request.fechaInicio().getDayOfWeek()));
+        event.setStartTime(request.fechaInicio().toLocalTime());
+        event.setEndTime(request.fechaFin().toLocalTime());
+        return ResponseEntity.ok(toResponse(calendarEventRepository.save(event)));
+    }
+
+    @PatchMapping("/admin/calendario/{id}/archivar")
+    @Transactional
+    public ResponseEntity<CalendarEventResponse> archiveEvent(@PathVariable Integer id) {
+        CalendarEvent event = calendarEventRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Evento no encontrado."));
+        event.setStatus("ARCHIVADO".equalsIgnoreCase(event.getStatus()) ? "ACTIVO" : "ARCHIVADO");
+        return ResponseEntity.ok(toResponse(calendarEventRepository.save(event)));
     }
 
     @GetMapping("/docente/calendario")
@@ -138,6 +171,7 @@ public class CalendarController {
     private List<CalendarEvent> filterTeacherEvents(User user) {
         TeacherProfile teacher = teacherForUser(user);
         return calendarEventRepository.findAll().stream()
+                .filter(event -> !"ARCHIVADO".equalsIgnoreCase(event.getStatus()))
                 .filter(event -> isGeneralFor("DOCENTE", event)
                         || (event.getCourse() != null
                         && event.getCourse().getTeacher() != null
@@ -155,6 +189,7 @@ public class CalendarController {
                 .forEach(enrolledCourseIds::add);
 
         return calendarEventRepository.findAll().stream()
+                .filter(event -> !"ARCHIVADO".equalsIgnoreCase(event.getStatus()))
                 .filter(event -> isGeneralFor("ALUMNO", event)
                         || (event.getStudent() != null && event.getStudent().getId().equals(student.getId()))
                         || (event.getCourse() != null && enrolledCourseIds.contains(event.getCourse().getId())))
@@ -162,6 +197,9 @@ public class CalendarController {
     }
 
     private boolean isGeneralFor(String role, CalendarEvent event) {
+        if (event.getCourse() != null || event.getStudent() != null) {
+            return false;
+        }
         String audience = normalizeAudience(event.getAudience());
         return audience.equals("TODOS")
                 || audience.equals(role)
@@ -190,7 +228,10 @@ public class CalendarController {
     private CalendarEventResponse toResponse(CalendarEvent event) {
         Course course = event.getCourse();
         String sectionName = course != null
-                ? course.getGradeLevel() + " Primaria " + course.getSection()
+                ? course.getGradeLevel() + " "
+                + (course.getEducationLevel() == null || course.getEducationLevel().isBlank()
+                ? "Primaria" : course.getEducationLevel())
+                + " " + course.getSection()
                 : null;
 
         return new CalendarEventResponse(
@@ -202,7 +243,9 @@ public class CalendarController {
                 event.getEventType(),
                 course != null ? course.getName() : null,
                 sectionName,
-                event.getAudience()
+                event.getAudience(),
+                course != null ? course.getId() : null,
+                event.getStatus() == null ? "ACTIVO" : event.getStatus()
         );
     }
 

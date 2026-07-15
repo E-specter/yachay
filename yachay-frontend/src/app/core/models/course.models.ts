@@ -20,6 +20,12 @@ export interface Course {
   area: CourseArea;
   docenteAsignado: string;
   estado: CourseStatus;
+  docenteId?: number;
+  materiaId?: number;
+  anioAcademicoId?: number;
+  seccion?: string;
+  aula?: string;
+  maximoEstudiantes?: number;
 }
 
 export interface CreateCourseRequest {

@@ -1,18 +1,14 @@
 <section class="grid gap-6">
-  <div>
-    <h1 class="text-3xl font-extrabold text-yachay-900">Perfil</h1>
-    <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Información laboral y de contacto.</p>
-  </div>
-
-  <section class="rounded-lg border border-yachay-300 bg-white p-5">
-    <dl class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-      <div><dt class="text-sm font-bold text-yachay-muted">Nombres</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.nombres }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Apellidos</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.apellidos }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Email</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.email }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Documento</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.documento }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Especialidad</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.especialidad }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Teléfono</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.telefono }}</dd></div>
-      <div><dt class="text-sm font-bold text-yachay-muted">Estado</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile.estado }}</dd></div>
-    </dl>
-  </section>
+  <div><h1 class="text-3xl font-extrabold text-yachay-900">Perfil</h1><p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Información laboral y de contacto.</p></div>
+  @if (errorMessage()) { <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{{ errorMessage() }}</div> }
+  <section class="rounded-lg border border-yachay-300 bg-white p-5"><dl class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+    <div><dt class="text-sm font-bold text-yachay-muted">Código</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().codigo }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Nombres</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().nombres }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Apellidos</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().apellidos }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Email</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().correoInstitucional }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Documento</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().documento || 'No registrado' }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Especialidad</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().especialidad }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Teléfono</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().telefono || 'No registrado' }}</dd></div>
+    <div><dt class="text-sm font-bold text-yachay-muted">Institución</dt><dd class="mt-1 font-extrabold text-yachay-900">{{ profile().institucion }}</dd></div>
+  </dl></section>
 </section>

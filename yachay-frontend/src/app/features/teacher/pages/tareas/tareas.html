@@ -1,57 +1,11 @@
 <section class="grid gap-6">
-  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-    <div>
-      <h1 class="text-3xl font-extrabold text-yachay-900">Tareas</h1>
-      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Gestión de tareas por curso y aula.</p>
-    </div>
-    <button type="button" class="btn-primary w-full sm:w-auto">Nueva tarea</button>
-  </div>
-
-  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
-    <input type="search" class="input" placeholder="Buscar tarea, curso o aula" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar tareas" />
-    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
-      <option value="TODOS">Todos</option>
-      <option value="BORRADOR">Borrador</option>
-      <option value="PUBLICADA">Publicada</option>
-      <option value="CERRADA">Cerrada</option>
-    </select>
-  </div>
-
-  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
-    <table class="w-full min-w-[86rem] border-collapse text-left text-sm">
-      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
-        <tr>
-          <th class="px-5 py-4 font-extrabold" scope="col">Tarea</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Aula</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Publicación</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Entrega</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (homework of filteredHomeworks(); track homework.id) {
-          <tr class="border-b border-yachay-300 last:border-b-0">
-            <td class="px-5 py-4"><p class="font-bold text-yachay-900">{{ homework.titulo }}</p><p class="max-w-md truncate font-semibold text-yachay-muted">{{ homework.descripcion }}</p></td>
-            <td class="px-5 py-4 font-semibold text-yachay-900">{{ homework.curso }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.nivel }} · {{ homework.grado }} {{ homework.seccion }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.fechaPublicacion }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ homework.fechaEntrega }}</td>
-            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ homework.estado }}</span></td>
-            <td class="px-5 py-4">
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Publicar</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Cerrar</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="viewSubmissions(homework)">Ver entregas</button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="7" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay tareas para los filtros seleccionados.</td></tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><h1 class="text-3xl font-extrabold text-yachay-900">Tareas</h1><p class="mt-2 text-sm font-medium text-yachay-muted">Gestión de tareas por curso y aula.</p></div><button type="button" class="btn-primary" (click)="openNew()">Nueva tarea</button></div>
+  @if (successMessage()) { <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm font-black text-green-700">{{ successMessage() }}</div> }
+  @if (errorMessage()) { <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{{ errorMessage() }}</div> }
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]"><input type="search" class="input" placeholder="Buscar tarea, curso o aula" [value]="search()" (input)="updateSearch($event)" /><select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)"><option value="TODOS">Todos</option><option value="BORRADOR">Borrador</option><option value="PUBLICADA">Publicada</option><option value="CERRADA">Cerrada</option></select></div>
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white"><table class="w-full min-w-[86rem] border-collapse text-left text-sm"><thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900"><tr><th class="px-5 py-4">Tarea</th><th class="px-5 py-4">Curso</th><th class="px-5 py-4">Aula</th><th class="px-5 py-4">Publicación</th><th class="px-5 py-4">Entrega</th><th class="px-5 py-4">Estado</th><th class="px-5 py-4">Acciones</th></tr></thead><tbody>
+    @for (homework of filteredHomeworks(); track homework.id) { <tr class="border-b border-yachay-300"><td class="px-5 py-4"><p class="font-bold">{{ homework.titulo }}</p><p class="max-w-md truncate text-yachay-muted">{{ homework.descripcion }}</p></td><td class="px-5 py-4">{{ homework.curso }}</td><td class="px-5 py-4">{{ homework.nivel }} · {{ homework.grado }} {{ homework.seccion }}</td><td class="px-5 py-4">{{ homework.fechaPublicacion }}</td><td class="px-5 py-4">{{ homework.fechaEntrega }}</td><td class="px-5 py-4"><span class="rounded-lg border px-3 py-2 text-xs font-extrabold">{{ homework.estado }}</span></td><td class="px-5 py-4"><div class="flex flex-wrap gap-2"><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="openEdit(homework)">Editar</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="changeStatus(homework, 'PUBLICADA')">Publicar</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="changeStatus(homework, 'CERRADA')">Cerrar</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="viewSubmissions(homework)">Entregas ({{ homework.entregas }})</button></div></td></tr> } @empty { <tr><td colspan="7" class="px-5 py-10 text-center text-yachay-muted">No hay tareas.</td></tr> }
+  </tbody></table></div>
+  @if (submissionTitle()) { <section class="rounded-lg border border-yachay-300 bg-white p-5"><div class="flex justify-between"><h2 class="text-xl font-extrabold">Entregas: {{ submissionTitle() }}</h2><button type="button" (click)="submissionTitle.set('')">Cerrar</button></div><div class="mt-4 grid gap-3">@for (row of submissions(); track row.id) { <article class="rounded-lg border p-4"><p class="font-black">{{ row.alumno }} · {{ row.estado }}</p><p class="mt-2 text-sm text-yachay-muted">{{ row.contenido }}</p><p class="mt-2 text-xs">{{ row.fechaEntrega }}</p></article> } @empty { <p class="text-yachay-muted">Todavía no hay entregas.</p> }</div></section> }
 </section>
+@if (modalOpen()) { <div class="fixed inset-0 z-[100] grid place-items-center bg-black/50 p-4"><form class="grid w-full max-w-2xl gap-4 rounded-lg bg-white p-6" [formGroup]="form" (ngSubmit)="save()"><div class="flex justify-between"><h2 class="text-xl font-extrabold">{{ editingId() ? 'Editar tarea' : 'Nueva tarea' }}</h2><button type="button" (click)="closeModal()">Cerrar</button></div><label class="grid gap-2 text-sm font-black">Curso<select class="input" formControlName="cursoId">@for (course of courses(); track course.id) { <option [value]="course.id">{{ course.nombre }}</option> }</select></label><label class="grid gap-2 text-sm font-black">Título<input class="input" formControlName="titulo" /></label><label class="grid gap-2 text-sm font-black">Descripción<textarea class="input min-h-28" formControlName="descripcion"></textarea></label><label class="grid gap-2 text-sm font-black">Fecha límite<input type="datetime-local" class="input" formControlName="fechaEntrega" /></label><label class="grid gap-2 text-sm font-black">Estado<select class="input" formControlName="estado"><option value="BORRADOR">Borrador</option><option value="PUBLICADA">Publicada</option><option value="CERRADA">Cerrada</option></select></label><button class="btn-primary" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando...' : 'Guardar tarea' }}</button></form></div> }

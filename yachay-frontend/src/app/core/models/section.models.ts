@@ -11,6 +11,9 @@ export interface SchoolSection {
   capacidad: number;
   matriculados: number;
   estado: SchoolSectionStatus;
+  tutorId?: number;
+  anioAcademicoId?: number;
+  aula?: string;
 }
 
 export interface CreateSchoolSectionRequest {

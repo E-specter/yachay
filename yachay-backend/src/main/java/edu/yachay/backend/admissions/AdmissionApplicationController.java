@@ -3,7 +3,6 @@ package edu.yachay.backend.admissions;
 import edu.yachay.backend.admissions.domain.models.AdmissionApplication;
 import edu.yachay.backend.admissions.domain.repositories.AdmissionApplicationRepository;
 import edu.yachay.backend.admissions.dto.*;
-import edu.yachay.backend.notification.PersistentNotificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,14 +15,14 @@ import java.util.*;
 public class AdmissionApplicationController {
 
     private final AdmissionApplicationRepository admissionApplicationRepository;
-    private final PersistentNotificationService persistentNotificationService;
+    private final AdmissionDecisionService decisionService;
 
     public AdmissionApplicationController(
             AdmissionApplicationRepository admissionApplicationRepository,
-            PersistentNotificationService persistentNotificationService
+            AdmissionDecisionService decisionService
     ) {
         this.admissionApplicationRepository = admissionApplicationRepository;
-        this.persistentNotificationService = persistentNotificationService;
+        this.decisionService = decisionService;
     }
 
     @GetMapping
@@ -49,18 +48,7 @@ public class AdmissionApplicationController {
             @PathVariable Long id,
             @RequestBody(required = false) AdmissionDecisionRequest request
     ) {
-        AdmissionApplication application = findApplication(id);
-        application.setStatus("ACEPTADA");
-        application.setObservations(resolveObservation(request, "Postulacion aceptada desde administracion."));
-        persistentNotificationService.createForRole(
-                "ADMINISTRADOR",
-                "Postulacion aceptada",
-                application.studentFullName() + " fue aceptado para " + application.getGrade(),
-                "ADMISION",
-                "/admin/postulaciones"
-        );
-
-        return ResponseEntity.ok(toResponse(admissionApplicationRepository.save(application)));
+        return ResponseEntity.ok(toResponse(decisionService.accept(id, request)));
     }
 
     @PatchMapping("/{id}/rechazar")
@@ -69,18 +57,7 @@ public class AdmissionApplicationController {
             @PathVariable Long id,
             @RequestBody(required = false) AdmissionDecisionRequest request
     ) {
-        AdmissionApplication application = findApplication(id);
-        application.setStatus("RECHAZADA");
-        application.setObservations(resolveObservation(request, "Postulacion rechazada desde administracion."));
-        persistentNotificationService.createForRole(
-                "ADMINISTRADOR",
-                "Postulacion rechazada",
-                application.studentFullName() + " fue rechazado para " + application.getGrade(),
-                "ADMISION",
-                "/admin/postulaciones"
-        );
-
-        return ResponseEntity.ok(toResponse(admissionApplicationRepository.save(application)));
+        return ResponseEntity.ok(toResponse(decisionService.reject(id, request)));
     }
 
     private AdmissionApplication findApplication(Long id) {
@@ -103,22 +80,6 @@ public class AdmissionApplicationController {
                 application.getCreatedAt(),
                 application.getUpdatedAt()
         );
-    }
-
-    private String resolveObservation(AdmissionDecisionRequest request, String defaultObservation) {
-        if (request == null) {
-            return defaultObservation;
-        }
-
-        if (request.observaciones() != null && !request.observaciones().isBlank()) {
-            return request.observaciones();
-        }
-
-        if (request.motivo() != null && !request.motivo().isBlank()) {
-            return request.motivo();
-        }
-
-        return defaultObservation;
     }
 
     private String displayStatus(String status) {

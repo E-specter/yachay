@@ -14,7 +14,7 @@
       <div class="rounded-lg border border-white/15 bg-white/10 p-5">
         <p class="text-sm font-black text-sky-soft">Resumen institucional</p>
         <div class="mt-4 grid gap-3">
-          @for (item of activity; track item) {
+          @for (item of activity(); track item) {
             <p class="rounded-lg bg-white/10 px-4 py-3 text-sm font-semibold leading-6 text-cloud">{{ item }}</p>
           }
         </div>
@@ -23,7 +23,7 @@
   </div>
 
   <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-    @for (stat of stats; track stat.label) {
+    @for (stat of stats(); track stat.label) {
       <app-stat-card
         [label]="stat.label"
         [value]="stat.value"
@@ -65,7 +65,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-100">
-            @for (admission of admissions; track admission.codigo) {
+            @for (admission of admissions(); track admission.codigo) {
               <tr class="text-sm font-semibold text-ink">
                 <td class="py-4 text-slate-500">{{ admission.codigo }}</td>
                 <td class="py-4 font-black">{{ admission.postulante }}</td>
@@ -83,7 +83,7 @@
 
     <app-section-card title="Calendario administrativo" subtitle="Fechas operativas y actividad institucional.">
       <div class="grid gap-3">
-        @for (event of adminCalendar; track event.day) {
+        @for (event of adminCalendar(); track event.day + event.event) {
           <article class="grid grid-cols-[3.5rem_1fr] gap-4 rounded-lg border border-slate-200 p-4 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
             <span class="grid size-11 place-items-center rounded-lg bg-cloud text-brown">
               <app-icon name="calendar" className="h-5 w-5" />
@@ -107,7 +107,7 @@
     actionLink="/admin/alumnos"
   >
     <div class="grid gap-3 md:grid-cols-3">
-      @for (student of recentStudents; track student.codigo) {
+      @for (student of recentStudents(); track student.codigo) {
         <article class="rounded-lg border border-slate-200 p-4">
           <p class="text-xs font-black uppercase tracking-wide text-slate-500">{{ student.codigo }}</p>
           <p class="mt-2 font-black text-ink">{{ student.nombre }}</p>

@@ -51,6 +51,10 @@ public class CalendarEvent {
     @Column(name = "description", length = 1000)
     private String description;
 
+    @Builder.Default
+    @Column(name = "status", nullable = false, length = 20, columnDefinition = "varchar(20) default 'ACTIVO'")
+    private String status = "ACTIVO";
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

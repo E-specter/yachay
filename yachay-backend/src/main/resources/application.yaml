@@ -2,9 +2,9 @@ spring:
   application:
     name: backend
   datasource:
-    url: ${DB_URL:jdbc:mysql://localhost:3306/yachay?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Lima}
-    username: ${DB_USERNAME:root}
-    password: ${DB_PASSWORD:}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -15,10 +15,10 @@ spring:
     show-sql: false
     open-in-view: false
   mail:
-    host: ${MAIL_HOST:mail.tudominio.com}
-    port: ${MAIL_PORT:465}
-    username: ${MAIL_USERNAME:cambiar_correo@tudominio.com}
-    password: ${MAIL_PASSWORD:}
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -31,18 +31,25 @@ server:
     context-path: /api
 
 jwt:
-  secret: ${JWT_SECRET:change_me_in_local}
-  expiration: ${JWT_EXPIRATION:86400000}
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 mail:
-  from: ${MAIL_FROM:notificaciones@yachay.edu.pe}
+  from: ${MAIL_FROM}
   from-name: ${MAIL_FROM_NAME:Yachay}
 
 ilovepdf:
-  public-key: ${ILOVEPDF_PUBLIC_KEY:}
-  secret-key: ${ILOVEPDF_SECRET_KEY:}
+  public-key: ${ILOVEPDF_PUBLIC_KEY:project_public_7d736b1c3e606c0f25fc5c98bfd74952_V4y930ff1a912a7d136e380e341d39d0d51f9}
+  secret-key: ${ILOVEPDF_SECRET_KEY:secret_key_c3ced951d131abea89826cc289e46fa2_TxDbm4068dc59014994a2de434f4d0563a74b}
 
 whatsapp:
   enabled: ${WHATSAPP_ENABLED:false}
   token: ${WHATSAPP_TOKEN:}
   phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID:}
+
+app:
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:4200}
+  seed:
+    enabled: false
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}

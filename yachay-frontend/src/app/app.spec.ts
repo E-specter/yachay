@@ -1,8 +1,10 @@
+import { ɵresolveComponentResources as resolveComponentResources } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    await resolveComponentResources(async () => '<router-outlet />');
     await TestBed.configureTestingModule({
       imports: [App],
     }).compileComponents();

@@ -1,37 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { StudentPortalService } from '../../../../core/services/student-portal';
 
-interface StudentProfile {
-  codigo: string;
-  nombres: string;
-  apellidos: string;
-  documento: string;
-  correoInstitucional: string;
-  nivel: string;
-  grado: string;
-  seccion: string;
-  apoderado: string;
-  correoApoderado: string;
-  celularApoderado: string;
-}
+interface StudentProfile { codigo: string; nombres: string; apellidos: string; documento: string; correoInstitucional: string; nivel: string; grado: string; seccion: string; apoderado: string; correoApoderado: string; celularApoderado: string; institucion: string; }
+const EMPTY: StudentProfile = { codigo: '', nombres: '', apellidos: '', documento: '', correoInstitucional: '', nivel: '', grado: '', seccion: '', apoderado: '', correoApoderado: '', celularApoderado: '', institucion: '' };
 
-@Component({
-  selector: 'app-student-perfil',
-  imports: [],
-  templateUrl: './perfil.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class StudentPerfil {
-  readonly profile: StudentProfile = {
-    codigo: 'ALU-2026-0001',
-    nombres: 'María Fernanda',
-    apellidos: 'Salazar Rojas',
-    documento: 'DNI 81234567',
-    correoInstitucional: 'msalazar@mgp.edu.pe',
-    nivel: 'Primaria',
-    grado: '3° Primaria',
-    seccion: 'B',
-    apoderado: 'Rosa Rojas Pérez',
-    correoApoderado: 'rosa.rojas@example.com',
-    celularApoderado: '987654321',
-  };
+@Component({ selector: 'app-student-perfil', imports: [], templateUrl: './perfil.html', changeDetection: ChangeDetectionStrategy.OnPush })
+export class StudentPerfil implements OnInit {
+  private readonly portal = inject(StudentPortalService); readonly profile = signal<StudentProfile>(EMPTY); readonly errorMessage = signal('');
+  ngOnInit(): void { this.portal.getProfile<StudentProfile>().subscribe({ next: (item) => this.profile.set(item), error: () => this.errorMessage.set('No se pudo cargar el perfil.') }); }
 }

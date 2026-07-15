@@ -111,7 +111,7 @@
       <form class="w-full max-w-2xl rounded-lg bg-white p-6 shadow-2xl" [formGroup]="form" (ngSubmit)="createStudent()">
         <div class="flex items-start justify-between gap-4">
           <div>
-            <h2 class="text-2xl font-black text-yachay-900">Nuevo alumno</h2>
+            <h2 class="text-2xl font-black text-yachay-900">{{ editingId() ? 'Editar alumno' : 'Nuevo alumno' }}</h2>
             <p class="mt-1 text-sm font-semibold text-yachay-muted">Crea el usuario del alumno y su perfil académico.</p>
           </div>
           <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-sm font-black" (click)="closeCreateModal()">Cerrar</button>
@@ -132,6 +132,14 @@
             </select>
           </label>
           <label><span class="label">Fecha matrícula</span><input class="input" type="date" formControlName="fechaMatricula" /></label>
+        </div>
+
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <label><span class="label">Tipo de documento</span><input class="input" formControlName="documentoTipo" /></label>
+          <label><span class="label">Número de documento</span><input class="input" formControlName="documentoNumero" /></label>
+          <label><span class="label">Nivel</span><select class="input" formControlName="nivel"><option>Inicial</option><option>Primaria</option><option>Secundaria</option></select></label>
+          <label><span class="label">Apoderado</span><input class="input" formControlName="apoderado" /></label>
+          <label><span class="label">Correo del apoderado</span><input class="input" type="email" formControlName="correoApoderado" /></label>
         </div>
 
         @if (errorMessage()) {

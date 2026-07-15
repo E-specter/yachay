@@ -30,9 +30,9 @@ export class AuthService {
   readonly user = this.userSignal.asReadonly();
   readonly isAuthenticated = computed(() => !!this.getToken());
 
-  login(payload: LoginRequest): Observable<LoginResponse> {
+  login(payload: LoginRequest, rememberSession = true): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${API_URL}/auth/login`, payload).pipe(
-      tap((response) => this.persistSession(response)),
+      tap((response) => this.persistSession(response, rememberSession)),
     );
   }
 
@@ -49,19 +49,21 @@ export class AuthService {
 
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    sessionStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem(this.userKey);
     this.userSignal.set(null);
   }
 
   getToken(): string | null {
     if (!this.isBrowser) return null;
 
-    return localStorage.getItem(this.tokenKey);
+    return localStorage.getItem(this.tokenKey) ?? sessionStorage.getItem(this.tokenKey);
   }
 
   private getStoredUser(): AuthUser | null {
     if (!this.isBrowser) return null;
 
-    const rawUser = localStorage.getItem(this.userKey);
+    const rawUser = localStorage.getItem(this.userKey) ?? sessionStorage.getItem(this.userKey);
 
     if (!rawUser) return null;
 
@@ -69,15 +71,22 @@ export class AuthService {
       return JSON.parse(rawUser) as AuthUser;
     } catch {
       localStorage.removeItem(this.userKey);
+      sessionStorage.removeItem(this.userKey);
       return null;
     }
   }
 
-  private persistSession(response: LoginResponse): void {
+  private persistSession(response: LoginResponse, rememberSession: boolean): void {
     if (!this.isBrowser) return;
 
-    localStorage.setItem(this.tokenKey, response.token);
-    localStorage.setItem(this.userKey, JSON.stringify(response.user));
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
+    sessionStorage.removeItem(this.tokenKey);
+    sessionStorage.removeItem(this.userKey);
+
+    const storage = rememberSession ? localStorage : sessionStorage;
+    storage.setItem(this.tokenKey, response.token);
+    storage.setItem(this.userKey, JSON.stringify(response.user));
     this.userSignal.set(response.user);
   }
 }

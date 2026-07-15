@@ -13,6 +13,9 @@ export interface Announcement {
   seccion?: SectionCode;
   fechaPublicacion: string;
   estado: AnnouncementStatus;
+  cursoId?: number;
+  fechaExpiracion?: string;
+  fijado?: boolean;
 }
 
 export interface CreateAnnouncementRequest {

@@ -1,54 +1,8 @@
 <section class="grid gap-6">
-  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
-    <div>
-      <h1 class="text-3xl font-extrabold text-yachay-900">Comunicados</h1>
-      <p class="mt-2 max-w-3xl text-sm font-medium leading-6 text-yachay-muted">Comunicados asociados a cursos y secciones asignadas.</p>
-    </div>
-    <button type="button" class="btn-primary w-full sm:w-auto">Nuevo comunicado</button>
-  </div>
-
-  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]">
-    <input type="search" class="input" placeholder="Buscar comunicado, curso o aula" [value]="search()" (input)="updateSearch($event)" aria-label="Buscar comunicados" />
-    <select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)" aria-label="Filtrar estado">
-      <option value="TODOS">Todos</option>
-      <option value="BORRADOR">Borrador</option>
-      <option value="PUBLICADO">Publicado</option>
-      <option value="ARCHIVADO">Archivado</option>
-    </select>
-  </div>
-
-  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white">
-    <table class="w-full min-w-[78rem] border-collapse text-left text-sm">
-      <thead class="border-b border-yachay-300 bg-yachay-100 text-yachay-900">
-        <tr>
-          <th class="px-5 py-4 font-extrabold" scope="col">Comunicado</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Curso</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Aula</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Publicación</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Estado</th>
-          <th class="px-5 py-4 font-extrabold" scope="col">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (announcement of filteredAnnouncements(); track announcement.id) {
-          <tr class="border-b border-yachay-300 last:border-b-0">
-            <td class="px-5 py-4"><p class="font-bold text-yachay-900">{{ announcement.titulo }}</p><p class="max-w-xl truncate font-semibold text-yachay-muted">{{ announcement.contenido }}</p></td>
-            <td class="px-5 py-4 font-semibold text-yachay-900">{{ announcement.curso }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ announcement.nivel }} · {{ announcement.grado }} {{ announcement.seccion }}</td>
-            <td class="px-5 py-4 font-semibold text-yachay-muted">{{ announcement.fechaPublicacion }}</td>
-            <td class="px-5 py-4"><span class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-900">{{ announcement.estado }}</span></td>
-            <td class="px-5 py-4">
-              <div class="flex flex-wrap gap-2">
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100" (click)="viewAnnouncement(announcement)">Ver</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Editar</button>
-                <button type="button" class="rounded-lg border border-yachay-300 px-3 py-2 text-xs font-extrabold text-yachay-800 hover:bg-yachay-100">Archivar</button>
-              </div>
-            </td>
-          </tr>
-        } @empty {
-          <tr><td colspan="6" class="px-5 py-10 text-center font-semibold text-yachay-muted">No hay comunicados para los filtros seleccionados.</td></tr>
-        }
-      </tbody>
-    </table>
-  </div>
+  <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between"><div><h1 class="text-3xl font-extrabold text-yachay-900">Comunicados</h1><p class="mt-2 text-sm font-medium text-yachay-muted">Comunicados asociados a cursos y secciones asignadas.</p></div><button type="button" class="btn-primary" (click)="openNew()">Nuevo comunicado</button></div>
+  @if (successMessage()) { <div class="rounded-lg border border-green-300 bg-green-50 px-4 py-3 text-sm font-black text-green-700">{{ successMessage() }}</div> } @if (errorMessage()) { <div class="rounded-lg border border-red-300 bg-red-50 px-4 py-3 text-sm font-black text-red-700">{{ errorMessage() }}</div> }
+  <div class="grid gap-3 rounded-lg border border-yachay-300 bg-white p-4 md:grid-cols-[1fr_14rem]"><input type="search" class="input" placeholder="Buscar comunicado, curso o aula" [value]="search()" (input)="updateSearch($event)" /><select class="input" [value]="statusFilter()" (change)="updateStatusFilter($event)"><option value="TODOS">Todos</option><option value="BORRADOR">Borrador</option><option value="PUBLICADO">Publicado</option><option value="ARCHIVADO">Archivado</option></select></div>
+  <div class="overflow-x-auto rounded-lg border border-yachay-300 bg-white"><table class="w-full min-w-[78rem] border-collapse text-left text-sm"><thead class="border-b bg-yachay-100"><tr><th class="px-5 py-4">Comunicado</th><th class="px-5 py-4">Curso</th><th class="px-5 py-4">Aula</th><th class="px-5 py-4">Publicación</th><th class="px-5 py-4">Estado</th><th class="px-5 py-4">Acciones</th></tr></thead><tbody>@for (item of filteredAnnouncements(); track item.id) { <tr class="border-b"><td class="px-5 py-4"><p class="font-bold">{{ item.titulo }}</p><p class="max-w-xl truncate text-yachay-muted">{{ item.contenido }}</p></td><td class="px-5 py-4">{{ item.curso }}</td><td class="px-5 py-4">{{ item.nivel }} · {{ item.grado }} {{ item.seccion }}</td><td class="px-5 py-4">{{ item.fechaPublicacion }}</td><td class="px-5 py-4">{{ item.estado }}</td><td class="px-5 py-4"><div class="flex gap-2"><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="viewAnnouncement(item)">Ver</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" (click)="openEdit(item)">Editar</button><button type="button" class="rounded-lg border px-3 py-2 text-xs font-extrabold" [disabled]="item.estado === 'ARCHIVADO'" (click)="archive(item)">Archivar</button></div></td></tr> } @empty { <tr><td colspan="6" class="px-5 py-10 text-center">No hay comunicados.</td></tr> }</tbody></table></div>
+  @if (viewing(); as item) { <article class="rounded-lg border border-yachay-300 bg-white p-5"><div class="flex justify-between"><h2 class="text-xl font-extrabold">{{ item.titulo }}</h2><button type="button" (click)="viewing.set(null)">Cerrar</button></div><p class="mt-4 whitespace-pre-line text-yachay-muted">{{ item.contenido }}</p></article> }
 </section>
+@if (modalOpen()) { <div class="fixed inset-0 z-[100] grid place-items-center bg-black/50 p-4"><form class="grid w-full max-w-2xl gap-4 rounded-lg bg-white p-6" [formGroup]="form" (ngSubmit)="save()"><div class="flex justify-between"><h2 class="text-xl font-extrabold">{{ editingId() ? 'Editar comunicado' : 'Nuevo comunicado' }}</h2><button type="button" (click)="closeModal()">Cerrar</button></div><label class="grid gap-2 text-sm font-black">Curso<select class="input" formControlName="cursoId"><option [ngValue]="null">Todos los cursos</option>@for (course of courses(); track course.id) { <option [ngValue]="course.id">{{ course.nombre }}</option> }</select></label><label class="grid gap-2 text-sm font-black">Título<input class="input" formControlName="titulo" /></label><label class="grid gap-2 text-sm font-black">Contenido<textarea class="input min-h-36" formControlName="contenido"></textarea></label><label class="grid gap-2 text-sm font-black">Estado<select class="input" formControlName="estado"><option value="BORRADOR">Borrador</option><option value="PUBLICADO">Publicado</option><option value="ARCHIVADO">Archivado</option></select></label><button type="submit" class="btn-primary" [disabled]="saving()">{{ saving() ? 'Guardando...' : 'Guardar comunicado' }}</button></form></div> }

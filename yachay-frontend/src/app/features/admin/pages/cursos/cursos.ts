@@ -31,6 +31,7 @@ export class Cursos {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -66,6 +67,7 @@ export class Cursos {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     const firstSubject = this.subjects()[0];
     const firstTeacher = this.teachers()[0];
     const activeYear = this.academicYears().find((year) => year.activo) ?? this.academicYears()[0];
@@ -88,6 +90,12 @@ export class Cursos {
     this.modalOpen.set(true);
   }
 
+  editCourse(course: Course): void {
+    this.editingId.set(course.id);
+    this.form.reset({ nombre: course.nombre, codigo: course.codigo, nivel: course.nivel, grado: course.grado, seccion: course.seccion ?? 'A', area: course.area, materiaId: course.materiaId ?? 0, docenteId: course.docenteId ?? 0, anioAcademicoId: course.anioAcademicoId ?? 0, aula: course.aula ?? '', maximoEstudiantes: course.maximoEstudiantes ?? 30, activo: course.estado === 'ACTIVO' });
+    this.errorMessage.set(''); this.modalOpen.set(true);
+  }
+
   closeCreateModal(): void {
     if (this.saving()) return;
     this.modalOpen.set(false);
@@ -107,7 +115,7 @@ export class Cursos {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.courseService.createCourse({
+    const payload = {
       nombre: raw.nombre,
       codigo: raw.codigo,
       nivel: raw.nivel as 'Inicial' | 'Primaria' | 'Secundaria',
@@ -120,11 +128,14 @@ export class Cursos {
       aula: raw.aula,
       maximoEstudiantes: raw.maximoEstudiantes,
       activo: raw.activo,
-    }).subscribe({
+      estado: raw.activo ? 'ACTIVO' as const : 'INACTIVO' as const,
+    };
+    const request = this.editingId() ? this.courseService.updateCourse(this.editingId()!, payload) : this.courseService.createCourse(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Curso actualizado correctamente.' : 'Registro creado correctamente.');
         this.loadCourses();
       },
       error: (error) => this.handleSaveError(error),
@@ -155,12 +166,12 @@ export class Cursos {
 
     this.reportService.downloadCursos().subscribe({
       next: (blob) => this.reportService.downloadFile(blob, filename),
-      error: (error) => this.reportService.handleDownloadError(filename, error),
+      error: (error) => this.errorMessage.set(this.reportService.handleDownloadError(filename, error)),
     });
   }
 
   viewCourse(course: Course): void {
-    this.successMessage.set(`Curso seleccionado: ${course.nombre}`);
+    this.courseService.getCourse(course.id).subscribe({ next: (item) => this.successMessage.set(`${item.codigo} · ${item.nombre} · ${item.nivel} ${item.grado} · ${item.docenteAsignado}`), error: (error) => this.handleSaveError(error) });
   }
 
   statusClass(status: CourseStatus): string {

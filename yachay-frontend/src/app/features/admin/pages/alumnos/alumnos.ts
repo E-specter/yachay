@@ -27,6 +27,7 @@ export class Alumnos {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -34,7 +35,12 @@ export class Alumnos {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    passwordTemporal: ['Alumno123456', [Validators.required, Validators.minLength(8)]],
+    passwordTemporal: ['Alumno123456', Validators.minLength(8)],
+    documentoTipo: ['DNI'],
+    documentoNumero: [''],
+    nivel: ['Primaria'],
+    apoderado: [''],
+    correoApoderado: ['', Validators.email],
     codigo: ['', Validators.required],
     grado: ['3 Primaria', Validators.required],
     seccion: ['A', Validators.required],
@@ -58,6 +64,7 @@ export class Alumnos {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       nombres: '',
       apellidos: '',
@@ -68,6 +75,7 @@ export class Alumnos {
       seccion: 'A',
       fechaMatricula: new Date().toISOString().slice(0, 10),
       activo: true,
+      documentoTipo: 'DNI', documentoNumero: '', nivel: 'Primaria', apoderado: '', correoApoderado: '',
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
@@ -89,25 +97,30 @@ export class Alumnos {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.studentService.createStudent({
+    const payload = {
       codigo: raw.codigo,
       nombres: raw.nombres,
       apellidos: raw.apellidos,
       email: raw.email,
       passwordTemporal: raw.passwordTemporal,
-      documentoTipo: 'DNI',
-      documentoNumero: '',
+      documentoTipo: raw.documentoTipo,
+      documentoNumero: raw.documentoNumero,
       correoInstitucional: raw.email,
-      nivel: 'Primaria',
+      nivel: raw.nivel as 'Inicial' | 'Primaria' | 'Secundaria',
       grado: raw.grado,
       seccion: raw.seccion as SectionCode,
       fechaMatricula: raw.fechaMatricula,
       activo: raw.activo,
-    }).subscribe({
+      apoderado: raw.apoderado,
+      correoApoderado: raw.correoApoderado,
+      estado: raw.activo ? 'ACTIVO' as const : 'INACTIVO' as const,
+    };
+    const request = this.editingId() ? this.studentService.updateStudent(this.editingId()!, payload) : this.studentService.createStudent(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Alumno actualizado correctamente.' : 'Registro creado correctamente.');
         this.loadStudents();
       },
       error: (error) => this.handleSaveError(error),
@@ -126,7 +139,7 @@ export class Alumnos {
     const filename = 'alumnos.xlsx';
     this.reportService.downloadAlumnos().subscribe({
       next: (blob) => this.reportService.downloadFile(blob, filename),
-      error: (error) => this.reportService.handleDownloadError(filename, error),
+      error: (error) => this.errorMessage.set(this.reportService.handleDownloadError(filename, error)),
     });
   }
 
@@ -145,11 +158,14 @@ export class Alumnos {
   }
 
   viewStudent(student: Student): void {
-    this.successMessage.set(`Alumno seleccionado: ${student.nombres} ${student.apellidos}`);
+    this.studentService.getStudent(student.id).subscribe({ next: (item) => this.successMessage.set(`${item.codigo} · ${item.nombres} ${item.apellidos} · ${item.nivel} ${item.grado} ${item.seccion}`), error: (error) => this.handleSaveError(error) });
   }
 
   editStudent(student: Student): void {
-    this.successMessage.set(`Edicion disponible para: ${student.nombres} ${student.apellidos}`);
+    this.editingId.set(student.id);
+    this.form.reset({ nombres: student.nombres, apellidos: student.apellidos, email: student.correoInstitucional, passwordTemporal: '', codigo: student.codigo, grado: student.grado, seccion: student.seccion, fechaMatricula: new Date().toISOString().slice(0, 10), activo: student.estado === 'ACTIVO', documentoTipo: student.documentoTipo, documentoNumero: student.documentoNumero, nivel: student.nivel, apoderado: student.apoderado, correoApoderado: student.correoApoderado });
+    this.errorMessage.set('');
+    this.modalOpen.set(true);
   }
 
   changeStudentStatus(student: Student): void {

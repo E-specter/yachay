@@ -14,6 +14,10 @@ export interface Homework {
   fechaPublicacion: string;
   fechaEntrega: string;
   estado: HomeworkStatus;
+  cursoId?: number;
+  puntajeMaximo?: number;
+  tipo?: 'TAREA' | 'PROYECTO' | 'EXAMEN' | 'PARTICIPACION';
+  permitirEntregaTardia?: boolean;
 }
 
 export interface CreateHomeworkRequest {

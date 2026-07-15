@@ -28,6 +28,7 @@ export class Login {
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]],
+    rememberSession: [true],
   });
 
   login(): void {
@@ -39,7 +40,8 @@ export class Login {
 
     this.loading.set(true);
 
-    this.authService.login(this.form.getRawValue()).subscribe({
+    const { rememberSession, ...credentials } = this.form.getRawValue();
+    this.authService.login(credentials, rememberSession).subscribe({
       next: (response) => {
         this.loading.set(false);
         this.router.navigateByUrl(this.homeRouteByRole(response.user.role));
@@ -81,10 +83,10 @@ export class Login {
       }
 
       if (error.status === 0) {
-        return 'No se pudo conectar con el servidor. Verifica que el backend este activo en http://localhost:8080/api y que MySQL este iniciado.';
+        return 'No se pudo conectar con el servidor. Intenta nuevamente en unos momentos.';
       }
     }
 
-    return 'No se pudo conectar con el servidor. Verifica que el backend este activo en http://localhost:8080/api y que MySQL este iniciado.';
+    return 'No fue posible iniciar sesión. Intenta nuevamente.';
   }
 }

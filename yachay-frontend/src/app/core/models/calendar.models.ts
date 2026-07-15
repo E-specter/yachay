@@ -30,6 +30,8 @@ export interface AcademicCalendarEvent {
   courseName?: string | null;
   sectionName?: string | null;
   audience?: CalendarAudience | string | null;
+  courseId?: number | null;
+  status?: 'ACTIVO' | 'ARCHIVADO';
 }
 
 export interface CreateCalendarEventRequest {

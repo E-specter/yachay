@@ -1,60 +1,40 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
-
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
+import { AdmissionApplication } from '../../../../core/models/admission.models';
+import { Student } from '../../../../core/models/student.models';
+import { AdmissionService } from '../../../../core/services/admission';
+import { AnnouncementService } from '../../../../core/services/announcement';
+import { CalendarService } from '../../../../core/services/calendar';
+import { StudentService } from '../../../../core/services/student';
+import { TeacherService } from '../../../../core/services/teacher';
+import { UserService } from '../../../../core/services/user';
 import { AppIcon } from '../../../../shared/components/app-icon/app-icon';
 import { QuickActionCard } from '../../../../shared/components/quick-action-card/quick-action-card';
 import { SectionCard } from '../../../../shared/components/section-card/section-card';
 import { StatCard } from '../../../../shared/components/stat-card/stat-card';
 import { StatusBadge } from '../../../../shared/components/status-badge/status-badge';
 
-@Component({
-  selector: 'app-dashboard',
-  imports: [AppIcon, QuickActionCard, SectionCard, StatCard, StatusBadge],
-  templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class Dashboard {
-  readonly stats = [
-    { label: 'Postulaciones en revision', value: 18, caption: '6 ingresaron esta semana', icon: 'plus', tone: 'blue' },
-    { label: 'Usuarios activos', value: 816, caption: 'Administradores, docentes y alumnos', icon: 'user', tone: 'sky' },
-    { label: 'Docentes habilitados', value: 46, caption: 'Con carga academica vigente', icon: 'profile', tone: 'yellow' },
-    { label: 'Comunicados publicados', value: 12, caption: 'Ultimos 30 dias', icon: 'announcements', tone: 'red' },
-  ] as const;
-
+@Component({ selector: 'app-dashboard', imports: [AppIcon, QuickActionCard, SectionCard, StatCard, StatusBadge], templateUrl: './dashboard.html', styleUrl: './dashboard.css', changeDetection: ChangeDetectionStrategy.OnPush })
+export class Dashboard implements OnInit {
+  private readonly admissionsService = inject(AdmissionService); private readonly userService = inject(UserService); private readonly teacherService = inject(TeacherService); private readonly announcementService = inject(AnnouncementService); private readonly studentService = inject(StudentService); private readonly calendarService = inject(CalendarService);
+  readonly admissionsData = signal<AdmissionApplication[]>([]); readonly studentsData = signal<Student[]>([]); readonly usersActive = signal(0); readonly teachersActive = signal(0); readonly announcementsPublished = signal(0); readonly calendarData = signal<any[]>([]); readonly errorMessage = signal('');
+  readonly stats = computed(() => [
+    { label: 'Postulaciones en revisión', value: this.admissionsData().filter((item) => item.status === 'PENDIENTE').length, caption: 'Pendientes reales', icon: 'plus' as const, tone: 'blue' as const },
+    { label: 'Usuarios activos', value: this.usersActive(), caption: 'Administradores, docentes y alumnos', icon: 'user' as const, tone: 'sky' as const },
+    { label: 'Docentes habilitados', value: this.teachersActive(), caption: 'Perfiles activos', icon: 'profile' as const, tone: 'yellow' as const },
+    { label: 'Comunicados publicados', value: this.announcementsPublished(), caption: 'Registros publicados', icon: 'announcements' as const, tone: 'red' as const },
+  ]);
+  readonly admissions = computed(() => this.admissionsData().slice(0, 5).map((item) => ({ codigo: `ADM-${item.id}`, postulante: item.postulante, nivel: item.nivel, grado: item.grado, estado: item.status })));
+  readonly recentStudents = computed(() => this.studentsData().slice(-5).reverse().map((item) => ({ codigo: item.codigo, nombre: `${item.nombres} ${item.apellidos}`, aula: `${item.grado} ${item.seccion}`, apoderado: item.apoderado || 'No registrado' })));
+  readonly activity = computed(() => [`${this.admissionsData().length} postulaciones registradas.`, `${this.studentsData().length} alumnos disponibles.`, `${this.calendarData().length} eventos en calendario.`]);
+  readonly adminCalendar = computed(() => this.calendarData().slice(0, 5).map((item) => ({ day: item.startDateTime.slice(0, 10), event: item.title, type: item.eventType, tone: 'bg-sky-soft/40 text-ink-dark' })));
   readonly quickActions = [
-    { title: 'Nueva postulacion', description: 'Revisar solicitudes pendientes de admision.', link: '/admin/postulaciones', icon: 'plus', tone: 'blue' },
+    { title: 'Revisar postulaciones', description: 'Gestionar solicitudes pendientes de admisión.', link: '/admin/postulaciones', icon: 'plus', tone: 'blue' },
     { title: 'Crear usuario', description: 'Gestionar accesos internos del campus.', link: '/admin/usuarios', icon: 'user', tone: 'sky' },
-    { title: 'Ver cursos', description: 'Administrar oferta academica por nivel.', link: '/admin/cursos', icon: 'courses', tone: 'yellow' },
+    { title: 'Ver cursos', description: 'Administrar oferta académica por nivel.', link: '/admin/cursos', icon: 'courses', tone: 'yellow' },
     { title: 'Comunicados', description: 'Publicar avisos institucionales.', link: '/admin/comunicados', icon: 'announcements', tone: 'red' },
   ] as const;
-
-  readonly admissions = [
-    { codigo: 'ADM-2026-018', postulante: 'Valeria Quispe Ramos', nivel: 'Primaria', grado: '3 Primaria', estado: 'PENDIENTE' },
-    { codigo: 'ADM-2026-017', postulante: 'Mateo Salas Flores', nivel: 'Inicial', grado: '5 anos', estado: 'PENDIENTE' },
-    { codigo: 'ADM-2026-016', postulante: 'Luciana Torres Vega', nivel: 'Secundaria', grado: '1 Secundaria', estado: 'ACEPTADA' },
-  ] as const;
-
-  readonly recentStudents = [
-    { codigo: 'ALU-2026-1042', nombre: 'Maria Fernanda Salazar', aula: '3 Primaria B', apoderado: 'Carmen Rojas' },
-    { codigo: 'ALU-2026-1041', nombre: 'Diego Paredes Soto', aula: '1 Secundaria A', apoderado: 'Miguel Paredes' },
-    { codigo: 'ALU-2026-1040', nombre: 'Sofia Herrera Luna', aula: '5 anos C', apoderado: 'Rosa Luna' },
-  ] as const;
-
-  readonly activity = [
-    'Se actualizo la carga de cursos de primaria.',
-    'Administracion publico un comunicado general.',
-    'Se habilitaron nuevas secciones para admision 2026.',
-  ] as const;
-
-  readonly events = [
-    { day: '08 May', title: 'Consejo academico', detail: 'Coordinacion general' },
-    { day: '10 May', title: 'Cierre de postulaciones', detail: 'Inicial y primaria' },
-    { day: '13 May', title: 'Entrega de reportes', detail: 'Bimestre I' },
-  ] as const;
-
-  readonly adminCalendar = [
-    { day: 'Lun', event: 'Revision de postulaciones', type: 'Admision', tone: 'bg-sky-soft/40 text-ink-dark' },
-    { day: 'Mie', event: 'Consejo academico', type: 'Gestion', tone: 'bg-green-soft/30 text-ink-dark' },
-    { day: 'Vie', event: 'Cierre de reportes', type: 'Evaluacion', tone: 'bg-brown/10 text-brown' },
-  ] as const;
+  ngOnInit(): void {
+    forkJoin({ admissions: this.admissionsService.listApplications(), users: this.userService.list(), teachers: this.teacherService.list(), announcements: this.announcementService.list(), students: this.studentService.list(), calendar: this.calendarService.list('ADMINISTRADOR') }).subscribe({ next: (data) => { this.admissionsData.set(data.admissions); this.studentsData.set(data.students); this.usersActive.set(data.users.filter((item) => item.estado === 'ACTIVO').length); this.teachersActive.set(data.teachers.filter((item) => item.estado === 'ACTIVO').length); this.announcementsPublished.set(data.announcements.filter((item) => item.estado === 'PUBLICADO').length); this.calendarData.set(data.calendar); }, error: () => this.errorMessage.set('No se pudieron cargar todos los indicadores administrativos.') });
+  }
 }

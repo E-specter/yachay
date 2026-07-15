@@ -25,6 +25,7 @@ export class Docentes {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -32,7 +33,9 @@ export class Docentes {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    passwordTemporal: ['Docente123456', [Validators.required, Validators.minLength(8)]],
+    passwordTemporal: ['Docente123456', Validators.minLength(8)],
+    documentoTipo: ['DNI'],
+    documentoNumero: [''],
     codigoEmpleado: ['', Validators.required],
     especialidad: ['', Validators.required],
     telefono: [''],
@@ -56,6 +59,7 @@ export class Docentes {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       nombres: '',
       apellidos: '',
@@ -66,6 +70,7 @@ export class Docentes {
       telefono: '',
       fechaContratacion: new Date().toISOString().slice(0, 10),
       activo: true,
+      documentoTipo: 'DNI', documentoNumero: '',
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
@@ -87,23 +92,26 @@ export class Docentes {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.teacherService.createTeacher({
+    const payload = {
       nombres: raw.nombres,
       apellidos: raw.apellidos,
       email: raw.email,
       passwordTemporal: raw.passwordTemporal,
       codigoEmpleado: raw.codigoEmpleado,
-      documentoTipo: 'DNI',
-      documentoNumero: '',
+      documentoTipo: raw.documentoTipo,
+      documentoNumero: raw.documentoNumero,
       especialidad: raw.especialidad,
       telefono: raw.telefono,
       fechaContratacion: raw.fechaContratacion,
       activo: raw.activo,
-    }).subscribe({
+      estado: raw.activo ? 'ACTIVO' as const : 'INACTIVO' as const,
+    };
+    const request = this.editingId() ? this.teacherService.updateTeacher(this.editingId()!, payload) : this.teacherService.createTeacher(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Docente actualizado correctamente.' : 'Registro creado correctamente.');
         this.loadTeachers();
       },
       error: (error) => this.handleSaveError(error),
@@ -122,12 +130,19 @@ export class Docentes {
     const filename = 'docentes.xlsx';
     this.reportService.downloadDocentes().subscribe({
       next: (blob) => this.reportService.downloadFile(blob, filename),
-      error: (error) => this.reportService.handleDownloadError(filename, error),
+      error: (error) => this.errorMessage.set(this.reportService.handleDownloadError(filename, error)),
     });
   }
 
   viewTeacher(teacher: Teacher): void {
-    this.successMessage.set(`Docente seleccionado: ${teacher.nombres} ${teacher.apellidos}`);
+    this.teacherService.getTeacher(teacher.id).subscribe({ next: (item) => this.successMessage.set(`${item.codigoEmpleado ?? ''} · ${item.nombres} ${item.apellidos} · ${item.especialidad}`), error: (error) => this.handleSaveError(error) });
+  }
+
+  editTeacher(teacher: Teacher): void {
+    this.editingId.set(teacher.id);
+    this.form.reset({ nombres: teacher.nombres, apellidos: teacher.apellidos, email: teacher.email, passwordTemporal: '', codigoEmpleado: teacher.codigoEmpleado ?? '', especialidad: teacher.especialidad, telefono: teacher.telefono, fechaContratacion: teacher.fechaContratacion ?? teacher.fechaCreacion, activo: teacher.estado === 'ACTIVO', documentoTipo: teacher.documentoTipo, documentoNumero: teacher.documentoNumero });
+    this.errorMessage.set('');
+    this.modalOpen.set(true);
   }
 
   toggleStatus(teacher: Teacher): void {

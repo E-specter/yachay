@@ -118,6 +118,7 @@ public class AdminAcademicController {
                 .code(request.codigo())
                 .name(resolveCourseName(request, subject))
                 .gradeLevel(parseGradeLevel(request.grado()))
+                .educationLevel(request.nivel() == null ? "Primaria" : request.nivel())
                 .section(request.seccion() != null ? request.seccion() : "A")
                 .room(request.aula())
                 .maxStudents(request.maximoEstudiantes())
@@ -125,6 +126,28 @@ public class AdminAcademicController {
                 .build();
 
         return ResponseEntity.status(HttpStatus.CREATED).body(toCourse(courseRepository.save(course)));
+    }
+
+    @PutMapping("/cursos/{id}")
+    @Transactional
+    public ResponseEntity<CourseResponse> updateCourse(@PathVariable Integer id, @Valid @RequestBody CreateCourseRequest request) {
+        Course course = findCourse(id);
+        if (!course.getCode().equalsIgnoreCase(request.codigo()) && courseRepository.existsByCode(request.codigo())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El codigo de curso ya existe.");
+        }
+        Subject subject = resolveSubject(request);
+        course.setSubject(subject);
+        course.setAcademicYear(resolveAcademicYear(request.anioAcademicoId()));
+        course.setTeacher(findTeacher(request.docenteId()));
+        course.setCode(request.codigo().trim());
+        course.setName(resolveCourseName(request, subject));
+        course.setGradeLevel(parseGradeLevel(request.grado()));
+        course.setEducationLevel(request.nivel() == null ? "Primaria" : request.nivel());
+        course.setSection(request.seccion() == null ? "A" : request.seccion());
+        course.setRoom(request.aula());
+        course.setMaxStudents(request.maximoEstudiantes());
+        course.setIsActive(request.activo() == null || request.activo());
+        return ResponseEntity.ok(toCourse(courseRepository.save(course)));
     }
 
     @PatchMapping("/cursos/{id}/estado")
@@ -142,6 +165,12 @@ public class AdminAcademicController {
                 .sorted(Comparator.comparing(SchoolSection::getId))
                 .map(this::toSection)
                 .toList());
+    }
+
+    @GetMapping("/secciones/{id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<SectionResponse> getSection(@PathVariable Integer id) {
+        return ResponseEntity.ok(toSection(findSection(id)));
     }
 
     @PostMapping("/secciones")
@@ -169,11 +198,26 @@ public class AdminAcademicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toSection(schoolSectionRepository.save(section)));
     }
 
+    @PutMapping("/secciones/{id}")
+    @Transactional
+    public ResponseEntity<SectionResponse> updateSection(@PathVariable Integer id, @Valid @RequestBody CreateSectionRequest request) {
+        SchoolSection section = findSection(id);
+        String name = request.seccion() != null ? request.seccion() : request.nombre();
+        section.setAcademicYear(resolveAcademicYear(request.anioAcademicoId()));
+        section.setTutorTeacher(request.tutorId() == null ? null : findTeacher(request.tutorId()));
+        section.setLevel(request.nivel() == null ? "Primaria" : request.nivel());
+        section.setGrade(request.grado());
+        section.setName(name);
+        section.setRoom(request.aula());
+        section.setCapacity(request.capacidad() == null ? section.getCapacity() : request.capacidad());
+        section.setIsActive(request.activo() == null || request.activo());
+        return ResponseEntity.ok(toSection(schoolSectionRepository.save(section)));
+    }
+
     @PatchMapping("/secciones/{id}/estado")
     @Transactional
     public ResponseEntity<SectionResponse> updateSectionStatus(@PathVariable Integer id, @RequestBody UpdateStatusRequest request) {
-        SchoolSection section = schoolSectionRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seccion no encontrada."));
+        SchoolSection section = findSection(id);
         section.setIsActive(!"INACTIVO".equalsIgnoreCase(request.estado()));
         return ResponseEntity.ok(toSection(schoolSectionRepository.save(section)));
     }
@@ -185,6 +229,12 @@ public class AdminAcademicController {
                 .sorted(Comparator.comparing(AcademicTask::getId))
                 .map(this::toHomework)
                 .toList());
+    }
+
+    @GetMapping("/tareas/{id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<HomeworkResponse> getTask(@PathVariable Integer id) {
+        return ResponseEntity.ok(toHomework(findTask(id)));
     }
 
     @PostMapping("/tareas")
@@ -201,7 +251,7 @@ public class AdminAcademicController {
                 .maxScore(request.puntajeMaximo() != null ? request.puntajeMaximo() : BigDecimal.valueOf(20))
                 .taskType(request.tipo() != null ? request.tipo() : "TAREA")
                 .allowLateSubmission(Boolean.TRUE.equals(request.permitirEntregaTardia()))
-                .status("PUBLICADA")
+                .status(normalizeStatus(request.estado(), "PUBLICADA", Set.of("BORRADOR", "PUBLICADA", "CERRADA")))
                 .build();
 
         AcademicTask savedTask = academicTaskRepository.save(task);
@@ -216,12 +266,29 @@ public class AdminAcademicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toHomework(savedTask));
     }
 
+    @PutMapping("/tareas/{id}")
+    @Transactional
+    public ResponseEntity<HomeworkResponse> updateTask(@PathVariable Integer id, @Valid @RequestBody CreateTaskRequest request) {
+        AcademicTask task = findTask(id);
+        Course course = findCourse(request.cursoId());
+        task.setCourse(course);
+        task.setTeacher(course.getTeacher());
+        task.setTitle(request.titulo().trim());
+        task.setDescription(request.descripcion());
+        task.setPublishedAt(request.fechaPublicacion() == null ? task.getPublishedAt() : request.fechaPublicacion());
+        task.setDueAt(request.fechaEntrega());
+        task.setMaxScore(request.puntajeMaximo() == null ? task.getMaxScore() : request.puntajeMaximo());
+        task.setTaskType(request.tipo() == null ? task.getTaskType() : request.tipo());
+        task.setAllowLateSubmission(Boolean.TRUE.equals(request.permitirEntregaTardia()));
+        task.setStatus(normalizeStatus(request.estado(), task.getStatus(), Set.of("BORRADOR", "PUBLICADA", "CERRADA")));
+        return ResponseEntity.ok(toHomework(academicTaskRepository.save(task)));
+    }
+
     @PatchMapping("/tareas/{id}/estado")
     @Transactional
     public ResponseEntity<HomeworkResponse> updateTaskStatus(@PathVariable Integer id, @RequestBody UpdateStatusRequest request) {
-        AcademicTask task = academicTaskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada."));
-        task.setStatus(request.estado());
+        AcademicTask task = findTask(id);
+        task.setStatus(normalizeStatus(request.estado(), task.getStatus(), Set.of("BORRADOR", "PUBLICADA", "CERRADA")));
         return ResponseEntity.ok(toHomework(academicTaskRepository.save(task)));
     }
 
@@ -232,6 +299,12 @@ public class AdminAcademicController {
                 .sorted(Comparator.comparing(GradeRecord::getId))
                 .map(this::toGrade)
                 .toList());
+    }
+
+    @GetMapping("/notas/{id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<GradeResponse> getGrade(@PathVariable Integer id) {
+        return ResponseEntity.ok(toGrade(findGrade(id)));
     }
 
     @PostMapping("/notas")
@@ -252,7 +325,7 @@ public class AdminAcademicController {
                 .evaluationType(request.tipoEvaluacion() != null ? request.tipoEvaluacion() : "Evaluacion")
                 .observation(request.comentario())
                 .registeredAt(LocalDateTime.now())
-                .status("REGISTRADA")
+                .status(normalizeStatus(request.estado(), "REGISTRADA", Set.of("REGISTRADA", "OBSERVADA", "ANULADA")))
                 .build();
 
         GradeRecord savedGrade = gradeRecordRepository.save(grade);
@@ -267,12 +340,28 @@ public class AdminAcademicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toGrade(savedGrade));
     }
 
+    @PutMapping("/notas/{id}")
+    @Transactional
+    public ResponseEntity<GradeResponse> updateGrade(@PathVariable Integer id, @Valid @RequestBody CreateGradeRequest request) {
+        validateScore(request.nota());
+        GradeRecord grade = findGrade(id);
+        Course course = findCourse(request.cursoId());
+        grade.setCourse(course);
+        grade.setStudent(findStudent(request.alumnoId()));
+        grade.setTeacher(course.getTeacher());
+        grade.setBimester(request.bimestre() == null ? grade.getBimester() : request.bimestre());
+        grade.setScore(request.nota());
+        grade.setEvaluationType(request.tipoEvaluacion() == null ? grade.getEvaluationType() : request.tipoEvaluacion());
+        grade.setObservation(request.comentario());
+        grade.setStatus(normalizeStatus(request.estado(), grade.getStatus(), Set.of("REGISTRADA", "OBSERVADA", "ANULADA")));
+        return ResponseEntity.ok(toGrade(gradeRecordRepository.save(grade)));
+    }
+
     @PatchMapping("/notas/{id}/estado")
     @Transactional
     public ResponseEntity<GradeResponse> updateGradeStatus(@PathVariable Integer id, @RequestBody UpdateStatusRequest request) {
-        GradeRecord grade = gradeRecordRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nota no encontrada."));
-        grade.setStatus(request.estado());
+        GradeRecord grade = findGrade(id);
+        grade.setStatus(normalizeStatus(request.estado(), grade.getStatus(), Set.of("REGISTRADA", "OBSERVADA", "ANULADA")));
         return ResponseEntity.ok(toGrade(gradeRecordRepository.save(grade)));
     }
 
@@ -283,6 +372,12 @@ public class AdminAcademicController {
                 .sorted(Comparator.comparing(Announcement::getId))
                 .map(this::toAnnouncement)
                 .toList());
+    }
+
+    @GetMapping("/comunicados/{id}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<AnnouncementResponse> getAnnouncement(@PathVariable Integer id) {
+        return ResponseEntity.ok(toAnnouncement(findAnnouncement(id)));
     }
 
     @PostMapping("/comunicados")
@@ -299,7 +394,7 @@ public class AdminAcademicController {
                 .expiresAt(request.fechaExpiracion())
                 .pinned(Boolean.TRUE.equals(request.fijado()))
                 .author(author)
-                .status("PUBLICADO")
+                .status(normalizeStatus(request.estado(), "PUBLICADO", Set.of("BORRADOR", "PUBLICADO", "ARCHIVADO")))
                 .build();
 
         Announcement savedAnnouncement = announcementRepository.save(announcement);
@@ -324,12 +419,26 @@ public class AdminAcademicController {
         return ResponseEntity.status(HttpStatus.CREATED).body(toAnnouncement(savedAnnouncement));
     }
 
+    @PutMapping("/comunicados/{id}")
+    @Transactional
+    public ResponseEntity<AnnouncementResponse> updateAnnouncement(@PathVariable Integer id, @Valid @RequestBody CreateAnnouncementRequest request) {
+        Announcement announcement = findAnnouncement(id);
+        announcement.setCourse(request.cursoId() == null ? null : findCourse(request.cursoId()));
+        announcement.setTitle(request.titulo().trim());
+        announcement.setContent(request.contenido() != null ? request.contenido() : request.cuerpo());
+        announcement.setAudience(request.destinatario() != null ? request.destinatario() : request.publicoObjetivo());
+        announcement.setPublishedAt(request.fechaPublicacion() == null ? announcement.getPublishedAt() : request.fechaPublicacion());
+        announcement.setExpiresAt(request.fechaExpiracion());
+        announcement.setPinned(Boolean.TRUE.equals(request.fijado()));
+        announcement.setStatus(normalizeStatus(request.estado(), announcement.getStatus(), Set.of("BORRADOR", "PUBLICADO", "ARCHIVADO")));
+        return ResponseEntity.ok(toAnnouncement(announcementRepository.save(announcement)));
+    }
+
     @PatchMapping("/comunicados/{id}/estado")
     @Transactional
     public ResponseEntity<AnnouncementResponse> updateAnnouncementStatus(@PathVariable Integer id, @RequestBody UpdateStatusRequest request) {
-        Announcement announcement = announcementRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunicado no encontrado."));
-        announcement.setStatus(request.estado());
+        Announcement announcement = findAnnouncement(id);
+        announcement.setStatus(normalizeStatus(request.estado(), announcement.getStatus(), Set.of("BORRADOR", "PUBLICADO", "ARCHIVADO")));
         return ResponseEntity.ok(toAnnouncement(announcementRepository.save(announcement)));
     }
 
@@ -346,6 +455,38 @@ public class AdminAcademicController {
     private StudentProfile findStudent(Integer id) {
         return studentProfileRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Alumno no encontrado."));
+    }
+
+    private SchoolSection findSection(Integer id) {
+        return schoolSectionRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Seccion no encontrada."));
+    }
+
+    private AcademicTask findTask(Integer id) {
+        return academicTaskRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tarea no encontrada."));
+    }
+
+    private GradeRecord findGrade(Integer id) {
+        return gradeRecordRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Nota no encontrada."));
+    }
+
+    private Announcement findAnnouncement(Integer id) {
+        return announcementRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Comunicado no encontrado."));
+    }
+
+    private void validateScore(BigDecimal score) {
+        if (score.compareTo(BigDecimal.ZERO) < 0 || score.compareTo(BigDecimal.valueOf(20)) > 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La nota debe estar entre 0 y 20.");
+        }
+    }
+
+    private String normalizeStatus(String value, String fallback, Set<String> allowed) {
+        String status = value == null || value.isBlank() ? fallback : value.trim().toUpperCase(Locale.ROOT);
+        if (!allowed.contains(status)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Estado no permitido.");
+        return status;
     }
 
     private School defaultSchool() {
@@ -401,6 +542,12 @@ public class AdminAcademicController {
         return profile != null ? profile.getFullName() : "";
     }
 
+    private String level(Course course) {
+        return course.getEducationLevel() == null || course.getEducationLevel().isBlank()
+                ? "Primaria"
+                : course.getEducationLevel();
+    }
+
     private List<User> usersForCourse(Course course) {
         return enrollmentRepository.findByCourse_Id(course.getId()).stream()
                 .map(Enrollment::getStudent)
@@ -414,11 +561,15 @@ public class AdminAcademicController {
                 course.getId(),
                 course.getName(),
                 course.getCode(),
-                "Primaria",
-                course.getGradeLevel() + " Primaria",
+                level(course),
+                course.getGradeLevel() + " " + level(course),
                 course.getSubject() != null ? course.getSubject().getArea() : "",
                 course.getTeacher() != null ? fullName(course.getTeacher().getProfile()) : "Sin asignar",
-                Boolean.TRUE.equals(course.getIsActive()) ? "ACTIVO" : "INACTIVO"
+                Boolean.TRUE.equals(course.getIsActive()) ? "ACTIVO" : "INACTIVO",
+                course.getTeacher() != null ? course.getTeacher().getId() : null,
+                course.getSubject() != null ? course.getSubject().getId() : null,
+                course.getAcademicYear() != null ? course.getAcademicYear().getId() : null,
+                course.getSection(), course.getRoom(), course.getMaxStudents()
         );
     }
 
@@ -431,7 +582,10 @@ public class AdminAcademicController {
                 section.getTutorTeacher() != null ? fullName(section.getTutorTeacher().getProfile()) : "Sin tutor",
                 section.getCapacity(),
                 section.getEnrolledCount(),
-                Boolean.TRUE.equals(section.getIsActive()) ? "ACTIVO" : "INACTIVO"
+                Boolean.TRUE.equals(section.getIsActive()) ? "ACTIVO" : "INACTIVO",
+                section.getTutorTeacher() != null ? section.getTutorTeacher().getId() : null,
+                section.getAcademicYear() != null ? section.getAcademicYear().getId() : null,
+                section.getRoom()
         );
     }
 
@@ -443,12 +597,14 @@ public class AdminAcademicController {
                 task.getDescription(),
                 course != null ? course.getName() : "",
                 task.getTeacher() != null ? fullName(task.getTeacher().getProfile()) : "",
-                "Primaria",
-                course != null ? course.getGradeLevel() + " Primaria" : "",
+                course != null ? level(course) : "",
+                course != null ? course.getGradeLevel() + " " + level(course) : "",
                 course != null ? course.getSection() : "A",
                 task.getPublishedAt() != null ? task.getPublishedAt().toLocalDate().toString() : "",
                 task.getDueAt() != null ? task.getDueAt().toLocalDate().toString() : "",
-                task.getStatus()
+                task.getStatus(),
+                course != null ? course.getId() : null,
+                task.getMaxScore(), task.getTaskType(), task.getAllowLateSubmission()
         );
     }
 
@@ -461,7 +617,10 @@ public class AdminAcademicController {
                 grade.getBimester(),
                 grade.getScore(),
                 grade.getRegisteredAt() != null ? grade.getRegisteredAt().toLocalDate().toString() : "",
-                grade.getStatus()
+                grade.getStatus(),
+                grade.getStudent() != null ? grade.getStudent().getId() : null,
+                grade.getCourse() != null ? grade.getCourse().getId() : null,
+                grade.getObservation(), grade.getEvaluationType()
         );
     }
 
@@ -472,11 +631,13 @@ public class AdminAcademicController {
                 announcement.getTitle(),
                 announcement.getContent(),
                 announcement.getAudience(),
-                course != null ? "Primaria" : null,
-                course != null ? course.getGradeLevel() + " Primaria" : null,
+                course != null ? level(course) : null,
+                course != null ? course.getGradeLevel() + " " + level(course) : null,
                 course != null ? course.getSection() : null,
                 announcement.getPublishedAt() != null ? announcement.getPublishedAt().toLocalDate().toString() : "",
-                announcement.getStatus()
+                announcement.getStatus(),
+                course != null ? course.getId() : null,
+                announcement.getExpiresAt(), announcement.getPinned()
         );
     }
 
@@ -486,19 +647,19 @@ public class AdminAcademicController {
     public record AcademicYearResponse(Integer id, Integer anio, Boolean activo) {
     }
 
-    public record CourseResponse(Integer id, String nombre, String codigo, String nivel, String grado, String area, String docenteAsignado, String estado) {
+    public record CourseResponse(Integer id, String nombre, String codigo, String nivel, String grado, String area, String docenteAsignado, String estado, Integer docenteId, Integer materiaId, Integer anioAcademicoId, String seccion, String aula, Integer maximoEstudiantes) {
     }
 
-    public record SectionResponse(Integer id, String nivel, String grado, String seccion, String tutor, Integer capacidad, Integer matriculados, String estado) {
+    public record SectionResponse(Integer id, String nivel, String grado, String seccion, String tutor, Integer capacidad, Integer matriculados, String estado, Integer tutorId, Integer anioAcademicoId, String aula) {
     }
 
-    public record HomeworkResponse(Integer id, String titulo, String descripcion, String curso, String docente, String nivel, String grado, String seccion, String fechaPublicacion, String fechaEntrega, String estado) {
+    public record HomeworkResponse(Integer id, String titulo, String descripcion, String curso, String docente, String nivel, String grado, String seccion, String fechaPublicacion, String fechaEntrega, String estado, Integer cursoId, BigDecimal puntajeMaximo, String tipo, Boolean permitirEntregaTardia) {
     }
 
-    public record GradeResponse(Integer id, String alumno, String curso, String docente, String bimestre, BigDecimal nota, String fechaRegistro, String estado) {
+    public record GradeResponse(Integer id, String alumno, String curso, String docente, String bimestre, BigDecimal nota, String fechaRegistro, String estado, Integer alumnoId, Integer cursoId, String comentario, String tipoEvaluacion) {
     }
 
-    public record AnnouncementResponse(Integer id, String titulo, String contenido, String destinatario, String nivel, String grado, String seccion, String fechaPublicacion, String estado) {
+    public record AnnouncementResponse(Integer id, String titulo, String contenido, String destinatario, String nivel, String grado, String seccion, String fechaPublicacion, String estado, Integer cursoId, LocalDateTime fechaExpiracion, Boolean fijado) {
     }
 
     public record CreateCourseRequest(String nombre, @NotBlank String codigo, String nivel, @NotBlank String grado, String seccion, String area, String materia, Integer materiaId, @NotNull Integer docenteId, Integer anioAcademicoId, String aula, Integer maximoEstudiantes, Boolean activo) {
@@ -507,13 +668,13 @@ public class AdminAcademicController {
     public record CreateSectionRequest(String nivel, @NotBlank String grado, String seccion, String nombre, Integer tutorId, String aula, Integer anioAcademicoId, Integer capacidad, Boolean activo) {
     }
 
-    public record CreateTaskRequest(@NotNull Integer cursoId, @NotBlank String titulo, String descripcion, LocalDateTime fechaPublicacion, @NotNull LocalDateTime fechaEntrega, BigDecimal puntajeMaximo, String tipo, Boolean permitirEntregaTardia) {
+    public record CreateTaskRequest(@NotNull Integer cursoId, @NotBlank String titulo, String descripcion, LocalDateTime fechaPublicacion, @NotNull LocalDateTime fechaEntrega, BigDecimal puntajeMaximo, String tipo, Boolean permitirEntregaTardia, String estado) {
     }
 
-    public record CreateGradeRequest(@NotNull Integer alumnoId, @NotNull Integer cursoId, String bimestre, @NotNull BigDecimal nota, String tipoEvaluacion, String comentario) {
+    public record CreateGradeRequest(@NotNull Integer alumnoId, @NotNull Integer cursoId, String bimestre, @NotNull BigDecimal nota, String tipoEvaluacion, String comentario, String estado) {
     }
 
-    public record CreateAnnouncementRequest(@NotBlank String titulo, String contenido, String cuerpo, String destinatario, String publicoObjetivo, Boolean fijado, LocalDateTime fechaPublicacion, LocalDateTime fechaExpiracion, Long autorId, Integer cursoId) {
+    public record CreateAnnouncementRequest(@NotBlank String titulo, String contenido, String cuerpo, String destinatario, String publicoObjetivo, Boolean fijado, LocalDateTime fechaPublicacion, LocalDateTime fechaExpiracion, Long autorId, Integer cursoId, String estado) {
     }
 
     public record UpdateStatusRequest(@NotBlank String estado) {

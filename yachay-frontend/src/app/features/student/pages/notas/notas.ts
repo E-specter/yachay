@@ -1,35 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { StudentPortalService } from '../../../../core/services/student-portal';
 
-interface StudentGrade {
-  curso: string;
-  docente: string;
-  bimestre: 'I' | 'II' | 'III' | 'IV';
-  nota: number;
-  observacion: string;
-  fechaRegistro: string;
-}
+interface StudentGrade { id: number; curso: string; docente: string; bimestre: 'I' | 'II' | 'III' | 'IV'; nota: number; observacion: string; fechaRegistro: string; }
 
-@Component({
-  selector: 'app-student-notas',
-  imports: [],
-  templateUrl: './notas.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class StudentNotas {
-  readonly search = signal('');
-
-  readonly grades: readonly StudentGrade[] = [
-    { curso: 'Matemática III', docente: 'Miguel Campos Flores', bimestre: 'I', nota: 17, observacion: 'Rendimiento sostenido.', fechaRegistro: '2026-05-04' },
-    { curso: 'Comunicación III', docente: 'Rosa Vargas Medina', bimestre: 'I', nota: 16, observacion: 'Buena comprensión lectora.', fechaRegistro: '2026-05-03' },
-    { curso: 'Inglés III', docente: 'Patricia López Rivas', bimestre: 'I', nota: 15, observacion: 'Reforzar pronunciación.', fechaRegistro: '2026-05-02' },
-  ];
-
-  readonly filteredGrades = computed(() => {
-    const query = this.search().trim().toLowerCase();
-    return this.grades.filter((grade) => `${grade.curso} ${grade.docente} ${grade.bimestre}`.toLowerCase().includes(query));
-  });
-
-  updateSearch(event: Event): void {
-    this.search.set((event.target as HTMLInputElement).value);
-  }
+@Component({ selector: 'app-student-notas', imports: [], templateUrl: './notas.html', changeDetection: ChangeDetectionStrategy.OnPush })
+export class StudentNotas implements OnInit {
+  private readonly portal = inject(StudentPortalService);
+  readonly search = signal(''); readonly grades = signal<StudentGrade[]>([]); readonly loading = signal(false); readonly errorMessage = signal('');
+  readonly filteredGrades = computed(() => { const query = this.search().trim().toLowerCase(); return this.grades().filter((grade) => `${grade.curso} ${grade.docente} ${grade.bimestre}`.toLowerCase().includes(query)); });
+  ngOnInit(): void { this.load(); }
+  load(): void { this.loading.set(true); this.errorMessage.set(''); this.portal.getGrades<StudentGrade[]>().subscribe({ next: (items) => { this.grades.set(items); this.loading.set(false); }, error: () => { this.errorMessage.set('No se pudieron cargar tus notas.'); this.loading.set(false); } }); }
+  updateSearch(event: Event): void { this.search.set((event.target as HTMLInputElement).value); }
 }

@@ -1,29 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
+import { TeacherPortalService } from '../../../../core/services/teacher-portal';
 
-interface TeacherProfile {
-  nombres: string;
-  apellidos: string;
-  email: string;
-  documento: string;
-  especialidad: string;
-  telefono: string;
-  estado: string;
-}
+interface TeacherProfile { codigo: string; nombres: string; apellidos: string; documento: string; correoInstitucional: string; especialidad: string; telefono: string; fechaContratacion: string; institucion: string; }
+const EMPTY: TeacherProfile = { codigo: '', nombres: '', apellidos: '', documento: '', correoInstitucional: '', especialidad: '', telefono: '', fechaContratacion: '', institucion: '' };
 
-@Component({
-  selector: 'app-teacher-perfil',
-  imports: [],
-  templateUrl: './perfil.html',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-})
-export class TeacherPerfil {
-  readonly profile: TeacherProfile = {
-    nombres: 'Rosa Elena',
-    apellidos: 'Vargas Medina',
-    email: 'rvargas@mgp.edu.pe',
-    documento: 'DNI 45678123',
-    especialidad: 'Comunicación',
-    telefono: '987654320',
-    estado: 'ACTIVO',
-  };
+@Component({ selector: 'app-teacher-perfil', imports: [], templateUrl: './perfil.html', changeDetection: ChangeDetectionStrategy.OnPush })
+export class TeacherPerfil implements OnInit {
+  private readonly portal = inject(TeacherPortalService); readonly profile = signal<TeacherProfile>(EMPTY); readonly errorMessage = signal('');
+  ngOnInit(): void { this.portal.getProfile<TeacherProfile>().subscribe({ next: (item) => this.profile.set(item), error: () => this.errorMessage.set('No se pudo cargar el perfil docente.') }); }
 }

@@ -11,6 +11,8 @@ public record CalendarEventResponse(
         String eventType,
         String courseName,
         String sectionName,
-        String audience
+        String audience,
+        Integer courseId,
+        String status
 ) {
 }

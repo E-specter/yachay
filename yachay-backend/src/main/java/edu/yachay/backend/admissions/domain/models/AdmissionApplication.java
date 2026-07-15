@@ -1,5 +1,6 @@
 package edu.yachay.backend.admissions.domain.models;
 
+import edu.yachay.backend.identity.domain.models.StudentProfile;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.*;
@@ -46,6 +47,13 @@ public class AdmissionApplication {
 
     @Column(name = "observations", length = 1000)
     private String observations;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "student_profile_id", unique = true)
+    private StudentProfile studentProfile;
+
+    @Column(name = "decided_at")
+    private LocalDateTime decidedAt;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

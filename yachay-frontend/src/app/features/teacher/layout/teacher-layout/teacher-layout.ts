@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   Router,
   RouterLink,
@@ -30,6 +31,7 @@ export class TeacherLayout implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly notificationService = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly sidebarCollapsed = signal(false);
   readonly mobileSidebarOpen = signal(false);
@@ -38,7 +40,7 @@ export class TeacherLayout implements OnInit {
   readonly notifications = signal<UserNotification[]>([]);
   readonly notificationError = signal('');
 
-  readonly userName = 'Jesus Gabriel';
+  readonly userName = computed(() => this.authService.user()?.displayName || 'Docente');
   readonly roleLabel = 'Docente';
   readonly sectionTitle = 'Panel docente';
   readonly profilePath = '/docente/perfil';
@@ -74,6 +76,11 @@ export class TeacherLayout implements OnInit {
 
   ngOnInit(): void {
     this.loadNotifications();
+    this.notificationService.changes$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((role) => {
+        if (role === 'DOCENTE') this.loadNotifications();
+      });
   }
 
   openMobileSidebar(): void {

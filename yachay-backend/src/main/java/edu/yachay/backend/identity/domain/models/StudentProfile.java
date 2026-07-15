@@ -35,11 +35,23 @@ public class StudentProfile {
     @Column(name = "grade_level", nullable = false)
     private Short gradeLevel;
 
+    @Column(name = "education_level", length = 30)
+    private String educationLevel;
+
     @Column(name = "section", length = 20)
     private String section;
 
     @Column(name = "enrollment_date", nullable = false)
     private LocalDate enrollmentDate;
+
+    @Column(name = "guardian_name", length = 255)
+    private String guardianName;
+
+    @Column(name = "guardian_email", length = 255)
+    private String guardianEmail;
+
+    @Column(name = "guardian_phone", length = 20)
+    private String guardianPhone;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

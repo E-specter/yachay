@@ -1,5 +1,9 @@
 package edu.yachay.backend.report;
 
+import edu.yachay.backend.academic.domain.models.Course;
+import edu.yachay.backend.academic.domain.models.GradeRecord;
+import edu.yachay.backend.academic.domain.repositories.CourseRepository;
+import edu.yachay.backend.academic.domain.repositories.GradeRecordRepository;
 import edu.yachay.backend.admissions.domain.models.AdmissionApplication;
 import edu.yachay.backend.admissions.domain.repositories.AdmissionApplicationRepository;
 import edu.yachay.backend.identity.domain.models.*;
@@ -20,17 +24,23 @@ public class ExcelReportService {
     private final TeacherProfileRepository teacherProfileRepository;
     private final UserRepository userRepository;
     private final AdmissionApplicationRepository admissionApplicationRepository;
+    private final CourseRepository courseRepository;
+    private final GradeRecordRepository gradeRecordRepository;
 
     public ExcelReportService(
             StudentProfileRepository studentProfileRepository,
             TeacherProfileRepository teacherProfileRepository,
             UserRepository userRepository,
-            AdmissionApplicationRepository admissionApplicationRepository
+            AdmissionApplicationRepository admissionApplicationRepository,
+            CourseRepository courseRepository,
+            GradeRecordRepository gradeRecordRepository
     ) {
         this.studentProfileRepository = studentProfileRepository;
         this.teacherProfileRepository = teacherProfileRepository;
         this.userRepository = userRepository;
         this.admissionApplicationRepository = admissionApplicationRepository;
+        this.courseRepository = courseRepository;
+        this.gradeRecordRepository = gradeRecordRepository;
     }
 
     @Transactional(readOnly = true)
@@ -121,11 +131,35 @@ public class ExcelReportService {
         });
     }
 
+    @Transactional(readOnly = true)
     public byte[] buildCoursesReport() {
-        return buildPreparedReport(
-                "Cursos",
-                "El backend actual aun no contiene entidad/repositorio de cursos. El endpoint queda preparado para conectar el modulo academico."
-        );
+        List<Course> courses = courseRepository.findAll();
+
+        return createWorkbook("Cursos", List.of(
+                "ID", "Codigo", "Curso", "Materia", "Docente", "Anio", "Grado", "Seccion", "Aula", "Vacantes", "Estado"
+        ), (sheet, headerStyle) -> {
+            writeHeader(sheet, headerStyle, List.of(
+                    "ID", "Codigo", "Curso", "Materia", "Docente", "Anio", "Grado", "Seccion", "Aula", "Vacantes", "Estado"
+            ));
+
+            int rowIndex = 1;
+            for (Course course : courses) {
+                Row row = sheet.createRow(rowIndex++);
+                writeCells(row,
+                        course.getId(),
+                        value(course.getCode()),
+                        value(course.getName()),
+                        course.getSubject() != null ? value(course.getSubject().getName()) : "",
+                        course.getTeacher() != null ? fullName(course.getTeacher().getProfile()) : "",
+                        course.getAcademicYear() != null ? course.getAcademicYear().getYear() : "",
+                        course.getGradeLevel(),
+                        value(course.getSection()),
+                        value(course.getRoom()),
+                        course.getMaxStudents(),
+                        Boolean.TRUE.equals(course.getIsActive()) ? "ACTIVO" : "INACTIVO"
+                );
+            }
+        });
     }
 
     @Transactional(readOnly = true)
@@ -158,18 +192,33 @@ public class ExcelReportService {
         });
     }
 
+    @Transactional(readOnly = true)
     public byte[] buildGradesReport() {
-        return buildPreparedReport(
-                "Notas",
-                "El backend actual aun no contiene entidad/repositorio de notas. El endpoint queda preparado para calificaciones."
-        );
-    }
+        List<GradeRecord> grades = gradeRecordRepository.findAll();
 
-    private byte[] buildPreparedReport(String sheetName, String detail) {
-        return createWorkbook(sheetName, List.of("Modulo", "Estado", "Detalle"), (sheet, headerStyle) -> {
-            writeHeader(sheet, headerStyle, List.of("Modulo", "Estado", "Detalle"));
-            Row row = sheet.createRow(1);
-            writeCells(row, sheetName, "Preparado", detail);
+        return createWorkbook("Notas", List.of(
+                "ID", "Alumno", "Curso", "Docente", "Bimestre", "Nota", "Tipo", "Observacion", "Registro", "Estado"
+        ), (sheet, headerStyle) -> {
+            writeHeader(sheet, headerStyle, List.of(
+                    "ID", "Alumno", "Curso", "Docente", "Bimestre", "Nota", "Tipo", "Observacion", "Registro", "Estado"
+            ));
+
+            int rowIndex = 1;
+            for (GradeRecord grade : grades) {
+                Row row = sheet.createRow(rowIndex++);
+                writeCells(row,
+                        grade.getId(),
+                        grade.getStudent() != null ? fullName(grade.getStudent().getProfile()) : "",
+                        grade.getCourse() != null ? value(grade.getCourse().getName()) : "",
+                        grade.getTeacher() != null ? fullName(grade.getTeacher().getProfile()) : "",
+                        value(grade.getBimester()),
+                        grade.getScore(),
+                        value(grade.getEvaluationType()),
+                        value(grade.getObservation()),
+                        grade.getRegisteredAt(),
+                        value(grade.getStatus())
+                );
+            }
         });
     }
 

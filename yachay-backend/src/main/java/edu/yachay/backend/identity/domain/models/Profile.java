@@ -37,6 +37,12 @@ public class Profile {
     @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
 
+    @Column(name = "document_type", length = 20)
+    private String documentType;
+
+    @Column(name = "document_number", length = 30)
+    private String documentNumber;
+
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 

@@ -32,3 +32,10 @@ whatsapp:
   enabled: false
   token: CAMBIAR_TOKEN
   phone-number-id: CAMBIAR_PHONE_NUMBER_ID
+
+app:
+  frontend-url: http://localhost:4200
+  seed:
+    enabled: true
+  cors:
+    allowed-origins: http://localhost:4200,http://127.0.0.1:4200

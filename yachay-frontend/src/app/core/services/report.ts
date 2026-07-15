@@ -52,7 +52,7 @@ export class ReportService {
     view.URL.revokeObjectURL(url);
   }
 
-  handleDownloadError(filename: string, error: unknown): void {
+  handleDownloadError(filename: string, error: unknown): string {
     const httpError = error instanceof HttpErrorResponse ? error : null;
 
     console.error(`Error descargando ${filename}`, {
@@ -63,11 +63,9 @@ export class ReportService {
       error: httpError?.error,
     });
 
-    if (!this.isBrowser) return;
-
-    this.document.defaultView?.alert(
-      'No se pudo descargar el reporte. Revisa la consola para ver el detalle.',
-    );
+    return httpError?.status === 403
+      ? 'No tienes permisos para descargar este reporte.'
+      : 'No se pudo descargar el reporte. Intenta nuevamente.';
   }
 
   private download(endpoint: string): Observable<Blob> {

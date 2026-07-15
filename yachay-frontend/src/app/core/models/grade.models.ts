@@ -10,6 +10,10 @@ export interface GradeRecord {
   nota: number;
   fechaRegistro: string;
   estado: GradeStatus;
+  alumnoId?: number;
+  cursoId?: number;
+  comentario?: string;
+  tipoEvaluacion?: string;
 }
 
 export interface CreateGradeRecordRequest {

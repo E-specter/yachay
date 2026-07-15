@@ -14,8 +14,16 @@ export class StudentPortalService {
     return this.http.get<T>(`${API_URL}/alumno/cursos`);
   }
 
+  getCourse<T>(id: number): Observable<T> {
+    return this.http.get<T>(`${API_URL}/alumno/cursos/${id}`);
+  }
+
   getHomeworks<T>(): Observable<T> {
     return this.http.get<T>(`${API_URL}/alumno/tareas`);
+  }
+
+  getHomework<T>(id: number): Observable<T> {
+    return this.http.get<T>(`${API_URL}/alumno/tareas/${id}`);
   }
 
   submitHomework<T>(id: number, payload: unknown): Observable<T> {
@@ -28,6 +36,10 @@ export class StudentPortalService {
 
   getAnnouncements<T>(): Observable<T> {
     return this.http.get<T>(`${API_URL}/alumno/comunicados`);
+  }
+
+  getAnnouncement<T>(id: number): Observable<T> {
+    return this.http.get<T>(`${API_URL}/alumno/comunicados/${id}`);
   }
 
   markAnnouncementAsRead<T>(id: number): Observable<T> {

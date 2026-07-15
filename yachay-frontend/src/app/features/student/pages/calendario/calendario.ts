@@ -24,6 +24,7 @@ export class StudentCalendario implements OnInit {
   readonly errorMessage = signal('');
   readonly notice = signal('');
   readonly selectedType = signal('TODOS');
+  readonly weekOffset = signal(0);
 
   readonly eventTypes = ['CLASE', 'EXAMEN', 'COMUNICADO', 'TAREA', 'FERIADO', 'OTRO'] as const;
   readonly timeSlots = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00'] as const;
@@ -56,6 +57,13 @@ export class StudentCalendario implements OnInit {
 
   readonly weeklyEvents = computed(() =>
     this.filteredEvents()
+      .filter((event) => {
+        const start = this.weekStart(this.weekOffset());
+        const end = new Date(start);
+        end.setDate(end.getDate() + 7);
+        const date = new Date(event.startDateTime);
+        return date >= start && date < end;
+      })
       .slice()
       .sort((left, right) => left.startDateTime.localeCompare(right.startDateTime))
       .slice(0, 12),
@@ -84,15 +92,18 @@ export class StudentCalendario implements OnInit {
   }
 
   goToday(): void {
-    this.notice.set('Mostrando tus próximos eventos registrados.');
+    this.weekOffset.set(0);
+    this.notice.set('Mostrando la semana actual.');
   }
 
   goPrevious(): void {
-    this.notice.set('Seleccionaste la semana anterior.');
+    this.weekOffset.update((value) => value - 1);
+    this.notice.set('Mostrando la semana anterior.');
   }
 
   goNext(): void {
-    this.notice.set('Seleccionaste la semana siguiente.');
+    this.weekOffset.update((value) => value + 1);
+    this.notice.set('Mostrando la semana siguiente.');
   }
 
   setFilter(type: string): void {
@@ -135,5 +146,13 @@ export class StudentCalendario implements OnInit {
       hour: '2-digit',
       minute: '2-digit',
     }).format(new Date(value));
+  }
+
+  private weekStart(offset: number): Date {
+    const date = new Date();
+    const day = date.getDay() || 7;
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - day + 1 + offset * 7);
+    return date;
   }
 }

@@ -25,6 +25,10 @@ export class AdmissionService {
     return this.http.get<AdmissionApplication[]>(`${API_URL}/admin/postulaciones`);
   }
 
+  getApplication(id: number): Observable<AdmissionApplication> {
+    return this.http.get<AdmissionApplication>(`${API_URL}/admin/postulaciones/${id}`);
+  }
+
   acceptApplication(id: number, payload: AdmissionDecisionRequest): Observable<AdmissionApplication> {
     return this.http.patch<AdmissionApplication>(`${API_URL}/admin/postulaciones/${id}/aceptar`, payload);
   }

@@ -23,6 +23,7 @@ export class Usuarios {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -30,7 +31,7 @@ export class Usuarios {
     nombres: ['', Validators.required],
     apellidos: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    passwordTemporal: ['Yachay123456', [Validators.required, Validators.minLength(8)]],
+    passwordTemporal: ['Yachay123456', Validators.minLength(8)],
     rol: ['ALUMNO', Validators.required],
     activo: [true],
   });
@@ -51,6 +52,7 @@ export class Usuarios {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       nombres: '',
       apellidos: '',
@@ -59,6 +61,13 @@ export class Usuarios {
       rol: 'ALUMNO',
       activo: true,
     });
+    this.errorMessage.set('');
+    this.modalOpen.set(true);
+  }
+
+  editUser(user: AdminUser): void {
+    this.editingId.set(user.id);
+    this.form.reset({ nombres: user.nombres, apellidos: user.apellidos, email: user.email, passwordTemporal: '', rol: user.rol, activo: user.estado === 'ACTIVO' });
     this.errorMessage.set('');
     this.modalOpen.set(true);
   }
@@ -79,18 +88,24 @@ export class Usuarios {
     this.successMessage.set('');
 
     const raw = this.form.getRawValue();
-    this.userService.createUser({
+    const request = this.editingId() ? this.userService.updateUser(this.editingId()!, {
+      nombres: raw.nombres, apellidos: raw.apellidos, email: raw.email,
+      passwordTemporal: raw.passwordTemporal || undefined,
+      rol: raw.rol as AdminUserRole, activo: raw.activo,
+      estado: raw.activo ? 'ACTIVO' : 'INACTIVO',
+    }) : this.userService.createUser({
       nombres: raw.nombres,
       apellidos: raw.apellidos,
       email: raw.email,
       passwordTemporal: raw.passwordTemporal,
       rol: raw.rol as AdminUserRole,
       activo: raw.activo,
-    }).subscribe({
+    });
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Usuario actualizado correctamente.' : 'Registro creado correctamente.');
         this.loadUsers();
       },
       error: (error) => this.handleSaveError(error),

@@ -19,6 +19,7 @@ import {
   NivelAcademico,
   PostulanteRequest,
 } from '../../../../core/models/admission.models';
+import { AdmissionService } from '../../../../core/services/admission';
 
 type NivelControl = NivelAcademico | '';
 
@@ -62,6 +63,7 @@ type ApoderadoForm = FormGroup<{
 })
 export class Register {
   private readonly fb = inject(FormBuilder).nonNullable;
+  private readonly admissionService = inject(AdmissionService);
   private readonly postulantesLength = signal(1);
 
   readonly submitted = signal(false);
@@ -142,13 +144,22 @@ export class Register {
     const payload = this.crearPayload();
 
     this.loading.set(true);
-    console.info('Postulación pendiente para revisión:', payload);
-    this.loading.set(false);
-    this.submitted.set(false);
-    this.successMessage.set(
-      'Solicitud registrada correctamente. El administrador revisará la postulación.',
-    );
-    this.reiniciarFormulario();
+    this.admissionService.createAdmission(payload).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.submitted.set(false);
+        this.successMessage.set(
+          'Solicitud registrada correctamente. El administrador revisará la postulación.',
+        );
+        this.reiniciarFormulario();
+      },
+      error: (error: { error?: { message?: string } }) => {
+        this.loading.set(false);
+        this.errorMessage.set(
+          error.error?.message ?? 'No se pudo registrar la solicitud. Intenta nuevamente.',
+        );
+      },
+    });
   }
 
   campoInvalido(path: string): boolean {

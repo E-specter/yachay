@@ -24,13 +24,14 @@ public class WhatsappService {
 
     public NotificationResponse sendTestMessage(String to, String message) {
         if (!enabled) {
-            return new NotificationResponse(true, "WhatsApp desactivado por configuracion.");
+            return new NotificationResponse(false, "CONFIGURACION_PENDIENTE: WhatsApp esta desactivado.");
         }
 
         if (!StringUtils.hasText(token) || !StringUtils.hasText(phoneNumberId)) {
             return new NotificationResponse(false, "WhatsApp activo, pero faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID.");
         }
 
-        return new NotificationResponse(true, "WhatsApp Cloud API preparada para enviar mensaje a " + to + ".");
+        return new NotificationResponse(false,
+                "CONFIGURACION_PENDIENTE: las credenciales existen, pero el envio real de WhatsApp no fue validado.");
     }
 }

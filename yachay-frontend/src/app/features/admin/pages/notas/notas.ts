@@ -33,6 +33,7 @@ export class Notas {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -62,6 +63,7 @@ export class Notas {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       alumnoId: this.students()[0]?.id ?? 0,
       cursoId: this.courses()[0]?.id ?? 0,
@@ -72,6 +74,12 @@ export class Notas {
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
+  }
+
+  editGrade(grade: GradeRecord): void {
+    this.editingId.set(grade.id);
+    this.form.reset({ alumnoId: grade.alumnoId ?? 0, cursoId: grade.cursoId ?? 0, bimestre: grade.bimestre, nota: grade.nota, tipoEvaluacion: grade.tipoEvaluacion ?? 'Práctica calificada', comentario: grade.comentario ?? '' });
+    this.errorMessage.set(''); this.modalOpen.set(true);
   }
 
   closeCreateModal(): void {
@@ -91,18 +99,21 @@ export class Notas {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.gradeService.createGrade({
+    const payload = {
       alumnoId: Number(raw.alumnoId),
       cursoId: Number(raw.cursoId),
       bimestre: raw.bimestre as AcademicTerm,
       nota: Number(raw.nota),
       tipoEvaluacion: raw.tipoEvaluacion,
       comentario: raw.comentario,
-    }).subscribe({
+      estado: this.editingId() ? this.grades().find((item) => item.id === this.editingId())?.estado ?? 'REGISTRADA' as const : 'REGISTRADA' as const,
+    };
+    const request = this.editingId() ? this.gradeService.updateGrade(this.editingId()!, payload) : this.gradeService.createGrade(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Nota actualizada correctamente.' : 'Registro creado correctamente.');
         this.loadGrades();
       },
       error: (error) => this.handleSaveError(error),
@@ -132,12 +143,12 @@ export class Notas {
 
     this.reportService.downloadNotas().subscribe({
       next: (blob) => this.reportService.downloadFile(blob, filename),
-      error: (error) => this.reportService.handleDownloadError(filename, error),
+      error: (error) => this.errorMessage.set(this.reportService.handleDownloadError(filename, error)),
     });
   }
 
   viewGrade(grade: GradeRecord): void {
-    this.successMessage.set(`Nota seleccionada: ${grade.alumno} - ${grade.curso}`);
+    this.gradeService.getGrade(grade.id).subscribe({ next: (item) => this.successMessage.set(`${item.alumno} · ${item.curso} · Bimestre ${item.bimestre}: ${item.nota}`), error: (error) => this.handleSaveError(error) });
   }
 
   statusClass(status: GradeStatus): string {

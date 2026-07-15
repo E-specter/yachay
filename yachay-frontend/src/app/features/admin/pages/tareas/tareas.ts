@@ -27,6 +27,7 @@ export class Tareas {
   readonly loading = signal(false);
   readonly saving = signal(false);
   readonly modalOpen = signal(false);
+  readonly editingId = signal<number | null>(null);
   readonly errorMessage = signal('');
   readonly successMessage = signal('');
 
@@ -57,6 +58,7 @@ export class Tareas {
   }
 
   openCreateModal(): void {
+    this.editingId.set(null);
     this.form.reset({
       cursoId: this.courses()[0]?.id ?? 0,
       titulo: '',
@@ -68,6 +70,12 @@ export class Tareas {
     });
     this.errorMessage.set('');
     this.modalOpen.set(true);
+  }
+
+  editHomework(homework: Homework): void {
+    this.editingId.set(homework.id);
+    this.form.reset({ cursoId: homework.cursoId ?? this.courses().find((item) => item.nombre === homework.curso)?.id ?? 0, titulo: homework.titulo, descripcion: homework.descripcion, fechaEntrega: homework.fechaEntrega.slice(0, 16), puntajeMaximo: homework.puntajeMaximo ?? 20, tipo: homework.tipo ?? 'TAREA', permitirEntregaTardia: homework.permitirEntregaTardia ?? false });
+    this.errorMessage.set(''); this.modalOpen.set(true);
   }
 
   closeCreateModal(): void {
@@ -88,23 +96,26 @@ export class Tareas {
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    this.homeworkService.createHomework({
+    const payload = {
       cursoId: Number(raw.cursoId),
       titulo: raw.titulo,
       descripcion: raw.descripcion,
       nivel: course?.nivel ?? 'Primaria',
       grado: course?.grado ?? '3 Primaria',
-      seccion: 'A',
+      seccion: 'A' as const,
       fechaPublicacion: this.localDateTimeNow(),
       fechaEntrega: raw.fechaEntrega,
       puntajeMaximo: raw.puntajeMaximo,
       tipo: raw.tipo as 'TAREA' | 'PROYECTO' | 'EXAMEN' | 'PARTICIPACION',
       permitirEntregaTardia: raw.permitirEntregaTardia,
-    }).subscribe({
+      estado: this.editingId() ? this.homeworks().find((item) => item.id === this.editingId())?.estado ?? 'PUBLICADA' as const : 'PUBLICADA' as const,
+    };
+    const request = this.editingId() ? this.homeworkService.updateHomework(this.editingId()!, payload) : this.homeworkService.createHomework(payload);
+    request.subscribe({
       next: () => {
         this.saving.set(false);
         this.modalOpen.set(false);
-        this.successMessage.set('Registro creado correctamente.');
+        this.successMessage.set(this.editingId() ? 'Tarea actualizada correctamente.' : 'Registro creado correctamente.');
         this.loadHomeworks();
       },
       error: (error) => this.handleSaveError(error),
@@ -130,7 +141,7 @@ export class Tareas {
   }
 
   viewHomework(homework: Homework): void {
-    this.successMessage.set(`Tarea seleccionada: ${homework.titulo}`);
+    this.homeworkService.getHomework(homework.id).subscribe({ next: (item) => this.successMessage.set(`${item.titulo} · ${item.curso} · vence ${item.fechaEntrega}: ${item.descripcion}`), error: (error) => this.handleSaveError(error) });
   }
 
   statusClass(status: HomeworkStatus): string {

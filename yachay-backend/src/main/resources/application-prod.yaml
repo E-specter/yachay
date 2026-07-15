@@ -1,0 +1,66 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+      minimum-idle: ${DB_POOL_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT_MS:30000}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: ${MAIL_SSL_ENABLED:true}
+
+server:
+  port: ${SERVER_PORT:8080}
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+    include-stacktrace: never
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+mail:
+  from: ${MAIL_FROM}
+  from-name: ${MAIL_FROM_NAME:Yachay}
+
+ilovepdf:
+  public-key: ${ILOVEPDF_PUBLIC_KEY:project_public_7d736b1c3e606c0f25fc5c98bfd74952_V4y930ff1a912a7d136e380e341d39d0d51f9}
+  secret-key: ${ILOVEPDF_SECRET_KEY:secret_key_c3ced951d131abea89826cc289e46fa2_TxDbm4068dc59014994a2de434f4d0563a74b}
+
+whatsapp:
+  enabled: ${WHATSAPP_ENABLED}
+  token: ${WHATSAPP_TOKEN}
+  phone-number-id: ${WHATSAPP_PHONE_NUMBER_ID}
+
+app:
+  frontend-url: ${APP_FRONTEND_URL}
+  seed:
+    enabled: false
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.security: INFO

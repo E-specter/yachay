@@ -59,7 +59,7 @@ MySQL es la base oficial de Avance 3.
 ## Ejecutar backend
 
 ```powershell
-cd C:\E-specter\yachay\yachay-backend
+cd yachay-backend
 Copy-Item src\main\resources\application-local.example.yaml src\main\resources\application-local.yaml
 .\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=local"
 ```
@@ -69,7 +69,7 @@ Copy-Item src\main\resources\application-local.example.yaml src\main\resources\a
 ## Ejecutar frontend
 
 ```powershell
-cd C:\E-specter\yachay\yachay-frontend
+cd yachay-frontend
 npm install
 npm start
 ```
